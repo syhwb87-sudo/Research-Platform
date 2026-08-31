@@ -353,6 +353,12 @@ PRIDE Dashboard
 
 ## 6. 장기성과 관리 Dashboard (심화 설계)
 
+> **⚠ 재설계 공지**: 본 장의 KPI Dashboard 설계는
+> [`PRIDE_Performance_Platform_Design.md`](PRIDE_Performance_Platform_Design.md)
+> — **연구성과 자동산출·검증·누적관리 플랫폼** 설계서로 대체·확장되었다.
+> (Rule Bank, ERP 자동 매칭, 역효과·기여율 보정, 재무실 승인 워크플로, Data Lineage,
+> 10개 Dashboard 상세 설계 포함.) 본 장은 위젯 참고용으로 유지한다.
+
 ### 6.1 성과 추적 모델
 
 ```
