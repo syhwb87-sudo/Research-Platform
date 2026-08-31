@@ -77,6 +77,11 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 input.search{font:inherit;border:1px solid var(--border);border-radius:6px;padding:5px 10px;width:180px}
 .brief{background:#f0f5fc;border:1px solid #d4e2f5;border-radius:var(--radius);
   padding:12px 16px;font-size:13px}
+.achip{border:1px solid var(--border);background:var(--surface);font:inherit;font-weight:600;
+  color:var(--text-2);border-radius:20px;padding:6px 14px;cursor:pointer;display:flex;
+  align-items:center;gap:7px}
+.achip .sw{width:10px;height:10px;border-radius:3px}
+.achip.on{color:#fff;border-color:transparent}
 footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:var(--text-3)}
 .legend-note{font-size:11px;color:var(--text-3)}
 @media (max-width:1100px){.row{grid-template-columns:1fr !important}.kpis{grid-template-columns:repeat(3,1fr)}}
@@ -87,9 +92,11 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
   <h1>⛭ PRIDE<span>연구활동 종합관리 Dashboard · Demo</span></h1>
   <nav id="nav">
     <button data-p="home" class="on">홈 종합현황</button>
+    <button data-p="act">활동군 상세</button>
     <button data-p="mw">MW 분석</button>
     <button data-p="lt">장기성과</button>
     <button data-p="exec">Executive</button>
+    <button data-p="sim">시뮬레이터</button>
   </nav>
   <span class="asof" id="asof"></span>
 </header>
@@ -139,6 +146,142 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     <div class="card"><h3>⚠ Attention Needed</h3><ul class="alist" id="attn"></ul></div>
     <div class="card"><h3>📅 완료 임박 과제 (90일 내)</h3><ul class="alist" id="upcoming"></ul></div>
     <div class="card"><h3>📰 최근 활동 Feed</h3><ul class="alist" id="feed"></ul></div>
+  </div>
+</section>
+
+<!-- ─────────────── 활동군 상세 ─────────────── -->
+<section class="page" id="p-act">
+  <div class="card" style="margin-bottom:14px;padding:10px 16px">
+    <div id="actNav" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+  </div>
+
+  <!-- 전략 프로젝트 -->
+  <div class="apanel" id="ap-1">
+    <div class="row" style="grid-template-columns:repeat(4,1fr)" id="stKpis"></div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>기술분류별 연구비 (진행중)</h3>
+        <div class="sub">억원 · a3 기술분류 상위 14</div>
+        <div class="chart" id="stTech"></div></div>
+      <div class="card"><h3>과제유형 × 연구부서</h3>
+        <div class="sub">진행중 과제 기준</div>
+        <div style="display:flex;gap:8px">
+          <div class="chart" id="stType" style="width:44%"></div>
+          <div class="chart" id="stDept" style="width:56%"></div>
+        </div></div>
+    </div>
+    <div class="card"><h3>진행중 전략 프로젝트 (연구비 상위 60)</h3>
+      <div class="scroll"><table id="stTable">
+        <thead><tr><th>과제코드</th><th>과제명</th><th>연구부서</th><th>책임자</th>
+        <th class="num">연구비</th><th class="num">완료예정</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <!-- 장기 성과관리 -->
+  <div class="apanel" id="ap-2" hidden>
+    <div class="row" style="grid-template-columns:repeat(4,1fr)" id="lt2Kpis"></div>
+    <div class="card" style="text-align:center;padding:34px">
+      <div style="font-size:14px;color:var(--text-2);margin-bottom:12px">
+        장기 성과관리·확산 검토는 전용 심화 대시보드에서 제공합니다 —
+        활용상태 추적, Achievement, 미활용 분석, BEP 등 위젯 10종.</div>
+      <button onclick="go('lt')" style="font:inherit;font-weight:600;color:#fff;background:var(--brand);
+        border:0;border-radius:8px;padding:10px 22px;cursor:pointer">장기성과 대시보드 열기 →</button>
+    </div>
+  </div>
+
+  <!-- 현업·고객 문제해결 -->
+  <div class="apanel" id="ap-3" hidden>
+    <div class="row" style="grid-template-columns:repeat(5,1fr)" id="supKpis"></div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>월별 접수 vs 완료</h3>
+        <div class="sub">최근 12개월 · 격차 = 백로그 증감</div>
+        <div class="chart" id="supMonthly"></div></div>
+      <div class="card"><h3>대응부서별 요청 건수 · 평균 리드타임</h3>
+        <div class="sub">막대 = 건수 · 라벨 = 평균 리드타임(일)</div>
+        <div class="chart" id="supResp"></div></div>
+    </div>
+    <div class="card"><h3>최근 현업지원 요청 40건</h3>
+      <div class="scroll"><table id="supTable">
+        <thead><tr><th>요청명</th><th>대응부서</th><th>담당</th><th>상태</th><th class="num">요청일</th></tr></thead>
+        <tbody></tbody></table></div></div>
+  </div>
+
+  <!-- 탐색·혁신 -->
+  <div class="apanel" id="ap-4" hidden>
+    <div class="row" style="grid-template-columns:repeat(4,1fr)" id="exKpis2"></div>
+    <div class="row" style="grid-template-columns:5fr 7fr">
+      <div class="card"><h3>탐색·혁신 MW 추이</h3>
+        <div class="sub">월별 투입 MW (a2 · N/L코드) · 실패 허용 지표는 후속연결·학습기록으로 관리</div>
+        <div class="chart" id="exFlow"></div></div>
+      <div class="card"><h3>탐색·혁신 과제 목록 (전체)</h3>
+        <div class="scroll" style="max-height:300px"><table id="exTable">
+          <thead><tr><th>과제코드</th><th>과제명</th><th>연구부서</th><th>책임자</th>
+          <th class="num">착수</th><th>상태</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+  </div>
+
+  <!-- 지식자산 -->
+  <div class="apanel" id="ap-5" hidden>
+    <div class="row" style="grid-template-columns:repeat(4,1fr)" id="knKpis"></div>
+    <div class="row" style="grid-template-columns:5fr 7fr">
+      <div class="card"><h3>연도별 활동유형 추이</h3>
+        <div class="sub">논문발표 · 논문투고 · 학회참가 건수</div>
+        <div class="chart" id="knYearly"></div></div>
+      <div class="card"><h3>기술분류 × 부서 분포</h3>
+        <div style="display:flex;gap:8px">
+          <div class="chart" id="knTech" style="width:55%"></div>
+          <div class="chart" id="knDept" style="width:45%"></div>
+        </div></div>
+    </div>
+    <div class="card"><h3>최근 지식자산 활동 25건</h3>
+      <div class="scroll"><table id="knTable">
+        <thead><tr><th>구분</th><th>연구원</th><th>학회/저널</th><th>분야</th><th class="num">기안일</th></tr></thead>
+        <tbody></tbody></table></div></div>
+  </div>
+
+  <!-- 조직역량 -->
+  <div class="apanel" id="ap-6" hidden>
+    <div class="row" style="grid-template-columns:repeat(4,1fr)" id="prKpis"></div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>홍보매체 분포</h3><div class="chart" id="prMedia"></div></div>
+      <div class="card"><h3>연구그룹별 홍보 기여</h3><div class="chart" id="prGroup"></div></div>
+    </div>
+    <div class="card"><h3>기술홍보 전체 목록</h3>
+      <div class="scroll"><table id="prTable">
+        <thead><tr><th>홍보제목</th><th>매체</th><th>연구그룹</th><th>담당</th>
+        <th class="num">홍보일</th><th>상태</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+</section>
+
+<!-- ─────────────── 시뮬레이터 ─────────────── -->
+<section class="page" id="p-sim">
+  <div class="card" style="margin-bottom:14px">
+    <h3>신규 과제 투입 시뮬레이터</h3>
+    <div class="sub" id="simSub"></div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end;margin-top:8px">
+      <label style="font-size:12px;color:var(--text-2)">대상 조직<br>
+        <select id="simOrg" style="font:inherit;padding:6px 10px;border:1px solid var(--border);border-radius:6px;margin-top:4px"></select></label>
+      <label style="font-size:12px;color:var(--text-2)">신규 과제 필요 MW/월<br>
+        <input id="simMw" type="number" value="20" min="1" max="500"
+          style="font:inherit;padding:6px 10px;border:1px solid var(--border);border-radius:6px;width:120px;margin-top:4px"></label>
+      <label style="font-size:12px;color:var(--text-2)">수행 기간(개월)<br>
+        <input id="simDur" type="number" value="12" min="1" max="36"
+          style="font:inherit;padding:6px 10px;border:1px solid var(--border);border-radius:6px;width:100px;margin-top:4px"></label>
+    </div>
+  </div>
+  <div class="row" style="grid-template-columns:repeat(4,1fr)" id="simKpis"></div>
+  <div class="row" style="grid-template-columns:6fr 6fr">
+    <div class="card">
+      <h3>조직 부하율: 현재 → 신규 반영 후</h3>
+      <div class="sub">가용 = 인원 × 4.3 MW/월 · 적정 상한 90%</div>
+      <div class="chart" id="simLoad"></div>
+      <div class="brief" id="simVerdict" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <h3>배정 후보 연구원 (여력 큰 순 15명)</h3>
+      <div class="sub">여력 = 4.3 − 최근 6개월 월평균 투입 MW</div>
+      <div class="scroll" style="max-height:340px"><table id="simTable">
+        <thead><tr><th>연구원</th><th>조직</th><th class="num">월평균 투입</th>
+        <th class="num">여력 MW/월</th><th>상태</th></tr></thead><tbody></tbody></table></div>
+    </div>
   </div>
 </section>
 
@@ -617,6 +760,254 @@ document.querySelector('#top5 tbody').innerHTML = E.top5.map((p,i)=>
 document.getElementById('alerts').innerHTML = E.alerts.map(a=>
   `<li><span class="dot" style="background:var(--${a.lv==='good'?'good':'warn'})"></span>${a.t}</li>`).join('');
 document.getElementById('brief').innerHTML = '<b>한 줄 브리핑</b> — ' + E.brief;
+
+/* ══════════ 활동군 상세 탭 ══════════ */
+const DT = D.detail;
+const kpiCard = (t,v,s)=>`<div class="card"><div class="sub" style="margin:0 0 2px">${t}</div>
+  <div class="stat">${v}</div><div class="legend-note">${s||''}</div></div>`;
+
+/* 서브내비 */
+const actNav = document.getElementById('actNav');
+actNav.innerHTML = [1,2,3,4,5,6].map(a=>
+  `<button class="achip${a===1?' on':''}" data-a="${a}">
+    <span class="sw" style="background:${C[a]}"></span>${ACT[a]}</button>`).join('');
+function goAct(a){
+  actNav.querySelectorAll('.achip').forEach(b=>{
+    const on = b.dataset.a==String(a);
+    b.classList.toggle('on', on);
+    b.style.background = on ? C[b.dataset.a] : '';
+  });
+  document.querySelectorAll('.apanel').forEach(p=>p.hidden = p.id!=='ap-'+a);
+  charts.forEach(c=>c.resize());
+}
+actNav.addEventListener('click', e=>{
+  const b = e.target.closest('.achip'); if(b) goAct(+b.dataset.a);
+});
+goAct(1);
+
+/* 4.1 전략 */
+const ST = DT.strategy;
+document.getElementById('stKpis').innerHTML =
+  kpiCard('진행 과제수', nf(ST.kpi.running)+' <small>건</small>','a3 · W/N 코드 제외')+
+  kpiCard('진행 연구비', nf(ST.kpi.budget)+' <small>억원</small>','확정 연구비 합계')+
+  kpiCard('집행률', ST.kpi.execRate+'<small>%</small>','집행예산 ÷ 연구비')+
+  kpiCard('투입 MW', nf(ST.kpi.mw)+' <small>MW</small>','2023~2026 누적');
+mk('stTech', {
+  tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b>억원`}),
+  series:[{type:'treemap',roam:false,nodeClick:false,breadcrumb:{show:false},
+    itemStyle:{gapWidth:2,borderColor:SURF},
+    label:{fontSize:11,formatter:p=>`${p.name}\n${nf(p.value)}억`},
+    color:['#2a78d6','#4a89dd','#6a9ae3','#8aabe9','#a9bdef','#1baf7a','#4dbf95',
+           '#eda100','#f0b23a','#e87ba4','#eb6834','#98a2b3','#748094','#5b6472'],
+    data:ST.techTreemap}]
+});
+mk('stType', {
+  tooltip:tip({formatter:p=>`${p.name} <b>${nf(p.value)}건</b> (${p.percent}%)`}),
+  legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}},
+  series:[{type:'pie',radius:['45%','70%'],center:['50%','42%'],
+    itemStyle:{borderColor:SURF,borderWidth:2},label:{show:false},
+    color:['#2a78d6','#6a9ae3','#a9bdef','#1baf7a','#eda100','#e87ba4','#98a2b3'],
+    data:ST.typeDist.map(([n,v])=>({name:n,value:v}))}]
+});
+mk('stDept', {
+  tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b>건`}),
+  grid:{left:110,right:30,top:8,bottom:20},
+  xAxis:axisY({type:'value'}),
+  yAxis:axisX({type:'category',data:ST.deptBar.map(x=>x[0]).reverse(),axisLabel:{fontSize:10}}),
+  series:[{type:'bar',barMaxWidth:14,color:C[1],itemStyle:{borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',fontSize:10,color:INK2},
+    data:ST.deptBar.map(x=>x[1]).reverse()}]
+});
+document.querySelector('#stTable tbody').innerHTML = ST.projects.map(p=>
+  `<tr><td>${p.code}</td><td>${p.name}</td><td>${p.dept}</td><td>${p.leader}</td>
+   <td class="num">${nf(p.budget)}억</td><td class="num">${p.end}</td></tr>`).join('');
+
+/* 4.2 장기성과 (요약 + 링크) */
+document.getElementById('lt2Kpis').innerHTML =
+  kpiCard('추적대상', nf(L.tracked)+' <small>건</small>','완료 후 1~5년차')+
+  kpiCard('장기 활용률', L.utilRate+'<small>%</small>','')+
+  kpiCard('Achievement', L.achievement+'<small>%</small>','DEMO 시뮬레이션')+
+  kpiCard('누적 실현이익', nf(L.cumRealized)+' <small>억원</small>','');
+
+/* 4.3 현업지원 */
+const SP = D.support, SPD = DT.support;
+document.getElementById('supKpis').innerHTML =
+  kpiCard('접수 누계', nf(SP.total)+' <small>건</small>','a4 전체')+
+  kpiCard('완료율', SP.doneRate+'<small>%</small>', nf(SP.done)+'건 완료')+
+  kpiCard('평균 리드타임', SP.avgLead+' <small>일</small>','요청→완료')+
+  kpiCard('진행중', nf(SP.open)+' <small>건</small>','미결 요청')+
+  kpiCard('지연', SP.delayedOpen+' <small>건</small>','⚠ 조치 필요');
+mk('supMonthly', {
+  tooltip:tip({trigger:'axis'}),
+  legend:{top:0,right:0,itemWidth:12,itemHeight:8,textStyle:{fontSize:11,color:INK2}},
+  grid:{left:40,right:10,top:28,bottom:24},
+  xAxis:axisX({type:'category',data:SP.months}),
+  yAxis:axisY({type:'value',name:'건',nameTextStyle:{color:INK3}}),
+  series:[
+    {name:'접수',type:'line',color:C[3],lineStyle:{width:2.5},symbol:'circle',symbolSize:7,data:SP.recv},
+    {name:'완료',type:'line',color:'#1e8e5a',lineStyle:{width:2.5},symbol:'circle',symbolSize:7,data:SP.doneM},
+  ]
+});
+mk('supResp', {
+  tooltip:tip({formatter:p=>`${p.name}<br>요청 <b>${SPD.byResp[p.dataIndex][1]}</b>건 · 평균 리드 <b>${SPD.byResp[p.dataIndex][2]}</b>일`}),
+  grid:{left:190,right:60,top:8,bottom:20},
+  xAxis:axisY({type:'value',name:'건',nameTextStyle:{color:INK3}}),
+  yAxis:axisX({type:'category',data:SPD.byResp.map(x=>x[0]).reverse(),axisLabel:{fontSize:10}}),
+  series:[{type:'bar',barMaxWidth:16,color:C[3],itemStyle:{borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',fontSize:10,color:INK2,
+      formatter:p=>`${p.value}건 · ${SPD.byResp[SPD.byResp.length-1-p.dataIndex][2]}일`},
+    data:SPD.byResp.map(x=>x[1]).reverse()}]
+});
+document.querySelector('#supTable tbody').innerHTML = SPD.recent.map(r=>
+  `<tr><td>${r.name}${r.delayed?' <span class="pill r">지연</span>':''}</td>
+   <td>${r.resp}</td><td>${r.owner}</td><td>${r.status}</td><td class="num">${r.date}</td></tr>`).join('');
+
+/* 4.4 탐색·혁신 */
+const EX = DT.explore;
+document.getElementById('exKpis2').innerHTML =
+  kpiCard('과제 누계', nf(EX.kpi.total)+' <small>건</small>','a3 N코드')+
+  kpiCard('진행중', EX.kpi.running+' <small>건</small>','')+
+  kpiCard('투입 MW', nf(EX.kpi.mw)+' <small>MW</small>','a2 N/L코드')+
+  kpiCard('MW 비중', EX.kpi.share+'<small>%</small>','목표 15% ⚠');
+mk('exFlow', {
+  tooltip:tip({trigger:'axis'}),
+  grid:{left:44,right:10,top:14,bottom:24},
+  xAxis:axisX({type:'category',data:D.home.mwYms}),
+  yAxis:axisY({type:'value',name:'MW',nameTextStyle:{color:INK3}}),
+  series:[{name:ACT[4],type:'line',areaStyle:{opacity:.4},symbol:'none',
+    lineStyle:{width:2},color:C[4],data:D.home.mwMonthly[4]}]
+});
+document.querySelector('#exTable tbody').innerHTML = EX.projects.map(p=>
+  `<tr><td>${p.code}</td><td>${p.name}</td><td>${p.dept}</td><td>${p.leader}</td>
+   <td class="num">${p.start}</td><td>${p.status}</td></tr>`).join('');
+
+/* 4.5 지식자산 */
+const KN = D.knowledge, KND = DT.knowledge;
+document.getElementById('knKpis').innerHTML =
+  kpiCard('금년 활동', KN.cur+' <small>건</small>','전년 '+KN.prev+'건')+
+  kpiCard('금년 논문', KN.papersCur+' <small>건</small>','발표+투고')+
+  kpiCard('활동 연구원', KN.people+' <small>명</small>','전체 기간')+
+  kpiCard('누계', nf(D.meta.rows.a5)+' <small>건</small>','a5 전체');
+mk('knYearly', {
+  tooltip:tip({trigger:'axis',axisPointer:{type:'shadow'}}),
+  legend:{top:0,right:0,itemWidth:12,itemHeight:8,textStyle:{fontSize:11,color:INK2}},
+  grid:{left:36,right:10,top:28,bottom:24},
+  xAxis:axisX({type:'category',data:KN.years}),
+  yAxis:axisY({type:'value'}),
+  series:[['논문발표',C[5]],['논문투고','#d9a0bb'],['학회참가','#98a2b3']].map(([k,col],i,arr)=>({
+    name:k,type:'bar',stack:'k',barMaxWidth:26,color:col,
+    itemStyle:{borderColor:SURF,borderWidth:1,borderRadius:i===arr.length-1?[4,4,0,0]:0},
+    data:KN.series[k]}))
+});
+mk('knTech', {
+  tooltip:tip({formatter:p=>`${p.name}<br><b>${p.value}</b>건`}),
+  grid:{left:120,right:26,top:8,bottom:20},
+  xAxis:axisY({type:'value'}),
+  yAxis:axisX({type:'category',data:KND.byTech.map(x=>x[0]).reverse(),axisLabel:{fontSize:10}}),
+  series:[{type:'bar',barMaxWidth:12,color:C[5],itemStyle:{borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',fontSize:10,color:INK2},
+    data:KND.byTech.map(x=>x[1]).reverse()}]
+});
+mk('knDept', {
+  tooltip:tip({formatter:p=>`${p.name}<br><b>${p.value}</b>건`}),
+  grid:{left:100,right:26,top:8,bottom:20},
+  xAxis:axisY({type:'value'}),
+  yAxis:axisX({type:'category',data:KND.byDept.map(x=>x[0]).reverse(),axisLabel:{fontSize:10}}),
+  series:[{type:'bar',barMaxWidth:12,color:'#d9a0bb',itemStyle:{borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',fontSize:10,color:INK2},
+    data:KND.byDept.map(x=>x[1]).reverse()}]
+});
+document.querySelector('#knTable tbody').innerHTML = KND.recent.map(r=>
+  `<tr><td>${r.type}</td><td>${r.person}</td><td>${r.society}</td>
+   <td>${r.field}</td><td class="num">${r.date}</td></tr>`).join('');
+
+/* 4.6 조직역량 */
+const PR = D.promotion, PRD = DT.promo;
+document.getElementById('prKpis').innerHTML =
+  kpiCard('홍보 건수', PR.total+' <small>건</small>','a6 전체')+
+  kpiCard('실행 완료', PR.done+' <small>건</small>','')+
+  kpiCard('실행률', PR.doneRate+'<small>%</small>','완료 ÷ 전체')+
+  kpiCard('매체 수', PR.media.length+'<small>+</small>','사내보·언론·유튜브 등');
+mk('prMedia', {
+  tooltip:tip({formatter:p=>`${p.name}<br><b>${p.value}</b>건`}),
+  grid:{left:120,right:26,top:8,bottom:20},
+  xAxis:axisY({type:'value'}),
+  yAxis:axisX({type:'category',data:PR.media.map(x=>x[0]).reverse(),axisLabel:{fontSize:10}}),
+  series:[{type:'bar',barMaxWidth:14,color:C[6],itemStyle:{borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',fontSize:10,color:INK2},
+    data:PR.media.map(x=>x[1]).reverse()}]
+});
+mk('prGroup', {
+  tooltip:tip({formatter:p=>`${p.name}<br><b>${p.value}</b>건`}),
+  grid:{left:120,right:26,top:8,bottom:20},
+  xAxis:axisY({type:'value'}),
+  yAxis:axisX({type:'category',data:PR.groups.map(x=>x[0]).reverse(),axisLabel:{fontSize:10}}),
+  series:[{type:'bar',barMaxWidth:14,color:'#4d9e4d',itemStyle:{borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',fontSize:10,color:INK2},
+    data:PR.groups.map(x=>x[1]).reverse()}]
+});
+document.querySelector('#prTable tbody').innerHTML = PRD.list.map(r=>
+  `<tr><td>${r.title}</td><td>${r.media}</td><td>${r.group}</td><td>${r.owner}</td>
+   <td class="num">${r.date}</td>
+   <td>${r.status==='완료'?'<span class="pill g">완료</span>':'<span class="pill y">'+r.status+'</span>'}</td></tr>`).join('');
+
+/* ══════════ 시뮬레이터 탭 ══════════ */
+const SIM = D.sim;
+document.getElementById('simSub').textContent =
+  `최근 6개월(${SIM.window[0]} ~ ${SIM.window[1]}) 실적 기반 · 가용 기준 ${SIM.capPerPerson} MW/월·인 · 설계서 5.1 ④`;
+const simOrgSel = document.getElementById('simOrg');
+simOrgSel.innerHTML = SIM.orgs.map(o=>`<option>${o.org}</option>`).join('');
+let simLoadChart = null;
+function runSim(){
+  const orgName = simOrgSel.value;
+  const o = SIM.orgs.find(x=>x.org===orgName);
+  const need = Math.max(1, +document.getElementById('simMw').value || 0);
+  const dur = Math.max(1, +document.getElementById('simDur').value || 0);
+  const loadNow = 100*o.avgMonthly/o.cap;
+  const loadAfter = 100*(o.avgMonthly+need)/o.cap;
+  const slack = o.cap - o.avgMonthly;
+  document.getElementById('simKpis').innerHTML =
+    kpiCard('조직 인원', o.people+' <small>명</small>', orgName)+
+    kpiCard('가용 MW/월', nf(o.cap)+' <small>MW</small>','인원 × 4.3')+
+    kpiCard('현재 투입 MW/월', nf(o.avgMonthly)+' <small>MW</small>','최근 6개월 평균')+
+    kpiCard('잔여 여력', nf(Math.round(slack*10)/10)+' <small>MW/월</small>',
+      slack>=need?'✓ 신규 수용 가능':'⚠ 여력 부족');
+  const opt = {
+    tooltip:tip({trigger:'axis',axisPointer:{type:'shadow'},
+      formatter:ps=>ps[0].name+'<br>'+ps.map(p=>`${p.marker}${p.seriesName} <b>${nf(Math.round(p.value*10)/10)}</b>%`).join('<br>')}),
+    legend:{top:0,right:0,itemWidth:12,itemHeight:8,textStyle:{fontSize:11,color:INK2}},
+    grid:{left:44,right:20,top:28,bottom:24},
+    xAxis:axisX({type:'category',data:['현재','신규 반영 후']}),
+    yAxis:axisY({type:'value',max:Math.max(120,Math.ceil(loadAfter/10)*10),axisLabel:{formatter:'{value}%'}}),
+    series:[
+      {name:'부하율',type:'bar',barMaxWidth:70,
+        itemStyle:{borderRadius:[4,4,0,0]},
+        label:{show:true,position:'top',fontWeight:700,color:INK1,
+          formatter:p=>Math.round(p.value)+'%'},
+        data:[{value:loadNow,itemStyle:{color:C[1]}},
+              {value:loadAfter,itemStyle:{color:loadAfter>90?'#c53030':C[1]}}]},
+      {name:'적정 상한 90%',type:'line',symbol:'none',
+        lineStyle:{color:'#b7791f',width:1.5,type:'dashed'},
+        markLine:{silent:true,symbol:'none',label:{show:false},
+          lineStyle:{color:'#b7791f',type:'dashed'},data:[{yAxis:90}]},
+        data:[90,90]},
+    ]};
+  if(!simLoadChart) simLoadChart = mk('simLoad', opt); else simLoadChart.setOption(opt);
+  const totalNeed = need*dur;
+  document.getElementById('simVerdict').innerHTML = slack>=need
+    ? `<b>수용 가능</b> — ${orgName}의 잔여 여력은 월 ${nf(Math.round(slack))} MW로, 신규 과제(월 ${need} MW × ${dur}개월 = 총 ${nf(totalNeed)} MW)를 반영해도 부하율 ${Math.round(loadAfter)}%로 ${loadAfter>90?'적정 상한(90%)을 초과하니 일부 인력 재배치를 권장합니다':'적정 범위입니다'}.`
+    : `<b>여력 부족</b> — 월 ${need} MW가 필요하나 잔여 여력은 ${nf(Math.round(slack))} MW입니다. 부하율이 ${Math.round(loadAfter)}%가 되므로 타 조직 협업 또는 기존 과제 조정이 필요합니다.`;
+  const cands = SIM.people.filter(p=>p.o===orgName)
+    .map(p=>({...p, slack: Math.max(0, SIM.capPerPerson - p.a)}))
+    .sort((a,b)=>b.slack-a.slack).slice(0,15);
+  document.querySelector('#simTable tbody').innerHTML = cands.map(p=>
+    `<tr><td>${p.n}</td><td>${p.o}</td><td class="num">${p.a.toFixed(1)}</td>
+     <td class="num"><b>${p.slack.toFixed(1)}</b></td>
+     <td>${p.a<1?'<span class="pill g">여유</span>':p.a<3.5?'<span class="pill g">배정 가능</span>':'<span class="pill y">포화 근접</span>'}</td></tr>`).join('');
+}
+['simOrg','simMw','simDur'].forEach(id=>
+  document.getElementById(id).addEventListener('input', runSim));
+runSim();
 </script>
 </body>
 </html>

@@ -17,7 +17,7 @@ python3 -m http.server 8080
 
 | 파일 | 역할 |
 |---|---|
-| `index.html` | 대시보드 본체 — 홈 종합현황 / MW 분석 / 장기성과 / Executive 4개 탭 |
+| `index.html` | 대시보드 본체 — 홈 종합현황 / 활동군 상세(6종) / MW 분석 / 장기성과 / Executive / 투입 시뮬레이터 6개 탭 |
 | `demo_data.js` | ETL 산출물 (집계 데이터, 자동생성) |
 | `etl.py` | CSV → 집계 데이터 변환 스크립트 (`python3 etl.py`로 재생성) |
 | `data/a1~a6*.csv` | 원천 Demo DB (완료평가 / ManWeek / 연구과제 / 현업지원 / 학회활동 / 기술홍보) |

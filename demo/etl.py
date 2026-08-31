@@ -97,6 +97,8 @@ def top_org(dept):
         return first
     return "기타(파견/TF 등)"
 
+person_ym = defaultdict(lambda: defaultdict(float))            # name -> ym -> mw
+
 for r in a2:
     act = classify(r["과제코드"])
     year = r.get("연도구분", "").strip()
@@ -112,6 +114,7 @@ for r in a2:
         ym = f"{year}-{i:02d}"
         mw_monthly_act[ym][act] += v
         mw_org_ym[org][ym] += v
+        person_ym[name][ym] += v
         total += v
     if total <= 0:
         continue
@@ -477,6 +480,122 @@ executive = {
               f"미활용 과제 {len(unused_projects)}건의 매몰비용 {round(sunk)}억원에 대한 Revival 심의를 권고합니다."),
 }
 
+# ──────────────────── Phase 2: 활동군 상세 + 시뮬레이터 ────────────────────
+def short(s, n):
+    s = (s or "").strip()
+    return s if len(s) <= n else s[:n - 1] + "…"
+
+def dept_short(s):
+    parts = (s or "").split()
+    return parts[0] if parts else "기타"
+
+# 4.1 전략 프로젝트 상세 (a3, W/N/L 제외)
+strat_run = [r for r in a3 if classify(r["과제코드"]) == 1 and "진행중" in r.get("진행상태", "")]
+tech_budget = defaultdict(float)
+type_dist = Counter()
+dept_cnt = Counter()
+for r in strat_run:
+    t = r.get("기술분류", "").strip()
+    if t and t != "-":
+        tech_budget[t] += money(r["연구비"])
+    type_dist[r.get("과제유형", "기타")] += 1
+    dept_cnt[dept_short(r.get("연구부서"))] += 1
+strat_budget = sum(money(r["연구비"]) for r in strat_run)
+strat_exec = sum(money(r["집행예산"]) for r in strat_run)
+strategy_detail = {
+    "kpi": {"running": len(strat_run), "budget": eok(strat_budget),
+            "execRate": round(100 * strat_exec / max(1, strat_budget)),
+            "mw": round(act_mw_total.get(1, 0))},
+    "techTreemap": sorted([{"name": short(k, 22), "value": eok(v)}
+                           for k, v in tech_budget.items() if v > 0],
+                          key=lambda x: -x["value"])[:14],
+    "typeDist": type_dist.most_common(7),
+    "deptBar": dept_cnt.most_common(10),
+    "projects": [{"code": r["과제코드"], "name": short(r["과제명"], 38),
+                  "dept": dept_short(r.get("연구부서")), "leader": r.get("연구책임자", ""),
+                  "budget": eok(money(r["연구비"])), "end": r.get("완료일", "")}
+                 for r in sorted(strat_run, key=lambda x: -money(x["연구비"]))[:60]],
+}
+
+# 4.4 탐색·혁신 상세 (a3, N·L 코드)
+expl = [r for r in a3 if classify(r["과제코드"]) == 4]
+explore_detail = {
+    "kpi": {"total": len(expl),
+            "running": sum(1 for r in expl if "진행중" in r.get("진행상태", "")),
+            "mw": round(act_mw_total.get(4, 0)),
+            "share": round(100 * act_mw_total.get(4, 0)
+                           / max(1, sum(act_mw_total.values())), 1)},
+    "projects": [{"code": r["과제코드"], "name": short(r["과제명"], 38),
+                  "dept": dept_short(r.get("연구부서")), "leader": r.get("연구책임자", ""),
+                  "start": r.get("착수일", ""), "end": r.get("완료일", ""),
+                  "status": short(r.get("진행상태", ""), 10)}
+                 for r in sorted(expl, key=lambda x: x.get("착수일", ""), reverse=True)],
+}
+
+# 4.3 현업지원 상세
+resp_stat = defaultdict(lambda: {"n": 0, "lead": [], "delay": 0})
+for r in a4:
+    resp = short(r.get("대응부서", "기타"), 20)
+    s = resp_stat[resp]
+    s["n"] += 1
+    rq, dn = d(r["요청일자"]), d(r["완료일"])
+    if rq and dn:
+        s["lead"].append((dn - rq).days)
+    if r.get("지연여부") == "지연":
+        s["delay"] += 1
+support_detail = {
+    "byResp": sorted([[k, v["n"], round(sum(v["lead"]) / len(v["lead"])) if v["lead"] else 0]
+                      for k, v in resp_stat.items()], key=lambda x: -x[1])[:8],
+    "recent": [{"name": short(r["요청명"], 34), "resp": short(r.get("대응부서", ""), 18),
+                "owner": r.get("대응담당자", ""), "status": short(r.get("진행상태", ""), 14),
+                "delayed": r.get("지연여부") == "지연", "date": r.get("요청일자", "")}
+               for r in a4[:40]],
+}
+
+# 4.5 지식자산 상세
+know_tech = Counter()
+know_dept = Counter()
+for r in a5:
+    t = r.get("기술분류", "").strip()
+    if t:
+        know_tech[short(t, 20)] += 1
+    know_dept[dept_short(r.get("부서명"))] += 1
+knowledge_detail = {
+    "byTech": know_tech.most_common(10),
+    "byDept": know_dept.most_common(8),
+    "recent": [{"type": r["활동구분"], "person": r["성명"],
+                "society": short(r.get("학회명", ""), 24), "date": r.get("기안일자", ""),
+                "field": r.get("학회구분", "")} for r in a5[:25]],
+}
+
+# 4.6 조직역량 상세
+promo_detail = {
+    "list": [{"title": short(r["홍보제목"], 32), "media": short(r.get("홍보매체", ""), 14),
+              "group": dept_short(r.get("연구그룹")), "owner": r.get("담당자", ""),
+              "date": r.get("홍보일") or r.get("홍보예정일", ""),
+              "status": r.get("진행상태", "")} for r in a6],
+}
+
+# 투입 시뮬레이터: 최근 6개월(기준일 이전) 월평균 부하
+SIM_WINDOW = yms[-6:]
+sim_orgs = []
+for o in orgs_sorted:
+    avg_m = sum(mw_org_ym[o].get(ym, 0) for ym in SIM_WINDOW) / len(SIM_WINDOW)
+    ppl = {p["name"] for p in person.values() if p["org"] == o}
+    if not ppl:
+        continue
+    sim_orgs.append({"org": o, "people": len(ppl), "avgMonthly": round(avg_m, 1),
+                     "cap": round(len(ppl) * 4.3, 1)})
+sim_people = []
+for name, p in person.items():
+    avg6 = sum(person_ym[name].get(ym, 0) for ym in SIM_WINDOW) / len(SIM_WINDOW)
+    sim_people.append({"n": name, "o": p["org"], "a": round(avg6, 2)})
+sim = {"window": [SIM_WINDOW[0], SIM_WINDOW[-1]], "capPerPerson": 4.3,
+       "orgs": sim_orgs, "people": sim_people}
+
+detail = {"strategy": strategy_detail, "explore": explore_detail,
+          "support": support_detail, "knowledge": knowledge_detail, "promo": promo_detail}
+
 mwpage = {
     "orgStack": org_stack,
     "heatOrgs": heat_orgs, "heatYms": heat_yms, "heatmap": heatmap,
@@ -492,6 +611,7 @@ DATA_OUT = {
                                         "a4": len(a4), "a5": len(a5), "a6": len(a6)}},
     "home": home, "support": support, "knowledge": knowledge, "promotion": promotion,
     "longterm": longterm, "executive": executive, "mw": mwpage,
+    "detail": detail, "sim": sim,
 }
 
 out = BASE / "demo_data.js"
