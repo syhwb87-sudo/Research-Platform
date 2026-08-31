@@ -92,6 +92,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
   <h1>⛭ PRIDE<span>연구활동 종합관리 Dashboard · Demo</span></h1>
   <nav id="nav">
     <button data-p="home" class="on">홈 종합현황</button>
+    <button data-p="my">My Dashboard</button>
     <button data-p="act">활동군 상세</button>
     <button data-p="mw">MW 분석</button>
     <button data-p="lt">장기성과</button>
@@ -146,6 +147,59 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     <div class="card"><h3>⚠ Attention Needed</h3><ul class="alist" id="attn"></ul></div>
     <div class="card"><h3>📅 완료 임박 과제 (90일 내)</h3><ul class="alist" id="upcoming"></ul></div>
     <div class="card"><h3>📰 최근 활동 Feed</h3><ul class="alist" id="feed"></ul></div>
+  </div>
+</section>
+
+<!-- ─────────────── My Dashboard ─────────────── -->
+<section class="page" id="p-my">
+  <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div>
+      <h3 style="margin:0">My Dashboard</h3>
+      <div class="sub" style="margin:2px 0 0">연구원 개인화 화면 — 실운영 시 로그인 계정 자동 연결 (Demo: 연구원 선택)</div>
+    </div>
+    <select id="mySel" style="font:inherit;padding:7px 12px;border:1px solid var(--border);border-radius:6px;margin-left:auto;min-width:200px"></select>
+    <span id="myNudge"></span>
+  </div>
+  <div class="row" style="grid-template-columns:repeat(4,1fr)" id="myKpis"></div>
+  <div class="row" style="grid-template-columns:5fr 7fr">
+    <div class="card">
+      <h3>My Portfolio</h3>
+      <div class="sub">내 MW의 활동군 배분 (누적)</div>
+      <div class="chart" id="myDonut"></div>
+    </div>
+    <div class="card">
+      <h3>My MW Calendar</h3>
+      <div class="sub">월별 투입 강도 — 진한 칸 = 집중 투입</div>
+      <div class="chart" id="myGrass"></div>
+    </div>
+  </div>
+  <div class="row" style="grid-template-columns:6fr 6fr">
+    <div class="card">
+      <h3>내 과제 Strip</h3>
+      <div class="sub">참여 과제별 내 투입 MW · 상위 8건</div>
+      <div class="scroll" style="max-height:300px"><table id="myProj">
+        <thead><tr><th>과제코드</th><th>과제명</th><th class="num">내 MW</th><th>상태</th></tr></thead>
+        <tbody></tbody></table></div>
+    </div>
+    <div class="card">
+      <h3>My Impact Trace <span class="badge">DEMO</span></h3>
+      <div class="sub">내가 참여한 완료과제의 활용상태·실현이익 (정량효과 과제)</div>
+      <div class="scroll" style="max-height:300px"><table id="myImpact">
+        <thead><tr><th>과제</th><th class="num">완료</th><th>활용상태</th><th class="num">실현이익</th></tr></thead>
+        <tbody></tbody></table></div>
+    </div>
+  </div>
+  <div class="row" style="grid-template-columns:6fr 6fr">
+    <div class="card">
+      <h3>지식자산 Profile</h3>
+      <div class="sub">내 논문·발표·학회 이력 (a5)</div>
+      <ul class="alist" id="myKnow"></ul>
+    </div>
+    <div class="card">
+      <h3>동료 벤치마크</h3>
+      <div class="sub" id="myBenchSub"></div>
+      <div class="chart" id="myBench"></div>
+    </div>
   </div>
 </section>
 
@@ -1008,6 +1062,101 @@ function runSim(){
 ['simOrg','simMw','simDur'].forEach(id=>
   document.getElementById(id).addEventListener('input', runSim));
 runSim();
+
+/* ══════════ My Dashboard 탭 ══════════ */
+const ME = D.me;
+const meNames = Object.keys(ME.people).sort((a,b)=>a.localeCompare(b,'ko'));
+const mySel = document.getElementById('mySel');
+mySel.innerHTML = meNames.map(n=>`<option>${n} · ${ME.people[n].o}</option>`).join('');
+let myDonut=null, myGrass=null, myBench=null;
+const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+function renderMe(name){
+  const p = ME.people[name];
+  const cy = ME.latestYm.slice(0,4);
+  const yearMw = Object.entries(p.ym).filter(([ym])=>ym.startsWith(cy))
+    .reduce((s,[,v])=>s+v,0);
+  const totalMw = p.acts[0]+p.acts[1]+p.acts[2];
+  document.getElementById('myNudge').innerHTML = p.curYm>0
+    ? `<span class="pill g">✓ ${ME.latestYm} MW 입력 완료</span>`
+    : `<span class="pill r">⚠ ${ME.latestYm} MW 미입력 — 입력해 주세요</span>`;
+  document.getElementById('myKpis').innerHTML =
+    kpiCard('금년 투입 MW', nf(Math.round(yearMw*10)/10)+' <small>MW</small>', cy+'년 누계')+
+    kpiCard('참여 과제', p.projects.length+' <small>건</small>','MW 투입 기준')+
+    kpiCard('누적 MW 백분위', '상위 '+Math.max(1,100-p.pct)+'<small>%</small>','전사 '+nf(meNames.length)+'명 중')+
+    kpiCard('지식자산 활동', p.knowledge.length+' <small>건</small>','논문·발표·학회');
+  /* 도넛 */
+  const donutOpt = {
+    tooltip:tip({formatter:q=>`${q.name} <b>${nf(q.value)}</b> MW (${q.percent}%)`}),
+    legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:11,color:INK2}},
+    series:[{type:'pie',radius:['50%','74%'],center:['50%','44%'],
+      itemStyle:{borderColor:SURF,borderWidth:2},label:{show:false},
+      data:[{name:ACT[1],value:p.acts[0],itemStyle:{color:C[1]}},
+            {name:ACT[3],value:p.acts[1],itemStyle:{color:C[3]}},
+            {name:ACT[4],value:p.acts[2],itemStyle:{color:C[4]}}].filter(d=>d.value>0)}]};
+  if(!myDonut) myDonut = mk('myDonut', donutOpt);
+  else myDonut.setOption(donutOpt, {replaceMerge:['series']});
+  /* 잔디밭: 연도 × 월 */
+  const grassData = [];
+  ME.years.forEach((y,yi)=>MONTHS.forEach((m,mi)=>{
+    const v = p.ym[`${y}-${String(mi+1).padStart(2,'0')}`];
+    if(v!==undefined) grassData.push([mi,yi,v]);
+  }));
+  const gMax = Math.max(1,...grassData.map(g=>g[2]));
+  const grassOpt = {
+    tooltip:tip({formatter:q=>`${ME.years[q.value[1]]}년 ${MONTHS[q.value[0]]}<br><b>${q.value[2]}</b> MW`}),
+    grid:{left:50,right:14,top:10,bottom:44},
+    xAxis:axisX({type:'category',data:MONTHS,axisLabel:{fontSize:10}}),
+    yAxis:axisX({type:'category',data:ME.years}),
+    visualMap:{min:0,max:gMax,orient:'horizontal',left:'center',bottom:0,
+      itemWidth:10,itemHeight:80,text:['많음','적음'],textStyle:{fontSize:10,color:INK3},
+      inRange:{color:['#eef3fa','#bcd3ee','#6ea3dd','#2a78d6','#174a86']}},
+    series:[{type:'heatmap',data:grassData,
+      itemStyle:{borderColor:SURF,borderWidth:2,borderRadius:3}}]};
+  if(!myGrass) myGrass = mk('myGrass', grassOpt);
+  else myGrass.setOption(grassOpt, {replaceMerge:['series','visualMap']});
+  /* 과제 Strip */
+  document.querySelector('#myProj tbody').innerHTML = p.projects.map(x=>
+    `<tr><td>${x[0]||'−'}</td><td>${x[1]}</td><td class="num"><b>${nf(x[2])}</b></td>
+     <td>${x[3]==='-'?'<span class="pill y">과제정보 없음</span>':
+       x[3].includes('진행')?'<span class="pill g">'+x[3]+'</span>':
+       '<span class="pill y">'+x[3]+'</span>'}</td></tr>`).join('')
+    || '<tr><td colspan="4" style="color:var(--text-3)">참여 과제 없음</td></tr>';
+  /* Impact Trace */
+  document.querySelector('#myImpact tbody').innerHTML = p.impact.map(x=>
+    `<tr><td>${x[0]}</td><td class="num">${x[1]}</td><td>${pillFor(x[2])}</td>
+     <td class="num">${nf(x[3])}억</td></tr>`).join('')
+    || '<tr><td colspan="4" style="color:var(--text-3)">추적 중인 완료과제 없음 (정량효과 과제 기준)</td></tr>';
+  /* 지식자산 */
+  document.getElementById('myKnow').innerHTML = p.knowledge.map(k=>
+    `<li><span class="dot" style="background:${C[5]}"></span>
+     <span>[${k[0]}] ${k[1]}</span><span class="meta">${k[2]}</span></li>`).join('')
+    || '<li style="color:var(--text-3)">등록된 지식자산 활동 없음</li>';
+  /* 벤치마크 */
+  const orgAvg = ME.orgAvgYear[p.o] || ME.allAvgYear;
+  const myYearAvg = Math.round(yearMw/(+ME.latestYm.slice(5,7))*12*10)/10;  // 금년 실적 연환산
+  document.getElementById('myBenchSub').textContent =
+    `연환산 MW 비교 — 나(${cy}년 실적 연환산) vs ${p.o} 평균 vs 전사 평균`;
+  const benchOpt = {
+    tooltip:tip({trigger:'axis',axisPointer:{type:'shadow'},
+      formatter:qs=>qs.map(q=>`${q.name}: <b>${nf(q.value)}</b> MW/년`).join('')}),
+    grid:{left:110,right:60,top:14,bottom:24},
+    xAxis:axisY({type:'value',name:'MW/년',nameTextStyle:{color:INK3}}),
+    yAxis:axisX({type:'category',data:['전사 평균',p.o+' 평균','나']}),
+    series:[{type:'bar',barMaxWidth:26,
+      itemStyle:{borderRadius:[0,4,4,0]},
+      label:{show:true,position:'right',fontSize:11,color:INK2,formatter:q=>nf(q.value)},
+      data:[{value:ME.allAvgYear,itemStyle:{color:'#98a2b3'}},
+            {value:orgAvg,itemStyle:{color:'#6ea3dd'}},
+            {value:myYearAvg,itemStyle:{color:C[1]}}]}]};
+  if(!myBench) myBench = mk('myBench', benchOpt);
+  else myBench.setOption(benchOpt, {replaceMerge:['series']});
+}
+mySel.addEventListener('change', ()=>renderMe(mySel.value.split(' · ')[0]));
+/* 기본 인물: Impact·지식자산이 모두 있는 사람 중 누적 MW 최대 */
+const myDefault = meNames.filter(n=>ME.people[n].impact.length && ME.people[n].knowledge.length)
+  .sort((a,b)=>{const t=x=>ME.people[x].acts.reduce((s,v)=>s+v,0);return t(b)-t(a)})[0] || meNames[0];
+mySel.value = `${myDefault} · ${ME.people[myDefault].o}`;
+renderMe(myDefault);
 </script>
 </body>
 </html>

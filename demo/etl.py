@@ -98,6 +98,8 @@ def top_org(dept):
     return "기타(파견/TF 등)"
 
 person_ym = defaultdict(lambda: defaultdict(float))            # name -> ym -> mw
+person_proj_mw = defaultdict(lambda: defaultdict(float))       # name -> 과제코드 -> mw
+proj_name_map = {}                                             # 과제코드 -> 과제명
 
 for r in a2:
     act = classify(r["과제코드"])
@@ -123,6 +125,8 @@ for r in a2:
     p["acts"][act] += total
     p["total"] += total
     person_projects[name].add(r["과제코드"])
+    person_proj_mw[name][r["과제코드"]] += total
+    proj_name_map.setdefault(r["과제코드"], r["과제명"])
 
 # 기준일 이후(계획) 데이터는 차트 축에서 제외
 yms = [ym for ym in sorted(mw_monthly_act.keys())
@@ -337,7 +341,7 @@ for p in completed:
     c["n"] += 1
     if not p["qual"] and exp_total > 0:
         proj_results.append({
-            "name": p["name"][:30], "cy": p["cy"], "dept": p["useDept"],
+            "code": p["code"], "name": p["name"][:30], "cy": p["cy"], "dept": p["useDept"],
             "exp": eok(exp_total), "real": eok(real_total),
             "achv": round(100 * real_total / exp_total),
             "cost": eok(p["cost"]), "status": last_status or "미평가",
@@ -596,6 +600,48 @@ sim = {"window": [SIM_WINDOW[0], SIM_WINDOW[-1]], "capPerPerson": 4.3,
 detail = {"strategy": strategy_detail, "explore": explore_detail,
           "support": support_detail, "knowledge": knowledge_detail, "promo": promo_detail}
 
+# ──────────────────── My Dashboard (아이디어 27~34) ────────────────────
+a3_status = {r["과제코드"]: short(r.get("진행상태", ""), 10) for r in a3}
+util_by_code = {}
+for pr_ in proj_results:
+    util_by_code[pr_["code"]] = pr_
+know_by_person = defaultdict(list)
+for r in a5:
+    know_by_person[r["성명"]].append(
+        [r["활동구분"], short(r.get("학회명", ""), 22), r.get("기안일자", "")])
+totals_sorted = sorted(p["total"] for p in person.values())
+def percentile(total):
+    import bisect
+    return round(100 * bisect.bisect_left(totals_sorted, total) / max(1, len(totals_sorted)))
+LATEST_YM = yms[-1]
+me_people = {}
+for name, p in person.items():
+    projs = sorted(person_proj_mw[name].items(), key=lambda x: -x[1])
+    impact = []
+    for code, _mw in projs:
+        u = util_by_code.get(code)
+        if u:
+            impact.append([short(u["name"], 26), u["cy"], u["status"], u["real"]])
+        if len(impact) >= 6:
+            break
+    me_people[name] = {
+        "o": p["org"],
+        "acts": [round(p["acts"].get(1, 0), 1), round(p["acts"].get(3, 0), 1),
+                 round(p["acts"].get(4, 0), 1)],
+        "ym": {ym: round(v, 1) for ym, v in person_ym[name].items() if v > 0 and ym <= LATEST_YM},
+        "projects": [[c, short(proj_name_map.get(c, c), 30), round(m, 1),
+                      a3_status.get(c, "-")] for c, m in projs[:8]],
+        "impact": impact,
+        "knowledge": know_by_person.get(name, [])[:6],
+        "pct": percentile(p["total"]),
+        "curYm": round(person_ym[name].get(LATEST_YM, 0), 1),
+    }
+org_avg_year = {o["org"]: round(o["avgMonthly"] / max(1, o["people"]) * 12, 1) for o in sim_orgs}
+me = {"latestYm": LATEST_YM, "years": sorted({ym[:4] for ym in yms}),
+      "orgAvgYear": org_avg_year,
+      "allAvgYear": round(latest_year_mw / max(1, len(latest_year_people)), 1),
+      "people": me_people}
+
 mwpage = {
     "orgStack": org_stack,
     "heatOrgs": heat_orgs, "heatYms": heat_yms, "heatmap": heatmap,
@@ -611,7 +657,7 @@ DATA_OUT = {
                                         "a4": len(a4), "a5": len(a5), "a6": len(a6)}},
     "home": home, "support": support, "knowledge": knowledge, "promotion": promotion,
     "longterm": longterm, "executive": executive, "mw": mwpage,
-    "detail": detail, "sim": sim,
+    "detail": detail, "sim": sim, "me": me,
 }
 
 out = BASE / "demo_data.js"
