@@ -642,6 +642,173 @@ me = {"latestYm": LATEST_YM, "years": sorted({ym[:4] for ym in yms}),
       "allAvgYear": round(latest_year_mw / max(1, len(latest_year_people)), 1),
       "people": me_people}
 
+# ──────────── P-1: 연구성과 자동산출 플랫폼 (목업, PRIDE_Performance_Platform_Design.md) ────────────
+PERF_TYPES = [
+    ["A-1", "A", "판매량증대"], ["A-2", "A", "판매가격인상"], ["A-3", "A", "고마진 Mix 확대"],
+    ["A-4", "A", "주문외 판매감소"],
+    ["B-1", "B", "구매단가 절감"], ["B-2", "B", "동일품목 원단위 절감"], ["B-3", "B", "저가원료 대체"],
+    ["B-3(2)", "B", "부산물/배합비 변경"], ["B-4", "B", "변동가공비 절감"], ["B-5", "B", "변동가공비 단가절감"],
+    ["B-6", "B", "수율 개선"], ["B-7", "B", "공정생략"], ["B-8", "B", "고정가공비 절감"], ["B-9", "B", "생산량 증가"],
+    ["C-1", "C", "판관비 절감"], ["C-2", "C", "클레임 비용 절감"],
+]
+# 연구효과 14종 → 재무성과 후보 매핑 (설계서 3.1)
+EFFECT_MAP = {
+    "신수요창출": ["A-1", "A-2", "A-3"],
+    "제품개발/수입대체": ["A-1", "B-1", "B-3", "C-1"],
+    "실수율/품질향상": ["A-4", "B-6", "C-2"],
+    "원단위절감": ["B-2", "B-4", "B-5", "B-9"],
+    "생산성향상": ["B-9", "B-8"],
+    "공정개선": ["B-7", "B-4"],
+    "에너지절감": ["B-2", "B-4"],
+    "자재수명향상": ["B-8", "B-1"],
+    "자동화에의한인력합리": ["B-8", "C-1"],
+    "부산물/폐기물재활용": ["B-3(2)", "B-3"],
+    "환경비용절감": ["B-4", "C-1"],
+    "장치제작개발": ["B-8"],
+    "분석기술개발": ["C-1"],
+    "기타": [],
+}
+EROSION_CATALOG = {
+    "A-1": ["기존제품 잠식", "잠식 품목 판매 감소량 × 해당 한계이익"],
+    "A-2": ["판매량 감소(가격탄력)", "수량 감소분 × 한계이익"],
+    "A-3": ["일반재 판매 감소", "일반재 감소량 × 일반재 마진"],
+    "A-4": ["초기 품질비용 증가", "전환 초기 검사·클레임 비용 증가분"],
+    "B-3": ["품질 저하 보정 비용", "후공정 처리비 증가분"],
+    "B-7": ["품질 리스크 비용", "불량률 변동 × 처리비"],
+}
+RULES = [
+    {"id": "RB-A1-003", "type": "A-1", "ver": "v2",
+     "formula": "성과총액 = (검증기간 판매량 − 기준기간 판매량) × 톤당 한계이익",
+     "vars": [["Q_v 검증기간 판매량", "ERP SD 판매실적 (지정 Key 필터)"],
+              ["Q_b 기준기간 판매량", "동일 Key · 착수 직전 12개월"],
+              ["CM_ton 톤당 한계이익", "CO 관리회계 공식값 (재무실 잠금)"]],
+     "period": "2026-01-01 ~", "source": "ERP SD · CO", "status": "승인",
+     "history": ["v1 2025-01 최초 제정", "v2 2026-03 기준기간 정의 변경(재무실)"]},
+    {"id": "RB-A2-001", "type": "A-2", "ver": "v1",
+     "formula": "성과총액 = (검증기간 FOB − 기준기간 FOB) × 판매량",
+     "vars": [["FOB", "ERP SD 수출 단가"], ["판매량", "ERP SD 판매실적"]],
+     "period": "2025-01-01 ~", "source": "ERP SD", "status": "승인",
+     "history": ["v1 2025-01 최초 제정"]},
+    {"id": "RB-A4-001", "type": "A-4", "ver": "v1",
+     "formula": "성과총액 = 주문외 전환량 × (정품 판매가 − 주문외 판매가)",
+     "vars": [["전환량", "품질 DW 주문외 실적"], ["가격차", "ERP SD 단가"]],
+     "period": "2025-07-01 ~", "source": "품질 DW · ERP SD", "status": "승인",
+     "history": ["v1 2025-07 최초 제정"]},
+    {"id": "RB-B2-002", "type": "B-2", "ver": "v3",
+     "formula": "성과총액 = (개선전 원단위 − 개선후 원단위) × 단가 × 생산량",
+     "vars": [["원단위", "생산 DW 원단위 실적"], ["단가", "MM 구매단가 (잠금)"], ["생산량", "생산 DW"]],
+     "period": "2026-04-01 ~", "source": "생산 DW · ERP MM", "status": "승인",
+     "history": ["v1 2025-01", "v2 2025-09 에너지 원단위 포함", "v3 2026-04 단가 기준월 고정"]},
+    {"id": "RB-B6-002", "type": "B-6", "ver": "v1",
+     "formula": "성과총액 = 실수율 개선폭 × 생산량 × (판매가 − 스크랩가)",
+     "vars": [["실수율", "생산 DW 실수율"], ["가격차", "ERP SD·스크랩 시세"]],
+     "period": "2025-01-01 ~", "source": "생산 DW · ERP SD", "status": "승인",
+     "history": ["v1 2025-01 최초 제정"]},
+    {"id": "RB-B7-001", "type": "B-7", "ver": "v1",
+     "formula": "성과총액 = 생략 공정 처리량 × 공정 단위비용",
+     "vars": [["처리량", "생산 DW"], ["단위비용", "CO 공정원가 (잠금)"]],
+     "period": "2025-01-01 ~", "source": "생산 DW · CO", "status": "승인",
+     "history": ["v1 2025-01 최초 제정"]},
+    {"id": "RB-B8-001", "type": "B-8", "ver": "v2",
+     "formula": "성과총액 = 절감 인시·수명연장 환산액 (고정비 계정 기준)",
+     "vars": [["고정비", "CO 고정가공비 계정"], ["환산계수", "재무실 고시"]],
+     "period": "2025-01-01 ~", "source": "ERP CO", "status": "검토중",
+     "history": ["v1 2025-01", "v2 2026-06 수명연장 환산계수 개정안(검토중)"]},
+    {"id": "RB-B9-001", "type": "B-9", "ver": "v1",
+     "formula": "성과총액 = 증산량 × 톤당 한계이익 × 가동 기여계수",
+     "vars": [["증산량", "생산 DW"], ["CM_ton", "CO 관리회계 (잠금)"]],
+     "period": "2025-01-01 ~", "source": "생산 DW · CO", "status": "승인",
+     "history": ["v1 2025-01 최초 제정"]},
+    {"id": "RB-C1-001", "type": "C-1", "ver": "v1",
+     "formula": "성과총액 = 대체된 외부 용역·분석 비용 실적",
+     "vars": [["비용계정", "ERP FI 판관비 계정"]],
+     "period": "2025-01-01 ~", "source": "ERP FI", "status": "승인",
+     "history": ["v1 2025-01 최초 제정"]},
+]
+RULE_BY_TYPE = {r["type"]: r for r in RULES}
+EFFECT_TO_TYPE = {k: v[0] for k, v in EFFECT_MAP.items() if v}
+EFFECT_TO_TYPE["실수율/품질향상"] = "B-6"   # 설계서 3.1 기본 추천 (목록 순서와 무관)
+
+STATUSES = ["확정", "확정", "확정", "확정", "확정", "승인", "승인", "검토", "검토", "검토", "보완", "등록"]
+KEY_BY_GROUP = {
+    "A": "제품군·강종·고객사·품질등급·판매기간",
+    "B": "공장·공정·품목코드·원단위 항목·기준/검증기간",
+    "C": "비용계정·부서·클레임 유형·기간",
+}
+prng = random.Random(20260901)
+a1_by_code = {r["과제코드"]: r for r in a1}
+# 이상치 제외(연간기대이익 1~80억), 유형별 버킷 후 라운드로빈으로 유형 다양성 확보
+buckets = defaultdict(list)
+for p in sorted(completed, key=lambda x: -x["annual"]):
+    if not (1e8 <= p["annual"] <= 8e9) or p["roi"] <= 0:
+        continue
+    r = a1_by_code.get(p["code"])
+    eff = re.split(r"[,\s]", ((r or {}).get("정량효과유형") or "기타").strip())[0]
+    ptype = EFFECT_TO_TYPE.get(eff)
+    if ptype and ptype in RULE_BY_TYPE:
+        buckets[ptype].append((p, eff))
+TYPE_ORDER = ["B-6", "A-1", "B-2", "B-9", "B-7", "B-8", "A-4", "B-3(2)", "C-1", "A-2"]
+picked = []
+ri = 0
+while len(picked) < 12 and any(buckets.get(t) for t in TYPE_ORDER):
+    t = TYPE_ORDER[ri % len(TYPE_ORDER)]
+    ri += 1
+    if buckets.get(t):
+        picked.append(buckets[t].pop(0))
+regs = []
+for p, eff in picked:
+    ptype = EFFECT_TO_TYPE[eff]
+    gross = p["annual"]
+    ero_pair = EROSION_CATALOG.get(ptype)
+    erosion = round(gross * prng.uniform(0.06, 0.22)) if ero_pair else 0
+    contrib = int(p.get("roi", 0) and 0) or 0
+    contrib_pct = None
+    for r in a1:
+        if r["과제코드"] == p["code"]:
+            contrib_pct = money(r.get("연구기여도", "")) or 70
+            break
+    contrib_pct = contrib_pct or 70
+    direct = round(gross * prng.uniform(0.01, 0.05))
+    net = round((gross - erosion) * contrib_pct / 100 - direct)
+    rule = RULE_BY_TYPE[ptype]
+    status = STATUSES[len(regs)]
+    regs.append({
+        "id": f"PF-2026-{len(regs)+1:03d}", "code": p["code"], "name": short(p["name"], 30),
+        "effect": eff, "type": ptype, "status": status,
+        "contrib": round(contrib_pct), "persist": round(p["persist"]),
+        "grossEok": eok(gross), "erosionEok": eok(erosion), "directEok": eok(direct),
+        "netEok": eok(net), "rule": rule["id"], "ruleVer": rule["ver"],
+        "match": prng.randint(180, 2400), "period": "2025-09 ~ 2026-08",
+        "key": KEY_BY_GROUP[ptype[0]],
+        "erosionName": ero_pair[0] if ero_pair else "해당 역효과 없음",
+        "dept": p["useDept"], "slaDay": prng.randint(1, 9),
+        "utilY1": prng.choice(["활용중", "활용중", "부분활용"]),
+    })
+
+appr_counts = Counter(r["status"] for r in regs)
+type_amounts = defaultdict(float)
+for r in regs:
+    if r["status"] in ("승인", "확정"):
+        type_amounts[r["type"]] += r["netEok"]
+perf = {
+    "types": PERF_TYPES,
+    "effectMap": EFFECT_MAP,
+    "erosionCatalog": [[k, v[0], v[1]] for k, v in EROSION_CATALOG.items()],
+    "rules": RULES,
+    "regs": regs,
+    "approval": {
+        "wait": appr_counts.get("검토", 0) + appr_counts.get("보완", 0) + appr_counts.get("등록", 0),
+        "done": appr_counts.get("승인", 0) + appr_counts.get("확정", 0),
+        "rejected": 1, "avgDays": 7.2,
+        "amountDone": round(sum(r["netEok"] for r in regs if r["status"] in ("승인", "확정")), 1),
+        "funnel": [["등록", len(regs)], ["검토", sum(appr_counts[s] for s in ("검토", "보완", "승인", "확정"))],
+                    ["보완", appr_counts.get("보완", 0)],
+                    ["승인", appr_counts.get("승인", 0) + appr_counts.get("확정", 0)],
+                    ["확정", appr_counts.get("확정", 0)]],
+        "byType": sorted(type_amounts.items(), key=lambda x: -x[1]),
+    },
+}
+
 mwpage = {
     "orgStack": org_stack,
     "heatOrgs": heat_orgs, "heatYms": heat_yms, "heatmap": heatmap,
@@ -657,7 +824,7 @@ DATA_OUT = {
                                         "a4": len(a4), "a5": len(a5), "a6": len(a6)}},
     "home": home, "support": support, "knowledge": knowledge, "promotion": promotion,
     "longterm": longterm, "executive": executive, "mw": mwpage,
-    "detail": detail, "sim": sim, "me": me,
+    "detail": detail, "sim": sim, "me": me, "perf": perf,
 }
 
 out = BASE / "demo_data.js"

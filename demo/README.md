@@ -17,7 +17,7 @@ python3 -m http.server 8080
 
 | 파일 | 역할 |
 |---|---|
-| `index.html` | 대시보드 본체 — 홈 종합현황 / 활동군 상세(6종) / MW 분석 / 장기성과 / Executive / 투입 시뮬레이터 6개 탭 |
+| `index.html` | 대시보드 본체 — 홈 종합현황 / My Dashboard / 활동군 상세(6종) / MW 분석 / 장기성과 / **성과 플랫폼(P-1 목업)** / Executive / 투입 시뮬레이터 8개 탭 |
 | `demo_data.js` | ETL 산출물 (집계 데이터, 자동생성) |
 | `etl.py` | CSV → 집계 데이터 변환 스크립트 (`python3 etl.py`로 재생성) |
 | `data/a1~a6*.csv` | 원천 Demo DB (완료평가 / ManWeek / 연구과제 / 현업지원 / 학회활동 / 기술홍보) |
@@ -31,6 +31,9 @@ python3 -m http.server 8080
   시드 고정 난수(seed 20260831)로 생성합니다. 화면의 `DEMO` 배지가 이 데이터를 표시하며,
   실운영 전환 시 PRIDE 활용평가 모듈 데이터로 `fact_utilization`만 교체하면 됩니다.
 - 기준일: 2026-08-31 (기준일 이후의 계획 MW는 추이 차트에서 제외).
+- **성과 플랫폼 탭(P-1)**: `docs/PRIDE_Performance_Platform_Design.md`의 로드맵 P-1 구현.
+  성과 등록 12건·Rule Bank 9종·승인 큐·Lineage는 a1 실과제 기반의 **시드 고정 목업**이며
+  (ERP 미연동), P-2에서 A그룹 2개 유형부터 실 ERP 연동으로 대체됩니다.
 
 ## 팔레트
 

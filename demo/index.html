@@ -96,6 +96,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     <button data-p="act">활동군 상세</button>
     <button data-p="mw">MW 분석</button>
     <button data-p="lt">장기성과</button>
+    <button data-p="pp">성과 플랫폼</button>
     <button data-p="exec">Executive</button>
     <button data-p="sim">시뮬레이터</button>
   </nav>
@@ -418,6 +419,96 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
         <thead><tr><th>과제</th><th class="num">완료</th><th class="num">기대</th>
         <th class="num">실현</th><th class="num">Achv</th><th>상태</th></tr></thead>
         <tbody></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 성과 플랫폼 (P-1 목업) ─────────────── -->
+<section class="page" id="p-pp">
+  <div class="card" style="margin-bottom:14px;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div id="ppNav" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    <span class="badge" style="margin-left:auto">P-1 목업 — 설계서: PRIDE_Performance_Platform_Design.md</span>
+  </div>
+
+  <!-- ① 자동산출 워크벤치 -->
+  <div class="ppanel" id="pp-1">
+    <div class="card" style="margin-bottom:14px">
+      <div id="ppStepper" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"></div>
+    </div>
+    <div class="row" style="grid-template-columns:5fr 7fr">
+      <div class="card">
+        <h3>성과 등록 (Step 1)</h3>
+        <div class="sub">연구책임자는 산식을 쓰지 않는다 — 유형 선택·기여율·지속년수·직접비만 입력</div>
+        <div id="ppReg"></div>
+      </div>
+      <div class="card">
+        <h3>ERP 매칭 미리보기 (Step 2) → 자동 산출 (Step 3~4)</h3>
+        <div class="sub">성과 발생 대상 지정 시 회사 공식 데이터 자동 매칭 · 매칭 0건이면 저장 불가</div>
+        <div id="ppMatch" style="margin-bottom:6px"></div>
+        <div class="chart short" id="ppWaterfall"></div>
+      </div>
+    </div>
+    <div class="card"><h3>성과 등록 현황 (12건 · 행 클릭 시 위 패널 갱신)</h3>
+      <div class="scroll" style="max-height:280px"><table id="ppRegs">
+        <thead><tr><th>성과ID</th><th>과제</th><th>유형</th><th class="num">성과총액</th>
+        <th class="num">순재무성과</th><th>상태</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+
+  <!-- ② Rule Bank -->
+  <div class="ppanel" id="pp-2" hidden>
+    <div class="row" style="grid-template-columns:5fr 7fr">
+      <div class="card">
+        <h3>Rule 카탈로그</h3>
+        <div class="sub">산식의 단일 진실 공급원 — 연구원은 산식 작성자가 아니다</div>
+        <div class="scroll" style="max-height:420px"><table id="ppRules">
+          <thead><tr><th>Rule ID</th><th>유형</th><th>버전</th><th>상태</th><th class="num">사용</th></tr></thead>
+          <tbody></tbody></table></div>
+      </div>
+      <div class="card" id="ppRuleDetail"></div>
+    </div>
+  </div>
+
+  <!-- ③ Data Lineage -->
+  <div class="ppanel" id="pp-3" hidden>
+    <div class="card" style="margin-bottom:14px">
+      <h3>Data Lineage — "이 숫자는 어디서 왔는가"
+        <select id="ppLinSel" style="font:inherit;padding:5px 10px;border:1px solid var(--border);border-radius:6px;float:right"></select></h3>
+      <div class="sub">최종 금액 → ERP 원천 레코드까지 역추적 · 노드 클릭 시 상세</div>
+      <div id="ppChain" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:14px 0"></div>
+    </div>
+    <div class="card" id="ppNode"></div>
+  </div>
+
+  <!-- ④ 재무실 승인 -->
+  <div class="ppanel" id="pp-4" hidden>
+    <div class="row" style="grid-template-columns:repeat(5,1fr)" id="ppApprKpis"></div>
+    <div class="row" style="grid-template-columns:5fr 7fr">
+      <div class="card">
+        <h3>승인 큐 (SLA 잔여일 순)</h3>
+        <div class="scroll" style="max-height:340px"><table id="ppQueue">
+          <thead><tr><th>SLA</th><th>성과ID</th><th>유형</th><th class="num">순액</th><th>상태</th></tr></thead>
+          <tbody></tbody></table></div>
+      </div>
+      <div class="card" id="ppVerify"></div>
+    </div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>워크플로 깔때기</h3><div class="chart short" id="ppFunnel"></div></div>
+      <div class="card"><h3>유형별 승인·확정 금액</h3><div class="chart short" id="ppByType"></div></div>
+    </div>
+  </div>
+
+  <!-- ⑤ 유형·매핑 -->
+  <div class="ppanel" id="pp-5" hidden>
+    <div class="card" style="margin-bottom:14px">
+      <h3>연구효과 14종 ↔ 재무성과 유형 매핑 매트릭스</h3>
+      <div class="sub">● 기본 추천 · ○ 후보 — 성과 등록 시 자동 추천의 근거 (그룹색: A 판매/매출 · B 원가/생산 · C 비용)</div>
+      <div style="overflow-x:auto"><table id="ppMatrix" style="min-width:900px"></table></div>
+    </div>
+    <div class="card">
+      <h3>역효과(Erosion) 카탈로그</h3>
+      <div class="sub">모든 성과는 긍정효과만 보지 않는다 — 유형 확정 시 기본 역효과 자동 첨부</div>
+      <table id="ppErosion"><thead><tr><th>성과유형</th><th>대표 역효과</th><th>산출 방식</th></tr></thead>
+      <tbody></tbody></table>
     </div>
   </div>
 </section>
@@ -1157,6 +1248,253 @@ const myDefault = meNames.filter(n=>ME.people[n].impact.length && ME.people[n].k
   .sort((a,b)=>{const t=x=>ME.people[x].acts.reduce((s,v)=>s+v,0);return t(b)-t(a)})[0] || meNames[0];
 mySel.value = `${myDefault} · ${ME.people[myDefault].o}`;
 renderMe(myDefault);
+
+/* ══════════ 성과 플랫폼 탭 (P-1 목업) ══════════ */
+const PF = D.perf;
+const GC = {A:'#2a78d6', B:'#1baf7a', C:'#eda100'};
+const gcOf = t => GC[t[0]] || INK3;
+const typeName = t => (PF.types.find(x=>x[0]===t)||[,, t])[2];
+const stPill = s => ({'확정':'<span class="pill g">확정</span>','승인':'<span class="pill g">승인</span>',
+  '검토':'<span class="pill y">검토</span>','보완':'<span class="pill y">보완</span>',
+  '등록':'<span class="pill y">등록</span>'})[s] || s;
+
+/* 서브내비 */
+const PP_TABS = [['1','① 자동산출 워크벤치'],['2','② Rule Bank'],['3','③ Data Lineage'],
+  ['4','④ 재무실 승인'],['5','⑤ 유형·매핑']];
+const ppNav = document.getElementById('ppNav');
+ppNav.innerHTML = PP_TABS.map(([k,t],i)=>
+  `<button class="achip${i===0?' on':''}" data-k="${k}">${t}</button>`).join('');
+function goPp(k){
+  ppNav.querySelectorAll('.achip').forEach(b=>{
+    const on = b.dataset.k===String(k);
+    b.classList.toggle('on', on);
+    b.style.background = on ? 'var(--brand)' : '';
+  });
+  document.querySelectorAll('.ppanel').forEach(p=>p.hidden = p.id!=='pp-'+k);
+  charts.forEach(c=>c.resize());
+}
+ppNav.addEventListener('click', e=>{const b=e.target.closest('.achip'); if(b) goPp(b.dataset.k)});
+goPp(1);
+
+/* ① 워크벤치 */
+const STEP_OF = {'등록':2,'검토':4,'보완':4,'승인':5,'확정':5};
+let ppWf = null;
+function drawWaterfall(elId, r, chartRef){
+  const adj = Math.round((r.grossEok - r.erosionEok) * (100 - r.contrib) / 100 * 10) / 10;
+  const steps = [
+    ['성과총액', r.grossEok, gcOf(r.type)],
+    ['역효과', -r.erosionEok, '#c53030'],
+    ['기여율 '+r.contrib+'%', -adj, '#b7791f'],
+    ['직접발생비', -r.directEok, '#98a2b3'],
+    ['순재무성과', r.netEok, '#1e8e5a'],
+  ];
+  let run = 0;
+  const base = [], val = [];
+  steps.forEach(([n,v],i)=>{
+    if(i===0 || i===steps.length-1){ base.push(0); val.push({value:Math.abs(v), itemStyle:{color:steps[i][2], borderRadius:[4,4,0,0]}}); run = i===0 ? v : run; }
+    else { run += v; base.push(run); val.push({value:Math.abs(v), itemStyle:{color:steps[i][2], borderRadius:[4,4,0,0]}}); }
+  });
+  const opt = {
+    tooltip:tip({formatter:p=>`${steps[p.dataIndex][0]}<br><b>${nf(Math.round(Math.abs(steps[p.dataIndex][1])*10)/10)}</b>억원`}),
+    grid:{left:46,right:14,top:16,bottom:24},
+    xAxis:axisX({type:'category',data:steps.map(s=>s[0]),axisLabel:{fontSize:10}}),
+    yAxis:axisY({type:'value',name:'억원',nameTextStyle:{color:INK3}}),
+    series:[
+      {type:'bar',stack:'w',barMaxWidth:44,itemStyle:{color:'rgba(0,0,0,0)'},
+        tooltip:{show:false},silent:true,data:base},
+      {type:'bar',stack:'w',barMaxWidth:44,
+        label:{show:true,position:'top',fontSize:10,color:INK2,
+          formatter:p=>{const v=steps[p.dataIndex][1];return (v<0&&p.dataIndex>0&&p.dataIndex<4?'−':'')+nf(Math.round(Math.abs(v)*10)/10)}},
+        data:val},
+    ]};
+  if(!chartRef.c) chartRef.c = mk(elId, opt); else chartRef.c.setOption(opt);
+}
+const wfRef = {c:null};
+function renderWb(reg){
+  const stepAt = STEP_OF[reg.status];
+  document.getElementById('ppStepper').innerHTML =
+    ['Step1 성과 등록','Step2 ERP 매칭','Step3 자동 산출','Step4 보정·검증','Step5 누적관리']
+    .map((s,i)=>{
+      const done = i+1 < stepAt, cur = i+1 === stepAt;
+      return `<span style="padding:7px 14px;border-radius:20px;font-weight:600;font-size:12px;
+        background:${done?'#e6f4ec':cur?'var(--brand)':'#f0f2f5'};
+        color:${done?'var(--good)':cur?'#fff':'var(--text-3)'}">${done?'✓ ':''}${s}</span>`
+        + (i<4?'<span style="color:var(--text-3)">─▶</span>':'');
+    }).join('');
+  const recs = PF.effectMap[reg.effect] || [];
+  document.getElementById('ppReg').innerHTML = `
+    <table style="margin-top:4px">
+      <tr><td style="width:110px;color:var(--text-2)">대상 성과</td><td><b>${reg.id}</b> · ${reg.name}</td></tr>
+      <tr><td style="color:var(--text-2)">연구효과(14종)</td><td>${reg.effect}</td></tr>
+      <tr><td style="color:var(--text-2)">자동 추천</td><td>${recs.map(t=>
+        `<span class="pill" style="background:${t===reg.type?gcOf(t):'#f0f2f5'};
+         color:${t===reg.type?'#fff':'var(--text-2)'};margin-right:4px">${t} ${typeName(t)}${t===reg.type?' ✓':''}</span>`).join('')||'—'}</td></tr>
+      <tr><td style="color:var(--text-2)">연구기여율</td><td><b>${reg.contrib}%</b> <span class="legend-note">(유사과제 승인 밴드 내)</span></td></tr>
+      <tr><td style="color:var(--text-2)">기술지속년수</td><td>${reg.persist}년 — 매년 자동 재산출</td></tr>
+      <tr><td style="color:var(--text-2)">직접발생비</td><td>${nf(reg.directEok)}억원</td></tr>
+      <tr><td style="color:var(--text-2)">역효과</td><td>${reg.erosionName} ${reg.erosionEok?`(−${nf(reg.erosionEok)}억, 자동 첨부)`:''}</td></tr>
+    </table>`;
+  document.getElementById('ppMatch').innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <span class="pill g">✓ 매칭 ${nf(reg.match)}건</span>
+      <span class="pill g">기간 ${reg.period}</span>
+      <span class="pill" style="background:#f0f5fc;color:var(--brand)">Rule ${reg.rule} (${reg.ruleVer})</span>
+      <span class="legend-note" style="align-self:center">Key: ${reg.key}</span>
+    </div>`;
+  drawWaterfall('ppWaterfall', reg, wfRef);
+}
+document.querySelector('#ppRegs tbody').innerHTML = PF.regs.map((r,i)=>
+  `<tr data-i="${i}" style="cursor:pointer"><td>${r.id}</td><td>${r.name}</td>
+   <td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${r.type}</span></td>
+   <td class="num">${nf(r.grossEok)}억</td><td class="num"><b>${nf(r.netEok)}억</b></td>
+   <td>${stPill(r.status)}</td></tr>`).join('');
+document.querySelector('#ppRegs tbody').addEventListener('click', e=>{
+  const tr = e.target.closest('tr'); if(tr) renderWb(PF.regs[+tr.dataset.i]);
+});
+renderWb(PF.regs[0]);
+
+/* ② Rule Bank */
+const ruleUsage = {};
+PF.regs.forEach(r=>ruleUsage[r.rule]=(ruleUsage[r.rule]||0)+1);
+function renderRule(rule){
+  document.getElementById('ppRuleDetail').innerHTML = `
+    <h3>${rule.id} <span class="pill" style="background:${gcOf(rule.type)};color:#fff">${rule.type} ${typeName(rule.type)}</span>
+      ${rule.status==='승인'?'<span class="pill g">승인</span>':'<span class="pill y">'+rule.status+'</span>'}</h3>
+    <div class="sub">적용기간 ${rule.period} · 데이터원천 ${rule.source} · 현재 ${rule.ver}</div>
+    <div class="brief" style="margin:10px 0;font-family:ui-monospace,monospace">${rule.formula}</div>
+    <table><thead><tr><th>변수</th><th>바인딩 (데이터원천)</th></tr></thead><tbody>
+      ${rule.vars.map(v=>`<tr><td><b>${v[0]}</b></td><td>${v[1]}</td></tr>`).join('')}
+    </tbody></table>
+    <h3 style="margin-top:14px;font-size:13px">버전 이력 <span class="legend-note">(버전 불변 — 산출액은 산출 시점 버전을 영구 참조)</span></h3>
+    <ul class="alist">${rule.history.map(h=>
+      `<li><span class="dot" style="background:var(--brand)"></span>${h}</li>`).join('')}</ul>`;
+}
+document.querySelector('#ppRules tbody').innerHTML = PF.rules.map((r,i)=>
+  `<tr data-i="${i}" style="cursor:pointer"><td><b>${r.id}</b></td>
+   <td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${r.type}</span></td>
+   <td>${r.ver}</td><td>${r.status==='승인'?'<span class="pill g">승인</span>':'<span class="pill y">'+r.status+'</span>'}</td>
+   <td class="num">${ruleUsage[r.id]||0}건</td></tr>`).join('');
+document.querySelector('#ppRules tbody').addEventListener('click', e=>{
+  const tr = e.target.closest('tr'); if(tr) renderRule(PF.rules[+tr.dataset.i]);
+});
+renderRule(PF.rules[0]);
+
+/* ③ Data Lineage */
+const linSel = document.getElementById('ppLinSel');
+linSel.innerHTML = PF.regs.map((r,i)=>`<option value="${i}">${r.id} · ${r.name}</option>`).join('');
+function lineageNodes(r){
+  const cum = Math.round(r.netEok * Math.min(2, r.persist) * 10) / 10;
+  return [
+    ['연구과제', `${r.code}\n${r.name}`],
+    ['성과유형', `${r.type} ${typeName(r.type)}\n(연구효과: ${r.effect})`],
+    ['입력 Key', r.key],
+    ['ERP 원천', `${nf(r.match)}건 매칭\n${r.period} · 스냅샷 동결`],
+    ['Rule', `${r.rule} (${r.ruleVer})\n산식·변수 버전 고정`],
+    ['성과총액', nf(r.grossEok)+'억원'],
+    ['역효과', r.erosionEok?`−${nf(r.erosionEok)}억\n${r.erosionName}`:'해당 없음'],
+    ['기여율', r.contrib+'% 적용'],
+    ['순재무성과', nf(r.netEok)+'억원'],
+    ['재무실 승인', r.status],
+    ['활용평가', `1년차 ${r.utilY1}`],
+    ['누적성과', `${nf(cum)}억 (진행중)\n지속년수 ${r.persist}년까지`],
+  ];
+}
+function renderLineage(idx, sel=8){
+  const r = PF.regs[idx];
+  const nodes = lineageNodes(r);
+  document.getElementById('ppChain').innerHTML = nodes.map(([t],i)=>
+    `<button class="achip${i===sel?' on':''}" data-n="${i}"
+      style="${i===sel?`background:${gcOf(r.type)};color:#fff;border-color:transparent`:''};font-size:11px;padding:5px 10px">${t}</button>`
+    + (i<nodes.length-1?'<span style="color:var(--text-3);font-size:11px">▶</span>':'')).join('');
+  const [t, d] = nodes[sel];
+  document.getElementById('ppNode').innerHTML = `
+    <h3>노드 상세 — ${t}</h3>
+    <div class="brief" style="white-space:pre-line">${d}</div>
+    <div class="legend-note" style="margin-top:8px">↔ 좌우 노드를 클릭해 원천(ERP)까지 역추적하거나 누적성과까지 순추적할 수 있습니다.
+    실운영에서는 ERP 노드에서 레코드 샘플 10건과 전체 내보내기를 제공합니다.</div>`;
+  document.getElementById('ppChain').onclick = e=>{
+    const b = e.target.closest('.achip'); if(b) renderLineage(idx, +b.dataset.n);
+  };
+}
+linSel.addEventListener('change', ()=>renderLineage(+linSel.value));
+renderLineage(0);
+
+/* ④ 재무실 승인 */
+const AP = PF.approval;
+document.getElementById('ppApprKpis').innerHTML =
+  kpiCard('승인대기', AP.wait+' <small>건</small>','검토·보완·등록')+
+  kpiCard('승인완료', AP.done+' <small>건</small>','승인+확정')+
+  kpiCard('반려', AP.rejected+' <small>건</small>','사유 필수')+
+  kpiCard('평균 승인기간', AP.avgDays+' <small>일</small>','SLA 10일')+
+  kpiCard('승인·확정 금액', nf(AP.amountDone)+' <small>억원</small>','순재무성과 기준');
+const queue = PF.regs.filter(r=>['검토','보완','등록'].includes(r.status))
+  .sort((a,b)=>a.slaDay-b.slaDay);
+const vRef = {c:null};
+function renderVerify(r){
+  document.getElementById('ppVerify').innerHTML = `
+    <h3>검증 패널 — ${r.id} ${stPill(r.status)}</h3>
+    <div class="sub">${r.name} · ${r.type} ${typeName(r.type)} · Rule ${r.rule}(${r.ruleVer}) · 매칭 ${nf(r.match)}건</div>
+    <div class="chart short" id="ppVerifyWf"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button style="font:inherit;font-weight:600;color:#fff;background:var(--good);border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업 — 실운영에서 승인 워크플로가 동작합니다')">승인</button>
+      <button style="font:inherit;font-weight:600;color:var(--warn);background:#fdf1d7;border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업')">보완요청</button>
+      <button style="font:inherit;font-weight:600;color:var(--bad);background:#fdecec;border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업')">반려</button>
+      <a href="#" onclick="goPp(3);document.getElementById('ppLinSel').value=${PF.regs.indexOf(r)};renderLineage(${PF.regs.indexOf(r)});return false"
+        style="margin-left:auto;font-size:12px;align-self:center">Lineage 열기 →</a>
+    </div>`;
+  vRef.c = null;
+  drawWaterfall('ppVerifyWf', r, vRef);
+}
+document.querySelector('#ppQueue tbody').innerHTML = queue.map((r,i)=>
+  `<tr data-i="${i}" style="cursor:pointer">
+   <td>${r.slaDay<=3?'<span class="pill r">D-'+r.slaDay+'</span>':'<span class="pill y">D-'+r.slaDay+'</span>'}</td>
+   <td>${r.id}</td><td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${r.type}</span></td>
+   <td class="num">${nf(r.netEok)}억</td><td>${stPill(r.status)}</td></tr>`).join('');
+document.querySelector('#ppQueue tbody').addEventListener('click', e=>{
+  const tr = e.target.closest('tr'); if(tr) renderVerify(queue[+tr.dataset.i]);
+});
+renderVerify(queue[0]);
+mk('ppFunnel', {
+  tooltip:tip({formatter:p=>`${p.name}<br><b>${p.value}</b>건`}),
+  grid:{left:60,right:40,top:8,bottom:20},
+  xAxis:axisY({type:'value'}),
+  yAxis:axisX({type:'category',data:AP.funnel.map(f=>f[0]).reverse()}),
+  series:[{type:'bar',barMaxWidth:22,color:'#6ea3dd',itemStyle:{borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',fontSize:11,color:INK2},
+    data:AP.funnel.map(f=>f[1]).reverse()}]
+});
+mk('ppByType', {
+  tooltip:tip({formatter:p=>`${p.name} ${typeName(p.name)}<br><b>${nf(p.value)}</b>억원`}),
+  grid:{left:70,right:50,top:8,bottom:20},
+  xAxis:axisY({type:'value',name:'억원',nameTextStyle:{color:INK3}}),
+  yAxis:axisX({type:'category',data:AP.byType.map(x=>x[0]).reverse()}),
+  series:[{type:'bar',barMaxWidth:18,itemStyle:{borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',fontSize:10,color:INK2,formatter:p=>nf(p.value)},
+    data:AP.byType.map(x=>({value:x[1],itemStyle:{color:gcOf(x[0])}})).reverse()}]
+});
+
+/* ⑤ 유형·매핑 */
+{
+  const effects = Object.keys(PF.effectMap);
+  const cols = PF.types.map(t=>t[0]);
+  const header = `<thead><tr><th style="min-width:150px">연구효과 ＼ 재무성과</th>${
+    cols.map(c=>`<th style="text-align:center;color:${gcOf(c)}">${c}</th>`).join('')}</tr></thead>`;
+  const defaults = {};
+  PF.regs.forEach(r=>{defaults[r.effect]=r.type});
+  const body = effects.map(e=>{
+    const cand = PF.effectMap[e];
+    const def = cand.includes(defaults[e]) ? defaults[e] : cand[0];
+    return `<tr><td>${e}</td>${cols.map(c=>{
+      if(!cand.includes(c)) return '<td></td>';
+      const isDef = c===def;
+      return `<td style="text-align:center;font-size:14px;color:${gcOf(c)}">${isDef?'●':'○'}</td>`;
+    }).join('')}</tr>`;
+  }).join('');
+  document.getElementById('ppMatrix').innerHTML = header + '<tbody>' + body + '</tbody>';
+  document.querySelector('#ppErosion tbody').innerHTML = PF.erosionCatalog.map(e=>
+    `<tr><td><span class="pill" style="background:${gcOf(e[0])};color:#fff">${e[0]}</span> ${typeName(e[0])}</td>
+     <td><b>${e[1]}</b></td><td>${e[2]}</td></tr>`).join('');
+}
 </script>
 </body>
 </html>
