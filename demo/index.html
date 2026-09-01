@@ -177,13 +177,17 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 
 /* ── Insight ── */
 #p-my .g-insight{background:linear-gradient(135deg,#1E3A8A 0%,#2563EB 55%,#3B82F6 100%);
-  border:0;color:#fff;box-shadow:0 14px 34px rgba(37,99,235,.28)}
+  border:0;color:#fff;box-shadow:0 14px 34px rgba(37,99,235,.28);
+  padding:20px 26px 22px}
+#p-my .g-insight .g-sub{margin-bottom:14px}
 #p-my .g-insight h4,#p-my .g-insight .g-ins-t{color:#fff}
 #p-my .g-insight .g-sub{color:#BFDBFE}
-#p-my .g-ins-list{display:grid;gap:2px}
-#p-my .g-ins-item{display:flex;gap:13px;align-items:flex-start;padding:12px 0;
-  border-bottom:1px solid rgba(255,255,255,.15)}
-#p-my .g-ins-item:last-child{border-bottom:0}
+/* 인사이트는 3~4개의 짧은 항목이다. 세로로 쌓으면 1400px 카드에서 폭의 31%만 쓰면서
+   높이만 누적돼 카드가 비어 보인다 → 가로 그리드로 폭을 쓰고 높이를 절반으로 줄인다.
+   auto-fit이라 항목 수(3·4개)와 화면 폭에 따라 열 수가 자동으로 맞춰진다. */
+#p-my .g-ins-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));
+  gap:16px 26px}
+#p-my .g-ins-item{display:flex;gap:12px;align-items:flex-start;padding:0}
 #p-my .g-ins-ic{width:28px;height:28px;border-radius:9px;flex:none;display:grid;place-items:center;
   background:rgba(255,255,255,.18);font-size:14px}
 #p-my .g-ins-t{font-size:13.5px;font-weight:600;line-height:1.5}
