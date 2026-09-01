@@ -95,7 +95,6 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     <button data-p="my">My Dashboard</button>
     <button data-p="act">활동군 상세</button>
     <button data-p="mw">MW 분석</button>
-    <button data-p="lt">장기성과</button>
     <button data-p="pp">성과 플랫폼</button>
     <button data-p="exec">Executive</button>
     <button data-p="sim">시뮬레이터</button>
@@ -139,7 +138,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
       </div>
       <div style="display:flex;justify-content:space-between;align-items:baseline">
         <div><span class="stat" id="cumReal"></span><small style="color:var(--text-2)">누적 실현이익</small></div>
-        <a href="#" onclick="go('lt');return false" style="font-size:12px">장기성과 대시보드 →</a>
+        <a href="#" onclick="go('act',2);return false" style="font-size:12px">장기성과 대시보드 →</a>
       </div>
     </div>
   </div>
@@ -230,15 +229,64 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
         <th class="num">연구비</th><th class="num">완료예정</th></tr></thead><tbody></tbody></table></div></div>
   </div>
 
-  <!-- 장기 성과관리 -->
+  <!-- 장기 성과관리·확산 — 심화 대시보드를 패널 내부에 직접 렌더링 (Single Entry Point) -->
   <div class="apanel" id="ap-2" hidden>
-    <div class="row" style="grid-template-columns:repeat(4,1fr)" id="lt2Kpis"></div>
-    <div class="card" style="text-align:center;padding:34px">
-      <div style="font-size:14px;color:var(--text-2);margin-bottom:12px">
-        장기 성과관리·확산 검토는 전용 심화 대시보드에서 제공합니다 —
-        활용상태 추적, Achievement, 미활용 분석, BEP 등 위젯 10종.</div>
-      <button onclick="go('lt')" style="font:inherit;font-weight:600;color:#fff;background:var(--brand);
-        border:0;border-radius:8px;padding:10px 22px;cursor:pointer">장기성과 대시보드 열기 →</button>
+    <div class="row" style="grid-template-columns:repeat(5,1fr)" id="ltKpis"></div>
+    <div class="legend-note" style="margin:-4px 0 12px">
+      완료평가 이후 1~5년차 활용평가 추적 — 활용상태 · Achievement · BEP · 미활용 분석 위젯 10종.
+      성과 등록·산식·재무실 승인 프로세스는
+      <a href="#" onclick="go('pp');return false">성과 플랫폼</a> 탭에서 관리합니다.
+    </div>
+    <div class="row" style="grid-template-columns:5fr 7fr">
+      <div class="card">
+        <h3>연차별 활용률 <span class="badge">DEMO</span></h3>
+        <div class="sub">완료 후 n년차 활용평가 결과 구성비</div>
+        <div class="chart" id="yearlyUtil"></div>
+      </div>
+      <div class="card">
+        <h3>완료연도 코호트: 기대 vs 실현</h3>
+        <div class="sub">기대 = 년간기대이익 × 경과년(a1) · 실현 = 활용평가 누계(시뮬레이션)</div>
+        <div class="chart" id="cohort"></div>
+      </div>
+    </div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card">
+        <h3>누적 실현이익 vs 누적 연구비 (BEP)</h3>
+        <div class="sub">단위: 억원 · 교차 이후 = 투자 회수 구간</div>
+        <div class="chart" id="bep"></div>
+      </div>
+      <div class="card">
+        <h3>기대효과 유형 구성 (a1 실데이터)</h3>
+        <div class="sub">완료평가 기대이익의 효과유형별 합계, 억원</div>
+        <div class="chart" id="effectMap"></div>
+      </div>
+    </div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card">
+        <h3>활용부서 기여 리더보드 <span class="badge">DEMO</span></h3>
+        <div class="sub">실현이익 합계 상위 10개 활용부서, 억원</div>
+        <div class="chart" id="deptLead"></div>
+      </div>
+      <div class="card">
+        <h3>미활용 사유 파레토 <span class="badge">DEMO</span></h3>
+        <div class="sub">막대 = 사유별 비중(%), 선 = 누적 비중(%)</div>
+        <div class="chart" id="pareto"></div>
+      </div>
+    </div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card">
+        <h3>투자효율 산점도</h3>
+        <div class="sub">X 집행비용 · Y 누적 실현이익 (억원) · 대각선 = BEP</div>
+        <div class="chart" id="scatter"></div>
+      </div>
+      <div class="card">
+        <h3>Achievement Top / Bottom 10</h3>
+        <div class="sub">기대 대비 실현 %가 가장 높은/낮은 과제</div>
+        <div class="scroll" style="max-height:320px"><table id="tbTable">
+          <thead><tr><th>과제</th><th class="num">완료</th><th class="num">기대</th>
+          <th class="num">실현</th><th class="num">Achv</th><th>상태</th></tr></thead>
+          <tbody></tbody></table></div>
+      </div>
     </div>
   </div>
 
@@ -367,61 +415,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
   </div>
 </section>
 
-<!-- ─────────────── 장기성과 ─────────────── -->
-<section class="page" id="p-lt">
-  <div class="row" style="grid-template-columns:repeat(5,1fr)" id="ltKpis"></div>
-  <div class="row" style="grid-template-columns:5fr 7fr">
-    <div class="card">
-      <h3>연차별 활용률 <span class="badge">DEMO</span></h3>
-      <div class="sub">완료 후 n년차 활용평가 결과 구성비</div>
-      <div class="chart" id="yearlyUtil"></div>
-    </div>
-    <div class="card">
-      <h3>완료연도 코호트: 기대 vs 실현</h3>
-      <div class="sub">기대 = 년간기대이익 × 경과년(a1) · 실현 = 활용평가 누계(시뮬레이션)</div>
-      <div class="chart" id="cohort"></div>
-    </div>
-  </div>
-  <div class="row" style="grid-template-columns:7fr 5fr">
-    <div class="card">
-      <h3>누적 실현이익 vs 누적 연구비 (BEP)</h3>
-      <div class="sub">단위: 억원 · 교차 이후 = 투자 회수 구간</div>
-      <div class="chart" id="bep"></div>
-    </div>
-    <div class="card">
-      <h3>기대효과 유형 구성 (a1 실데이터)</h3>
-      <div class="sub">완료평가 기대이익의 효과유형별 합계, 억원</div>
-      <div class="chart" id="effectMap"></div>
-    </div>
-  </div>
-  <div class="row" style="grid-template-columns:6fr 6fr">
-    <div class="card">
-      <h3>활용부서 기여 리더보드 <span class="badge">DEMO</span></h3>
-      <div class="sub">실현이익 합계 상위 10개 활용부서, 억원</div>
-      <div class="chart" id="deptLead"></div>
-    </div>
-    <div class="card">
-      <h3>미활용 사유 파레토 <span class="badge">DEMO</span></h3>
-      <div class="sub">막대 = 사유별 비중(%), 선 = 누적 비중(%)</div>
-      <div class="chart" id="pareto"></div>
-    </div>
-  </div>
-  <div class="row" style="grid-template-columns:6fr 6fr">
-    <div class="card">
-      <h3>투자효율 산점도</h3>
-      <div class="sub">X 집행비용 · Y 누적 실현이익 (억원) · 대각선 = BEP</div>
-      <div class="chart" id="scatter"></div>
-    </div>
-    <div class="card">
-      <h3>Achievement Top / Bottom 10</h3>
-      <div class="sub">기대 대비 실현 %가 가장 높은/낮은 과제</div>
-      <div class="scroll" style="max-height:320px"><table id="tbTable">
-        <thead><tr><th>과제</th><th class="num">완료</th><th class="num">기대</th>
-        <th class="num">실현</th><th class="num">Achv</th><th>상태</th></tr></thead>
-        <tbody></tbody></table></div>
-    </div>
-  </div>
-</section>
+<!-- 장기성과 전용 페이지(#p-lt)는 제거 — 활동군 상세 > 장기 성과관리·확산(ap-2)으로 통합 -->
 
 <!-- ─────────────── 성과 플랫폼 (P-1 목업) ─────────────── -->
 <section class="page" id="p-pp">
@@ -568,15 +562,48 @@ const axisY = extra => Object.assign({splitLine:{lineStyle:{color:GRID}},axisLin
 const tip = extra => Object.assign({backgroundColor:SURF,borderColor:'#e4e7ec',
   textStyle:{color:INK1,fontSize:12},confine:true}, extra||{});
 
-/* ── 탭 ── */
-function go(p){
+/* ── 탭 + 라우팅 (동일 페이지 내 상태 전환) ──
+   URL: #page=act&activity=long-term-performance
+   구 경로(#page=lt)는 활동군 상세 > 장기 성과관리·확산으로 자동 승계 */
+const ACT_SLUG = {1:'strategy', 2:'long-term-performance', 3:'field-support',
+                  4:'exploration', 5:'knowledge-asset', 6:'org-capability'};
+const SLUG_ACT = Object.fromEntries(Object.entries(ACT_SLUG).map(([k,v])=>[v,+k]));
+// 초기화 중에는 hash 쓰기를 억제한다 (init 시점의 goAct/go 호출이 딥링크를 덮어쓰지 않도록)
+let currentPage = 'home', currentAct = 1, applyingRoute = true;
+
+function setHash(h){
+  if(location.hash === h) return;
+  try { history.replaceState(null, '', h); } catch(e) { location.hash = h; }
+}
+function syncHash(){
+  if(applyingRoute) return;
+  let h = '#page=' + currentPage;
+  if(currentPage === 'act') h += '&activity=' + ACT_SLUG[currentAct];
+  setHash(h);
+}
+function go(p, act){
+  currentPage = p;
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on', b.dataset.p===p));
   document.querySelectorAll('.page').forEach(s=>s.classList.toggle('on', s.id==='p-'+p));
+  if(p === 'act') goAct(act || currentAct);
   charts.forEach(c=>c.resize());
+  syncHash();
+}
+function applyRoute(){
+  const q = new URLSearchParams(location.hash.replace(/^#/, ''));
+  let page = q.get('page') || 'home';
+  let act = SLUG_ACT[q.get('activity')] || null;
+  if(page === 'lt'){ page = 'act'; act = 2; }            // 구 '장기성과' 탭 링크 호환
+  if(!document.getElementById('p-' + page)) page = 'home';
+  applyingRoute = true;
+  go(page, act);
+  applyingRoute = false;
+  syncHash();
 }
 document.getElementById('nav').addEventListener('click', e=>{
   if(e.target.dataset.p) go(e.target.dataset.p);
 });
+window.addEventListener('hashchange', applyRoute);
 window.addEventListener('resize', ()=>charts.forEach(c=>c.resize()));
 
 document.getElementById('asof').textContent = '데이터 기준 ' + D.meta.asOf;
@@ -917,6 +944,7 @@ actNav.innerHTML = [1,2,3,4,5,6].map(a=>
   `<button class="achip${a===1?' on':''}" data-a="${a}">
     <span class="sw" style="background:${C[a]}"></span>${ACT[a]}</button>`).join('');
 function goAct(a){
+  currentAct = a;
   actNav.querySelectorAll('.achip').forEach(b=>{
     const on = b.dataset.a==String(a);
     b.classList.toggle('on', on);
@@ -924,6 +952,7 @@ function goAct(a){
   });
   document.querySelectorAll('.apanel').forEach(p=>p.hidden = p.id!=='ap-'+a);
   charts.forEach(c=>c.resize());
+  syncHash();
 }
 actNav.addEventListener('click', e=>{
   const b = e.target.closest('.achip'); if(b) goAct(+b.dataset.a);
@@ -967,12 +996,7 @@ document.querySelector('#stTable tbody').innerHTML = ST.projects.map(p=>
   `<tr><td>${p.code}</td><td>${p.name}</td><td>${p.dept}</td><td>${p.leader}</td>
    <td class="num">${nf(p.budget)}억</td><td class="num">${p.end}</td></tr>`).join('');
 
-/* 4.2 장기성과 (요약 + 링크) */
-document.getElementById('lt2Kpis').innerHTML =
-  kpiCard('추적대상', nf(L.tracked)+' <small>건</small>','완료 후 1~5년차')+
-  kpiCard('장기 활용률', L.utilRate+'<small>%</small>','')+
-  kpiCard('Achievement', L.achievement+'<small>%</small>','DEMO 시뮬레이션')+
-  kpiCard('누적 실현이익', nf(L.cumRealized)+' <small>억원</small>','');
+/* 4.2 장기성과 — KPI·차트는 ap-2 패널에 인라인 렌더링 (위 '장기성과' 블록에서 처리) */
 
 /* 4.3 현업지원 */
 const SP = D.support, SPD = DT.support;
@@ -1495,6 +1519,10 @@ mk('ppByType', {
     `<tr><td><span class="pill" style="background:${gcOf(e[0])};color:#fff">${e[0]}</span> ${typeName(e[0])}</td>
      <td><b>${e[1]}</b></td><td>${e[2]}</td></tr>`).join('');
 }
+
+/* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
+applyingRoute = false;
+applyRoute();
 </script>
 </body>
 </html>

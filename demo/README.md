@@ -17,11 +17,26 @@ python3 -m http.server 8080
 
 | 파일 | 역할 |
 |---|---|
-| `index.html` | 대시보드 본체 — 홈 종합현황 / My Dashboard / 활동군 상세(6종) / MW 분석 / 장기성과 / **성과 플랫폼(P-1 목업)** / Executive / 투입 시뮬레이터 8개 탭 |
+| `index.html` | 대시보드 본체 — 홈 종합현황 / My Dashboard / 활동군 상세(6종) / MW 분석 / **성과 플랫폼(P-1 목업)** / Executive / 투입 시뮬레이터 7개 탭 |
 | `demo_data.js` | ETL 산출물 (집계 데이터, 자동생성) |
 | `etl.py` | CSV → 집계 데이터 변환 스크립트 (`python3 etl.py`로 재생성) |
 | `data/a1~a6*.csv` | 원천 Demo DB (완료평가 / ManWeek / 연구과제 / 현업지원 / 학회활동 / 기술홍보) |
 | `vendor/echarts.min.js` | ECharts 5.5.0 (오프라인 동작용 로컬 사본) |
+
+## 화면 라우팅
+
+탭·활동군 상태는 URL 해시로 동기화되어 딥링크·뒤로가기가 동작합니다 (페이지 이동 없음).
+
+| URL | 화면 |
+|---|---|
+| `#page=home` | 홈 종합현황 (기본) |
+| `#page=act&activity=strategy` | 활동군 상세 > 전략 프로젝트 |
+| `#page=act&activity=long-term-performance` | 활동군 상세 > **장기 성과관리·확산** (장기성과 대시보드 인라인) |
+| `#page=mw` / `#page=pp` / `#page=exec` / `#page=sim` / `#page=my` | 각 탭 |
+
+`activity` 슬러그: `strategy` · `long-term-performance` · `field-support` ·
+`exploration` · `knowledge-asset` · `org-capability`.
+구 링크 `#page=lt`(장기성과 전용 탭)는 활동군 상세 > 장기 성과관리·확산으로 자동 승계됩니다.
 
 ## 데이터 규칙
 
