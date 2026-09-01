@@ -626,6 +626,8 @@ for name, p in person.items():
             break
     me_people[name] = {
         "o": p["org"],
+        # 실제 참여 과제 총건수 (projects는 표시용 상위 8건이라 집계에 쓸 수 없음)
+        "projN": len(person_projects[name]),
         "acts": [round(p["acts"].get(1, 0), 1), round(p["acts"].get(3, 0), 1),
                  round(p["acts"].get(4, 0), 1)],
         "ym": {ym: round(v, 1) for ym, v in person_ym[name].items() if v > 0 and ym <= LATEST_YM},
