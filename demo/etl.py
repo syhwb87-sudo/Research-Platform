@@ -795,7 +795,6 @@ for r in regs:
 perf = {
     "types": PERF_TYPES,
     "effectMap": EFFECT_MAP,
-    "erosionCatalog": [[k, v[0], v[1]] for k, v in EROSION_CATALOG.items()],
     "rules": RULES,
     "regs": regs,
     "approval": {
