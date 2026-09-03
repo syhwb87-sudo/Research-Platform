@@ -381,6 +381,62 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #pp-5 .er-cgrid input:focus-visible,#pp-5 .er-cgrid textarea:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 #pp-5 .er-generic{display:inline-block;font-size:10px;font-weight:700;color:var(--text-2);background:#eef1f5;border-radius:4px;padding:1px 5px;margin-left:4px}
 @media (max-width:1180px){#pp-5 .er-kpis{grid-template-columns:repeat(3,1fr) !important}}
+/* ═════════ 성과 플랫폼 ③ 산출 근거 추적 — #pp-3 스코프 ═════════ */
+#pp-3 .ln-top{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+#pp-3 .ln-top label{display:block;font-size:11px;color:var(--text-3);margin-bottom:3px}
+#pp-3 .ln-top select,#pp-3 .ln-top input{font:inherit;font-size:12.5px;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:var(--surface)}
+#pp-3 .ln-top select:focus-visible,#pp-3 .ln-top input:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+#pp-3 .ln-search{position:relative;flex:1 1 260px;max-width:420px}
+#pp-3 .ln-hits{position:absolute;left:0;right:0;top:100%;z-index:5;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);margin-top:4px;overflow:hidden}
+#pp-3 .ln-hits button{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;font-size:12px;padding:7px 12px;cursor:pointer}
+#pp-3 .ln-hits button:hover,#pp-3 .ln-hits button:focus-visible{background:#f0f5fc;outline:none}
+#pp-3 .ln-hits .m{color:var(--text-3);margin-left:6px}
+#pp-3 .ln-lane{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:6px 2px}
+#pp-3 .ln-lane-h{font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.3px;margin:8px 0 0}
+#pp-3 .ln-node{position:relative;flex:1 1 0;min-width:118px;border:1px solid var(--border);background:var(--surface);border-radius:10px;
+  padding:9px 10px 8px;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:2px;
+  border-top:3px solid var(--border);transition:box-shadow .15s}
+#pp-3 .ln-node:hover{box-shadow:var(--shadow)}
+#pp-3 .ln-node:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#pp-3 .ln-node.on{border-color:var(--brand);border-top-color:var(--brand);background:#f0f5fc}
+#pp-3 .ln-node .t{font-size:11px;color:var(--text-2);font-weight:600;display:flex;align-items:center;gap:5px}
+#pp-3 .ln-node .v{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pp-3 .ln-node .s{font-size:10.5px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pp-3 .ln-node.amt .v{font-size:16px}
+#pp-3 .ln-node .st{margin-left:auto;font-size:11px;font-weight:700;line-height:1}
+#pp-3 .st.ok{color:var(--good)} #pp-3 .st.warn{color:var(--warn)} #pp-3 .st.info{color:var(--brand)}
+#pp-3 .ln-edge{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;width:44px;font-size:10.5px;color:var(--text-3)}
+#pp-3 .ln-edge b{font-size:13px;color:var(--text-2);font-weight:700;line-height:1}
+#pp-3 .ln-edge::after{content:'▶';font-size:9px;margin-top:1px}
+#pp-3 .ln-join{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-2);padding:2px 0 2px 6px}
+#pp-3 .ln-join::before{content:'';width:0;height:18px;border-left:2px dashed var(--border);margin-left:52px}
+#pp-3 .ln-join span{background:#f0f5fc;border:1px solid #d4e2f5;border-radius:20px;padding:2px 10px}
+#pp-3 .ln-kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px;align-items:baseline}
+#pp-3 .ln-kv dt{color:var(--text-3);font-size:11.5px;white-space:nowrap} #pp-3 .ln-kv dd{margin:0}
+#pp-3 dl{margin:0}
+#pp-3 .ln-formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;background:#f7f9fc;border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;line-height:1.7;white-space:pre-wrap}
+#pp-3 .ln-ok{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;background:#e6f4ec;color:var(--good)}
+#pp-3 .ln-ok.warn{background:#fdf1d7;color:var(--warn)} #pp-3 .ln-ok.info{background:#e3ecfa;color:var(--brand)}
+#pp-3 .ln-samples{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--text-2)}
+#pp-3 .ln-tl{list-style:none;margin:6px 0 0;padding:0 0 0 18px;position:relative}
+#pp-3 .ln-tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;border-left:2px solid var(--border)}
+#pp-3 .ln-tl li{position:relative;padding:4px 0 10px;font-size:12.5px}
+#pp-3 .ln-tl li::before{content:'';position:absolute;left:-17px;top:9px;width:8px;height:8px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 0 0 1px var(--brand)}
+#pp-3 .ln-tl .m{font-size:11px;color:var(--text-3)}
+#pp-3 .ln-checks{list-style:none;margin:0;padding:0}
+#pp-3 .ln-checks li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--border);font-size:12.5px}
+#pp-3 .ln-checks li:last-child{border-bottom:0}
+#pp-3 .ln-checks .ic{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff}
+#pp-3 .ic.ok{background:var(--good)} #pp-3 .ic.warn{background:var(--warn)} #pp-3 .ic.info{background:var(--brand)}
+#pp-3 .ln-checks .n{font-size:11.5px;color:var(--text-3);margin-top:1px}
+#pp-3 .ln-rev button{border:1px solid var(--border);background:var(--surface);font:inherit;font-size:12px;border-radius:8px;padding:6px 10px;cursor:pointer;text-align:left;width:100%;display:flex;gap:8px;align-items:center}
+#pp-3 .ln-rev button:hover{background:#f0f5fc} #pp-3 .ln-rev button:focus-visible{outline:2px solid var(--brand)}
+#pp-3 .ln-rev .m{margin-left:auto;color:var(--text-3);font-size:11px;white-space:nowrap}
+#pp-3 .ln-act{border:1px solid var(--brand);background:var(--surface);color:var(--brand);font:inherit;font-size:12px;font-weight:600;border-radius:8px;padding:5px 12px;cursor:pointer}
+#pp-3 .ln-act:hover{background:#f0f5fc} #pp-3 .ln-act:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#pp-3 .ln-act[disabled]{opacity:.5;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -853,15 +909,31 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     </div>
   </div>
 
-  <!-- ③ Data Lineage -->
+  <!-- ③ 산출 근거 추적 — 데이터: PF.regs[i].lineage (etl.py), 렌더: 스크립트 하단 LN 모듈 -->
   <div class="ppanel" id="pp-3" hidden>
+    <div class="row" style="grid-template-columns:repeat(4,1fr)" id="lnKpis"></div>
     <div class="card" style="margin-bottom:14px">
-      <h3>Data Lineage — "이 숫자는 어디서 왔는가"
-        <select id="ppLinSel" style="font:inherit;padding:5px 10px;border:1px solid var(--border);border-radius:6px;float:right"></select></h3>
-      <div class="sub">최종 금액 → ERP 원천 레코드까지 역추적 · 노드 클릭 시 상세</div>
-      <div id="ppChain" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:14px 0"></div>
+      <h3 style="font-size:16px">산출 근거 추적 <span class="legend-note" style="font-weight:500">— 이 숫자는 어디서 왔는가</span></h3>
+      <div class="sub">최종 순재무성과에서 ERP 원천 스냅샷까지 역추적하고, 산식에 변수를 다시 대입해 숫자를 재현합니다. 노드를 누르면 단계별 근거가 열립니다.</div>
+      <div class="ln-top">
+        <div class="ln-search"><label for="lnQ">검색 (성과ID · 과제명 · 금액)</label>
+          <input id="lnQ" type="search" placeholder="예: PF-2026-004, 턴디시, 35" autocomplete="off"><div class="ln-hits" id="lnHits" hidden></div></div>
+        <div><label for="ppLinSel">추적 대상 성과</label><select id="ppLinSel"></select></div>
+        <div id="lnHead" style="margin-left:auto;font-size:12px;color:var(--text-2)"></div>
+      </div>
+      <div class="ln-lane-h">근거 레인 — 어떤 데이터·규칙으로</div>
+      <div class="ln-lane" id="lnLaneSrc" role="group" aria-label="근거 레인"></div>
+      <div class="ln-join"><span id="lnJoin">Rule 산식에 스냅샷 변수 대입 ↓</span></div>
+      <div class="ln-lane-h">금액 레인 — 숫자가 어떻게 바뀌어</div>
+      <div class="ln-lane" id="lnLaneAmt" role="group" aria-label="금액 레인"></div>
     </div>
-    <div class="card" id="ppNode"></div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card" id="lnDetail" aria-live="polite"></div>
+      <div>
+        <div class="card" style="margin-bottom:14px"><h3>체인 건전성</h3><div class="sub">스냅샷·규칙 잠금·재계산·승인·역효과 점검 상태</div><ul class="ln-checks" id="lnChecks"></ul></div>
+        <div class="card"><h3>역방향 추적</h3><div class="sub">같은 Rule·입력 Key 체계를 쓰는 다른 성과 — 중복 계상 확인</div><div class="ln-rev" id="lnRev" style="display:flex;flex-direction:column;gap:6px"></div></div>
+      </div>
+    </div>
   </div>
 
   <!-- ④ 재무실 승인 -->
@@ -2066,7 +2138,7 @@ const stPill = s => ({'확정':'<span class="pill g">확정</span>','승인':'<s
   '등록':'<span class="pill y">등록</span>'})[s] || s;
 
 /* 서브내비 */
-const PP_TABS = [['1','① 자동산출 워크벤치'],['2','② Rule Bank'],['3','③ Data Lineage'],
+const PP_TABS = [['1','① 자동산출 워크벤치'],['2','② Rule Bank'],['3','③ 산출 근거 추적'],
   ['4','④ 재무실 승인'],['5','⑤ 역효과(Erosion)']];
 const ppNav = document.getElementById('ppNav');
 ppNav.innerHTML = PP_TABS.map(([k,t],i)=>
@@ -2079,6 +2151,7 @@ function goPp(k){
   });
   document.querySelectorAll('.ppanel').forEach(p=>p.hidden = p.id!=='pp-'+k);
   charts.forEach(c=>c.resize());
+  if(String(k)==='3' && typeof LN !== 'undefined') LN.refresh();   // ⑤ 점검 상태 반영
 }
 ppNav.addEventListener('click', e=>{const b=e.target.closest('.achip'); if(b) goPp(b.dataset.k)});
 goPp(1);
@@ -2186,45 +2259,150 @@ document.querySelector('#ppRules tbody').addEventListener('click', e=>{
 });
 renderRule(PF.rules[0]);
 
-/* ③ Data Lineage */
-const linSel = document.getElementById('ppLinSel');
-linSel.innerHTML = PF.regs.map((r,i)=>`<option value="${i}">${r.id} · ${r.name}</option>`).join('');
-function lineageNodes(r){
-  const cum = Math.round(r.netEok * Math.min(2, r.persist) * 10) / 10;
-  return [
-    ['연구과제', `${r.code}\n${r.name}`],
-    ['성과유형', `${r.type} ${typeName(r.type)}\n(연구효과: ${r.effect})`],
-    ['입력 Key', r.key],
-    ['ERP 원천', `${nf(r.match)}건 매칭\n${r.period} · 스냅샷 동결`],
-    ['Rule', `${r.rule} (${r.ruleVer})\n산식·변수 버전 고정`],
-    ['성과총액', nf(r.grossEok)+'억원'],
-    ['역효과', r.erosionEok?`−${nf(r.erosionEok)}억\n${r.erosionName}`:'해당 없음'],
-    ['기여율', r.contrib+'% 적용'],
-    ['순재무성과', nf(r.netEok)+'억원'],
-    ['재무실 승인', r.status],
-    ['활용평가', `1년차 ${r.utilY1}`],
-    ['누적성과', `${nf(cum)}억 (진행중)\n지속년수 ${r.persist}년까지`],
-  ];
-}
-function renderLineage(idx, sel=8){
-  const r = PF.regs[idx];
-  const nodes = lineageNodes(r);
-  document.getElementById('ppChain').innerHTML = nodes.map(([t],i)=>
-    `<button class="achip${i===sel?' on':''}" data-n="${i}"
-      style="${i===sel?`background:${gcOf(r.type)};color:#fff;border-color:transparent`:''};font-size:11px;padding:5px 10px">${t}</button>`
-    + (i<nodes.length-1?'<span style="color:var(--text-3);font-size:11px">▶</span>':'')).join('');
-  const [t, d] = nodes[sel];
-  document.getElementById('ppNode').innerHTML = `
-    <h3>노드 상세 — ${t}</h3>
-    <div class="brief" style="white-space:pre-line">${d}</div>
-    <div class="legend-note" style="margin-top:8px">↔ 좌우 노드를 클릭해 원천(ERP)까지 역추적하거나 누적성과까지 순추적할 수 있습니다.
-    실운영에서는 ERP 노드에서 레코드 샘플 10건과 전체 내보내기를 제공합니다.</div>`;
-  document.getElementById('ppChain').onclick = e=>{
-    const b = e.target.closest('.achip'); if(b) renderLineage(idx, +b.dataset.n);
+/* ③ 산출 근거 추적 */
+/* ③ 산출 근거 추적 — PF.regs[i].lineage(etl.py 생성) 기반. 실운영: lineage_edge·스냅샷 저장소 API로 교체 */
+const LN = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const ST_IC = {ok:'✓', warn:'!', info:'i'};
+  const eok = v => nf(v) + '억';
+  const short = (t, n) => (t = String(t ?? ''), t.length > n ? t.slice(0, n - 1) + '…' : t);
+  const cumOf = r => { const done = r.lineage.years.filter(y => y[2] != null); return done.reduce((a,y)=>a+y[2],0); };
+  const erosionCheck = r => {   // ⑤ 역효과 점검 상태(브라우저 저장) — 런타임 연동
+    if(typeof ErosionService === 'undefined') return ['역효과 점검', 'info', '점검 모듈 로드 전'];
+    const s = ErosionService.assessmentSummary(r.id);
+    if(!s) return ['역효과 점검(⑤)', 'info', (r.erosionEok ? `카탈로그 기본 역효과 −${eok(r.erosionEok)} 첨부 · ` : '') + '체크리스트 미작성 — ⑤에서 점검'];
+    const st = {NOT_STARTED:'warn', IN_PROGRESS:'info', COMPLETED:'ok'}[s.status];
+    return ['역효과 점검(⑤)', st, `${ER_ENUM.status[s.status]} · 해당 ${s.applicable}건 · 판단불가 ${s.undetermined}건 · 조정 검토 ${s.adjust}건`];
   };
-}
-linSel.addEventListener('change', ()=>renderLineage(+linSel.value));
-renderLineage(0);
+  const allChecks = r => [...r.lineage.checks, erosionCheck(r)];
+
+  /* 노드 정의 — [레인, 제목, 값, 보조, 진입 연산, 연결 체크 인덱스] */
+  function nodes(r){
+    const L = r.lineage, S = L.snapshot, C = L.calc;
+    return [
+      ['src','연구과제', r.code, short(r.name, 16), null, null],
+      ['src','성과유형', r.type, typeName(r.type), '분류', null],
+      ['src','입력 Key', `${L.keyValues.length}개 차원`, r.key.split('·').slice(0,2).join('·')+'…', '지정', null],
+      ['src','ERP 스냅샷', S.id || '미생성', S.id ? `${nf(S.records)}건 · ${S.frozenAt.slice(0,10)} 동결` : '등록 단계', '조회·동결', [0,3]],
+      ['src','Rule 버전', `${r.rule} ${r.ruleVer}`, C.ok ? '재계산 일치' : `차이 ${C.diffEok}억`, '적용', [1,2]],
+      ['amt','성과총액', eok(r.grossEok), `재계산 ${eok(C.recomputedEok)}`, '= Rule', [2]],
+      ['amt','역효과', r.erosionEok ? '−'+eok(r.erosionEok) : '0억', r.erosionEok ? short(r.erosionName, 12) : '해당 없음', '−', [5]],
+      ['amt','연구기여율', `× ${r.contrib}%`, 'a1 완료평가 기여도', '×', null],
+      ['amt','직접비용', '−'+eok(r.directEok), '재무실 인정분', '−', null],
+      ['amt','순재무성과', eok(r.netEok), stPillText(r.status), '=', null],
+      ['amt','재무실 승인', r.status, L.approval.length ? L.approval[L.approval.length-1][2] : '—', '→', [4]],
+      ['amt','연차 누적', eok(cumOf(r)), `${L.years.filter(y=>y[2]!=null).length}/${r.persist}년차 반영`, '→', null],
+    ];
+  }
+  const stPillText = s => ({'확정':'확정 · 월마감 반영','승인':'승인 완료','검토':'재무실 검토중','보완':'보완 요청','등록':'등록 (검토 전)'})[s] || s;
+  const worst = sts => sts.includes('warn') ? 'warn' : sts.includes('info') ? 'info' : 'ok';
+
+  let cur = 0, sel = 9;
+  function nodeHtml(n, i, r, checks){
+    const [lane, t, v, s, op, ci] = n;
+    const st = ci ? worst(ci.map(k => checks[k][1])) : null;
+    return (op ? `<div class="ln-edge" aria-hidden="true"><b>${esc(op)}</b></div>` : '') +
+      `<button type="button" class="ln-node ${lane}${i===sel?' on':''}" data-n="${i}" aria-pressed="${i===sel}" style="border-top-color:${i===sel?'var(--brand)':lane==='amt'?gcOf(r.type):'var(--border)'}">
+        <span class="t">${esc(t)}${st?`<span class="st ${st}" title="${esc(checks.filter((_,k)=>ci.includes(k)).map(c=>c[0]+': '+c[2]).join(' / '))}">${ST_IC[st]}</span>`:''}</span>
+        <span class="v">${esc(v)}</span><span class="s">${esc(s)}</span></button>`;
+  }
+  function render(idx, node){
+    cur = idx; if(node != null) sel = node;
+    const r = PF.regs[idx], L = r.lineage, ns = nodes(r), checks = allChecks(r);
+    $('ppLinSel').value = idx;
+    $('lnHead').innerHTML = `<b>${esc(r.id)}</b> · ${esc(r.name)} <span class="legend-note">· ${esc(r.dept)} · 등록 ${L.registeredAt}</span>`;
+    $('lnLaneSrc').innerHTML = ns.slice(0,5).map((n,i)=>nodeHtml(n,i,r,checks)).join('');
+    $('lnLaneAmt').innerHTML = ns.slice(5).map((n,i)=>nodeHtml(n,i+5,r,checks)).join('');
+    $('lnJoin').textContent = `${r.rule} ${r.ruleVer} 산식에 스냅샷 변수 ${L.calc.vars.length}개 대입 ↓  ${L.calc.ok ? '재계산 일치 ✓' : '재계산 차이 !'}`;
+    $('lnDetail').innerHTML = detail(r, sel, ns);
+    $('lnChecks').innerHTML = checks.map(([t,st,n]) => `<li><span class="ic ${st}" aria-hidden="true">${ST_IC[st]}</span><div><div><b>${esc(t)}</b> <span class="legend-note">${({ok:'정상',warn:'주의',info:'참고'})[st]}</span></div><div class="n">${esc(n)}</div></div></li>`).join('');
+    const rev = PF.regs.filter(x => x !== r && x.type === r.type);
+    $('lnRev').innerHTML = rev.length ? rev.map(x => `<button type="button" data-go="${PF.regs.indexOf(x)}"><span class="er-code" style="display:inline-block;font-size:10.5px;font-weight:700;color:#fff;border-radius:4px;padding:1px 6px;background:${gcOf(x.type)}">${esc(x.type)}</span>${esc(x.id)} · ${esc(short(x.name,18))}<span class="m">${eok(x.netEok)} · ${esc(x.status)}</span></button>`).join('')
+      + `<div class="legend-note">같은 Rule(${esc(r.rule)})을 쓰는 성과 ${rev.length}건. 입력 Key(공장·품목·기간)가 겹치면 공통-7 성과 중복 항목으로 점검합니다.</div>`
+      : `<div class="legend-note">같은 Rule을 쓰는 다른 성과가 없습니다.</div>`;
+  }
+  const kv = rows => `<dl class="ln-kv">${rows.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${v}</dd>`).join('')}</dl>`;
+  const tbl = (head, rows) => `<div style="overflow-x:auto"><table><thead><tr>${head.map(h=>`<th${/금액|값|억|건/.test(h)?' class="num"':''}>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(rw=>`<tr>${rw.map((c,i)=>`<td${/금액|값|억|건/.test(head[i])?' class="num"':''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const okPill = (ok, t) => `<span class="ln-ok${ok?'':' warn'}">${ok?'✓ ':'! '}${esc(t)}</span>`;
+  const fmtV = (v, u) => (typeof v === 'number' ? (Number.isInteger(v) ? nf(v) : v) : esc(v)) + (u ? ' ' + esc(u) : '');
+
+  function detail(r, n, ns){
+    const L = r.lineage, S = L.snapshot, C = L.calc, rule = PF.rules.find(x => x.id === r.rule) || {};
+    const h = t => `<h3>노드 상세 — ${esc(t)}</h3>`;
+    switch(n){
+      case 0: return h('연구과제') + kv([['과제코드', `<b>${esc(r.code)}</b>`],['과제명', esc(r.name)],['활용 부서', esc(r.dept)],['연구효과(a1 완료평가)', esc(r.effect)],['성과 등록 ID', esc(r.id)],['등록일', L.registeredAt],['지속년수', `${r.persist}년 (완료평가 기준)`]])
+        + `<div class="legend-note" style="margin-top:10px">원천: a1 완료평가 · a3 연구과제. 과제 상세는 활동군 상세 &gt; 장기 성과관리·확산에서 확인합니다.</div>`;
+      case 1: { const cand = PF.effectMap[r.effect] || [];
+        return h('성과유형') + kv([['확정 유형', `<b style="color:${gcOf(r.type)}">${esc(r.type)} ${esc(typeName(r.type))}</b>`],['그룹', {A:'A 판매·매출',B:'B 원가·생산',C:'C 비용'}[r.type[0]]],['선택 근거', `연구효과 「${esc(r.effect)}」의 자동 추천 후보 ${cand.length}종 중 확정`],['후보 유형', cand.map(c=>`<span class="pill" style="background:${gcOf(c)}22;color:${gcOf(c)}">${esc(c)} ${esc(typeName(c))}</span>`).join(' ') || '—'],['적용 Rule', `${esc(r.rule)} ${esc(r.ruleVer)}`]]); }
+      case 2: return h('입력 Key') + `<div class="sub">성과 등록 시 지정한 조회 조건 — ERP 원천을 이 Key로 필터링해 스냅샷을 만듭니다</div>` + tbl(['차원','지정값'], L.keyValues.map(([k,v])=>[esc(k), esc(v)]))
+        + `<div class="legend-note" style="margin-top:8px">Key 체계(${r.type[0]}그룹): ${esc(r.key)}</div>`;
+      case 3: return h('ERP 원천 스냅샷') + (S.id ? kv([['스냅샷 ID', `<b>${esc(S.id)}</b>`],['동결 시각', esc(S.frozenAt)],['원천 시스템', esc(S.source)],['조회 기간', esc(S.period)],['레코드 수', `<b>${nf(S.records)}건</b>${S.currentRecords !== S.records ? ` <span class="ln-ok info">i 현재 재조회 ${nf(S.currentRecords)}건 — 스냅샷 기준 유지</span>` : ' ' + okPill(true, '현재 원천과 일치')}`]])
+        + `<h4 style="margin:12px 0 6px;font-size:12.5px">집계값 (산식 변수로 전달)</h4>` + tbl(['변수','값','출처'], C.vars.map(v=>[esc(v[0]), `<b>${fmtV(v[1], v[2])}</b>`, esc(v[3])]))
+        + `<h4 style="margin:12px 0 6px;font-size:12.5px">레코드 식별자 샘플 10건 <span class="legend-note">/ ${nf(S.records)}건</span></h4><div class="ln-samples">${S.samples.map(esc).map(x=>`<span>${x}</span>`).join('')}</div>
+           <div style="margin-top:12px;display:flex;gap:8px;align-items:center"><button type="button" class="ln-act" disabled title="실운영에서 제공">전체 레코드 내보내기 (실운영)</button><span class="legend-note">ERP 원본은 변할 수 있으므로 산출에 쓰인 집계값과 식별자 목록을 동결해 보관합니다.</span></div>`
+        : `<div class="brief">등록 단계라 아직 스냅샷이 생성되지 않았습니다. 재무실 검토 착수 시 입력 Key로 원천을 조회해 동결합니다.</div>`);
+      case 4: return h('Rule 버전 · 재계산') + kv([['Rule', `<b>${esc(r.rule)} ${esc(r.ruleVer)}</b> ${rule.status==='승인' ? okPill(true,'버전 잠금') : `<span class="ln-ok warn">! ${esc(rule.status||'')} — 잠금 전</span>`}`],['적용 기간', esc(rule.period||'')],['원천', esc(rule.source||'')]])
+        + `<div class="ln-formula" style="margin-top:10px">${esc(rule.formula||'')}</div>`
+        + `<h4 style="margin:12px 0 6px;font-size:12.5px">변수 대입</h4>` + tbl(['변수','값','출처'], C.vars.map(v=>[esc(v[0]), `<b>${fmtV(v[1], v[2])}</b>`, esc(v[3])]))
+        + `<h4 style="margin:12px 0 6px;font-size:12.5px">계산 단계</h4>` + tbl(['단계','대입','값'], C.steps.map(s=>[esc(s[0]), `<span style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px">${esc(s[1])}</span>`, `<b>${fmtV(s[2], s[3])}</b>`]))
+        + `<div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">${okPill(C.ok, C.ok ? `재계산 ${eok(C.recomputedEok)} = 등록 성과총액 ${eok(r.grossEok)}` : `재계산 ${eok(C.recomputedEok)} ≠ 등록 ${eok(r.grossEok)} (차이 ${C.diffEok}억)`)}<span class="legend-note">허용 오차 0.5%</span></div>
+           <div class="legend-note" style="margin-top:8px">개정 이력: ${(rule.history||[]).map(esc).join(' → ')}</div>`;
+      case 5: return h('성과총액') + `<div class="stat" style="color:${gcOf(r.type)}">${eok(r.grossEok)}<small>원</small></div>` + kv([['산출', `${esc(r.rule)} ${esc(r.ruleVer)} 산식 × 스냅샷 ${esc(S.id||'미생성')}`],['재계산', okPill(C.ok, `${eok(C.recomputedEok)} · ${C.ok?'일치':'차이 '+C.diffEok+'억'}`)],['검증 기간', esc(r.period)]])
+        + `<div class="legend-note" style="margin-top:10px">역효과·기여율·직접비용을 반영하기 전 총액입니다. 좌측 「Rule 버전」 노드에서 변수 대입을 확인하세요.</div>`;
+      case 6: { const cat = typeof ErosionService !== 'undefined' ? ErosionService.catalogFor(r.type) : null; const s = typeof ErosionService !== 'undefined' ? ErosionService.assessmentSummary(r.id) : null;
+        return h('역효과 (Erosion)') + `<div class="stat" style="color:var(--warn)">${r.erosionEok ? '−'+eok(r.erosionEok) : '0억'}<small>원</small></div>`
+        + kv([['자동 첨부 역효과', esc(r.erosionName)],['카탈로그 권장 산정', cat ? `<span style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px">${esc(cat.recommendedFormula[0])}</span>` : '—'],['⑤ 체크리스트 점검', s ? `<span class="ln-ok ${({NOT_STARTED:'warn',IN_PROGRESS:'info',COMPLETED:''})[s.status]}">${ER_ENUM.status[s.status]}</span> 해당 ${s.applicable}건 · 판단불가 ${s.undetermined}건 · 조정 검토 ${s.adjust}건` : `<span class="ln-ok warn">! 미작성</span>`]])
+        + `<div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="ln-act" data-act="erosion">⑤ 역효과 점검 열기 →</button><span class="legend-note">체크리스트 '해당' 항목의 금액은 조정 검토용이며 자동 차감되지 않습니다.</span></div>`; }
+      case 7: return h('연구기여율') + `<div class="stat">${r.contrib}<small>%</small></div>` + kv([['근거', 'a1 완료평가 「연구기여도」 — 설비투자·조업개선 등 타 요인을 제외한 연구 기여분'],['적용', `(성과총액 ${eok(r.grossEok)} − 역효과 ${eok(r.erosionEok)}) × ${r.contrib}% = <b>${eok(Math.round((r.grossEok-r.erosionEok)*r.contrib)/100)}</b>`],['조정 권한', '재무실 승인 단계에서 조정 가능 (이력 보존)']]);
+      case 8: return h('직접비용') + `<div class="stat">−${eok(r.directEok)}<small>원</small></div>` + kv([['정의', '성과 실현을 위해 직접 투입된 비용 중 재무실 인정분 (설비 개조·시운전·외주 등)'],['출처', 'ERP CO 과제 원가 집계'],['참고', '공통-1(설비투자) 등 ⑤ 체크리스트 「해당」 금액과 중복되지 않도록 확인']]);
+      case 9: return h('순재무성과') + `<div class="stat" style="color:var(--brand)">${eok(r.netEok)}<small>원</small></div>`
+        + `<div class="ln-formula">순재무성과 = (성과총액 − 역효과) × 기여율 − 직접비용\n= (${eok(r.grossEok)} − ${eok(r.erosionEok)}) × ${r.contrib}% − ${eok(r.directEok)}\n= <b>${eok(r.netEok)}</b></div>`
+        + kv([['상태', stPill(r.status)],['누적 편입', r.status==='확정' ? '월마감 반영 완료' : '확정 후 누적성과에 편입']]);
+      case 10: return h('재무실 승인') + kv([['현재 상태', `${stPill(r.status)} <span class="legend-note">SLA 잔여 ${r.slaDay}일</span>`]])
+        + `<ul class="ln-tl">${L.approval.map(a=>`<li><b>${esc(a[0])}</b> <span class="m">${esc(a[2])} · ${esc(a[1])}</span><div class="m">${esc(a[3])}</div></li>`).join('')}${r.status!=='확정' ? `<li style="opacity:.55"><b>다음: ${esc(({'등록':'검토','검토':'승인','보완':'재검토','승인':'확정'})[r.status]||'')}</b><div class="m">대기중</div></li>` : ''}</ul>`
+        + `<div style="margin-top:6px"><button type="button" class="ln-act" data-act="approval">④ 재무실 승인 큐 열기 →</button></div>`;
+      case 11: return h('연차 누적') + `<div class="stat">${eok(cumOf(r))}<small>원 누적</small></div>` + tbl(['연차','활용상태','순재무성과(억)','비고'], L.years.map(y=>[`${y[0]}년차`, esc(y[1]), y[2]!=null ? `<b>${nf(y[2])}</b>` : '—', esc(y[3])]))
+        + `<div class="legend-note" style="margin-top:8px">지속년수 ${r.persist}년까지 연차별 활용평가로 갱신됩니다. 각 연차 산출은 해당 시점 Rule 버전·스냅샷을 가리킵니다.</div>`;
+    }
+    return '';
+  }
+  function kpis(){
+    const R = PF.regs;
+    const complete = R.filter(r => !allChecks(r).some(c => c[1] === 'warn')).length;
+    const snaps = R.filter(r => r.lineage.snapshot.id).length;
+    const warns = R.reduce((a,r)=>a+allChecks(r).filter(c=>c[1]==='warn').length,0);
+    const drift = R.filter(r => r.lineage.snapshot.currentRecords !== r.lineage.snapshot.records).length;
+    $('lnKpis').innerHTML = kpiCard('체인 완결률', `${Math.round(complete/R.length*100)} <small>%</small>`, `주의 없는 성과 ${complete} / ${R.length}건`) + kpiCard('스냅샷 보존', `${snaps} <small>/ ${R.length}건</small>`, '등록 단계 제외 전건 동결')
+      + kpiCard('주의 항목', `${warns} <small>건</small>`, '잠금 전 Rule · 미작성 점검 등') + kpiCard('원천 변경 감지', `${drift} <small>건</small>`, '스냅샷 이후 ERP 변동 — 산출 불변');
+  }
+  function search(q){
+    q = q.trim().toLowerCase(); const box = $('lnHits');
+    if(!q){ box.hidden = true; return; }
+    const hits = PF.regs.map((r,i)=>[r,i]).filter(([r]) => r.id.toLowerCase().includes(q) || r.name.toLowerCase().includes(q) || r.code.toLowerCase().includes(q) || String(r.netEok).startsWith(q) || String(r.grossEok).startsWith(q)).slice(0,6);
+    box.innerHTML = hits.length ? hits.map(([r,i])=>`<button type="button" data-hit="${i}"><b>${esc(r.id)}</b> ${esc(short(r.name,22))}<span class="m">${eok(r.netEok)} · ${esc(r.status)}</span></button>`).join('') : `<div class="legend-note" style="padding:8px 12px">일치하는 성과가 없습니다.</div>`;
+    box.hidden = false;
+  }
+  function init(){
+    const selEl = $('ppLinSel');
+    selEl.innerHTML = PF.regs.map((r,i)=>`<option value="${i}">${r.id} · ${r.name}</option>`).join('');
+    selEl.addEventListener('change', () => render(+selEl.value, sel));
+    $('lnQ').addEventListener('input', e => search(e.target.value));
+    $('lnQ').addEventListener('keydown', e => { if(e.key==='Escape'){ $('lnHits').hidden = true; } if(e.key==='Enter'){ const b = $('lnHits').querySelector('[data-hit]'); if(b) b.click(); } });
+    $('pp-3').addEventListener('click', e => {
+      const n = e.target.closest('.ln-node'); if(n){ render(cur, +n.dataset.n); return; }
+      const hit = e.target.closest('[data-hit]'); if(hit){ $('lnHits').hidden = true; $('lnQ').value = ''; render(+hit.dataset.hit, sel); return; }
+      const go = e.target.closest('[data-go]'); if(go){ render(+go.dataset.go, sel); $('lnLaneAmt').scrollIntoView({block:'nearest'}); return; }
+      const act = e.target.closest('[data-act]'); if(!act) return;
+      if(act.dataset.act === 'erosion'){ ErosionView.select(PF.regs[cur].id); goPp(5); }
+      if(act.dataset.act === 'approval'){ goPp(4); }
+      if(!e.target.closest('.ln-search')) $('lnHits').hidden = true;
+    });
+    kpis(); render(0, 9);
+  }
+  return {init, render, refresh: () => { kpis(); render(cur, sel); }};
+})();
+function renderLineage(idx){ LN.render(idx); }   // ④ 승인 큐 → 추적 바로가기 호환
 
 /* ④ 재무실 승인 */
 const AP = PF.approval;
@@ -2596,8 +2774,14 @@ const ErosionService = (() => {
     if(hit) return Object.assign({performanceName:m.label, group:m.group, generic:false}, hit);
     return Object.assign({id:'ERC-GEN-'+code, performanceCode:code, performanceName:m.label, group:m.group, generic:true}, E.groupDefaultCatalog[m.group]);
   }
+  /* 저장된 평가의 요약(다른 화면 참조용) — 원본을 변경하지 않는다. 저장 없음 → null */
+  function assessmentSummary(performanceResultId){
+    const a = ErosionRepo.loadAssessment(performanceResultId); if(!a) return null;
+    const c = JSON.parse(JSON.stringify(a));
+    return summary(syncItems(c, buildChecklist(c.selectedPerformanceCodes)));
+  }
   return {codeMeta, defById, now, hasAmount, groupsOf, buildChecklist, newAssessment, syncItems, needsSupplement, itemState,
-    summary, adjustment, catalogFor, allCatalog:() => E.codes.map(c => catalogFor(c.code))};
+    summary, adjustment, catalogFor, assessmentSummary, allCatalog:() => E.codes.map(c => catalogFor(c.code))};
 })();
 
 /* ── 뷰 계층 */
@@ -2888,9 +3072,11 @@ const ErosionView = (() => {
   });
 
   function init(){ load(0); renderCatFilters(); renderCatalog(); }
-  return {init, state:ER};
+  function select(performanceResultId){ const i = ER.ctxs.findIndex(c => c.performanceResultId === performanceResultId); if(i >= 0) load(i); }
+  return {init, select, state:ER};
 })();
 ErosionView.init();
+LN.init();   // ③ 산출 근거 추적 — ⑤ 점검 상태를 참조하므로 역효과 모듈 이후 초기화
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
 applyingRoute = false;

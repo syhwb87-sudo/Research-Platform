@@ -12,7 +12,7 @@ import json
 import random
 import re
 from collections import Counter, defaultdict
-from datetime import date
+from datetime import timedelta, date
 from pathlib import Path
 
 BASE = Path(__file__).parent
@@ -786,6 +786,123 @@ for p, eff in picked:
         "dept": p["useDept"], "slaDay": prng.randint(1, 9),
         "utilY1": prng.choice(["활용중", "활용중", "부분활용"]),
     })
+
+
+# ── 산출 근거 추적(Lineage) 데이터: 성과 등록별 스냅샷·변수값·재계산·승인 이력·연차·건전성 (시드 고정)
+lprng = random.Random(20260902)
+STEP_ORDER = ["등록", "검토", "보완", "승인", "확정"]
+STEP_ACTOR = {"등록": "연구책임자 (과제 부서)", "검토": "재무실 검토자", "보완": "연구책임자 (과제 부서)",
+              "승인": "재무실 팀장", "확정": "재무실 (월마감)"}
+STEP_NOTE = {"등록": "성과 등록·입력 Key 지정, ERP 스냅샷 자동 생성", "검토": "Rule 변수·역효과 첨부 검토",
+             "보완": "역효과 산정 근거 보완 요청 → 재제출", "승인": "재계산 일치 확인, 기여율 적용 승인", "확정": "월마감 반영·누적성과 편입"}
+
+def _doc_ids(src, n):
+    pre = {"SD": "SD", "DW": "PD", "CO": "CO", "FI": "FI", "MM": "MM", "QD": "QD"}[src]
+    out = []
+    for _ in range(n):
+        m = lprng.randint(1, 12)
+        out.append(f"{pre}-2026{m:02d}-{lprng.randint(100000, 999999)}")
+    return out
+
+def _calc(r, gross):
+    """Rule 산식에 실제 대입되는 변수값을 생성해 성과총액이 재현되도록 한다. 반환: (vars, steps, recomputed 원)"""
+    t = r["type"]
+    if t == "A-1":
+        cm = lprng.randint(120, 300) * 1000; dq = round(gross / cm); qb = lprng.randint(8000, 60000)
+        v = [["Q_v 검증기간 판매량", qb + dq, "톤", "ERP SD 판매실적 (스냅샷)"], ["Q_b 기준기간 판매량", qb, "톤", "ERP SD 착수 직전 12개월"], ["CM_ton 톤당 한계이익", cm, "원/톤", "CO 관리회계 (재무실 잠금)"]]
+        st = [["ΔQ = Q_v − Q_b", f"{qb+dq:,} − {qb:,}", dq, "톤"], ["성과총액 = ΔQ × CM_ton", f"{dq:,} × {cm:,}", dq * cm, "원"]]
+        return v, st, dq * cm, "SD"
+    if t == "A-2":
+        d = lprng.randint(8000, 40000); q = round(gross / d); fb = lprng.randint(900000, 1500000)
+        v = [["FOB_v 검증기간 단가", fb + d, "원/톤", "ERP SD 수출 단가"], ["FOB_b 기준기간 단가", fb, "원/톤", "ERP SD 수출 단가"], ["판매량", q, "톤", "ERP SD 판매실적"]]
+        st = [["ΔFOB = FOB_v − FOB_b", f"{fb+d:,} − {fb:,}", d, "원/톤"], ["성과총액 = ΔFOB × 판매량", f"{d:,} × {q:,}", d * q, "원"]]
+        return v, st, d * q, "SD"
+    if t == "A-4":
+        gap = lprng.randint(30000, 90000); q = round(gross / gap); pn = lprng.randint(1000000, 1400000)
+        v = [["전환량 (주문외→정품)", q, "톤", "품질 DW 주문외 실적"], ["정품 판매가", pn, "원/톤", "ERP SD 단가"], ["주문외 판매가", pn - gap, "원/톤", "ERP SD 단가"]]
+        st = [["가격차 = 정품가 − 주문외가", f"{pn:,} − {pn-gap:,}", gap, "원/톤"], ["성과총액 = 전환량 × 가격차", f"{q:,} × {gap:,}", q * gap, "원"]]
+        return v, st, q * gap, "QD"
+    if t == "B-2":
+        price = lprng.randint(300, 1200); qty = lprng.randint(50000, 400000); du = round(gross / (price * qty), 2); ub = round(lprng.uniform(12, 40), 2)
+        v = [["개선전 원단위", ub, "kg/톤", "생산 DW 원단위 실적 (기준기간)"], ["개선후 원단위", round(ub - du, 2), "kg/톤", "생산 DW 원단위 실적 (검증기간)"], ["단가", price, "원/kg", "MM 구매단가 (기준월 고정)"], ["생산량", qty, "톤", "생산 DW"]]
+        rec = round(du * price * qty)
+        st = [["Δ원단위 = 개선전 − 개선후", f"{ub} − {round(ub-du,2)}", du, "kg/톤"], ["성과총액 = Δ원단위 × 단가 × 생산량", f"{du} × {price:,} × {qty:,}", rec, "원"]]
+        return v, st, rec, "DW"
+    if t == "B-6":
+        gap = lprng.randint(150000, 400000); qty = lprng.randint(100000, 600000); dy = round(gross / (qty * gap) * 100, 3); yb = round(lprng.uniform(90, 95), 2)
+        v = [["개선전 실수율", yb, "%", "생산 DW 실수율 (기준기간)"], ["개선후 실수율", round(yb + dy, 3), "%", "생산 DW 실수율 (검증기간)"], ["생산량", qty, "톤", "생산 DW"], ["판매가 − 스크랩가", gap, "원/톤", "ERP SD · 스크랩 시세"]]
+        rec = round(dy / 100 * qty * gap)
+        st = [["개선폭 = 개선후 − 개선전", f"{round(yb+dy,3)} − {yb}", dy, "%p"], ["성과총액 = 개선폭 × 생산량 × 가격차", f"{dy}% × {qty:,} × {gap:,}", rec, "원"]]
+        return v, st, rec, "DW"
+    if t == "B-7":
+        uc = lprng.randint(3000, 15000); q = round(gross / uc)
+        v = [["생략 공정 처리량", q, "톤", "생산 DW"], ["공정 단위비용", uc, "원/톤", "CO 공정원가 (잠금)"]]
+        st = [["성과총액 = 처리량 × 단위비용", f"{q:,} × {uc:,}", q * uc, "원"]]
+        return v, st, q * uc, "DW"
+    if t == "B-8":
+        k = round(lprng.uniform(0.3, 0.8), 2); fc = round(gross / k)
+        v = [["절감 고정비 (계정 실적)", fc, "원", "CO 고정가공비 계정"], ["환산계수", k, "", "재무실 고시 (v2 개정 검토중)"]]
+        st = [["성과총액 = 고정비 × 환산계수", f"{fc:,} × {k}", round(fc * k), "원"]]
+        return v, st, round(fc * k), "CO"
+    if t == "B-9":
+        cm = lprng.randint(80000, 200000); k = round(lprng.uniform(0.5, 0.9), 2); q = round(gross / (cm * k))
+        v = [["증산량", q, "톤", "생산 DW"], ["CM_ton 톤당 한계이익", cm, "원/톤", "CO 관리회계 (잠금)"], ["가동 기여계수", k, "", "생산기술 산정"]]
+        rec = round(q * cm * k)
+        st = [["성과총액 = 증산량 × CM_ton × 기여계수", f"{q:,} × {cm:,} × {k}", rec, "원"]]
+        return v, st, rec, "DW"
+    # C-1
+    prev = gross + lprng.randint(200000000, 900000000)
+    v = [["기준기간 외부 용역·분석비", prev, "원", "ERP FI 판관비 계정"], ["검증기간 외부 용역·분석비", prev - gross, "원", "ERP FI 판관비 계정"]]
+    st = [["성과총액 = 기준기간 − 검증기간", f"{prev:,} − {prev-gross:,}", gross, "원"]]
+    return v, st, gross, "FI"
+
+for r, (p, eff) in zip(regs, picked):
+    gross = p["annual"]
+    vars_, steps, recomputed, src = _calc(r, gross)
+    rule = RULE_BY_TYPE[r["type"]]
+    # 승인 이력: 등록일부터 현재 상태까지, 각 단계 수일 간격
+    reg_day = date(2026, lprng.randint(3, 7), lprng.randint(1, 28))
+    upto = STEP_ORDER.index(r["status"]) + 1
+    if r["status"] == "확정":
+        upto = 5
+    hist, d = [], reg_day
+    for stp in STEP_ORDER[:upto]:
+        if stp == "보완" and r["status"] in ("승인", "확정") and lprng.random() < 0.5:
+            continue  # 보완 없이 승인된 건
+        hist.append([stp, STEP_ACTOR[stp], d.isoformat(), STEP_NOTE[stp]])
+        d = d + timedelta(days=lprng.randint(2, 9))
+    frozen = f"{reg_day.isoformat()} 02:{lprng.randint(10,59):02d}"
+    snap_id = f"SNAP-{reg_day.strftime('%Y%m%d')}-{r['id'][-3:]}"
+    has_snapshot = r["status"] != "등록"
+    drift = lprng.choice([0, 0, 0, lprng.randint(3, 40)])  # 스냅샷 이후 원천 변경 감지(일부 건)
+    diff = recomputed - gross
+    recompute_ok = abs(diff) <= max(gross * 0.005, 1)
+    checks = [
+        ["ERP 스냅샷 동결", "ok" if has_snapshot else "warn", f"{snap_id} · {frozen}" if has_snapshot else "등록 단계 — 스냅샷 미생성"],
+        ["Rule 버전 잠금", "ok" if rule["status"] == "승인" else "warn", f"{rule['id']} {rule['ver']} 잠금" if rule["status"] == "승인" else f"{rule['id']} {rule['ver']} 개정 검토중 — 잠금 전"],
+        ["재계산 일치", "ok" if recompute_ok else "warn", f"재계산 {eok(recomputed)}억 vs 등록 {r['grossEok']}억 (차이 {eok(diff):+.1f}억)"],
+        ["원천 변경 감지", "ok" if drift == 0 else "info", "스냅샷 이후 원천 변경 없음" if drift == 0 else f"현재 ERP 재조회 {r['match']+drift:,}건 (스냅샷 {r['match']:,}건, +{drift}) — 산출은 스냅샷 기준 유지"],
+        ["승인 기록", "ok" if r["status"] in ("승인", "확정") else "info" if r["status"] in ("검토", "보완") else "warn",
+         f"{r['status']} · {hist[-1][2]}" if hist else "기록 없음"],
+    ]
+    years = []
+    for y in range(1, r["persist"] + 1):
+        if y == 1:
+            years.append([1, r["utilY1"], r["netEok"] if r["status"] in ("승인", "확정") else None, "1년차 실적" if r["status"] in ("승인", "확정") else "승인 전 — 산출값 미확정"])
+        else:
+            years.append([y, "예정", None, f"{2026+y-1}년 활용평가 예정"])
+    r["lineage"] = {
+        "snapshot": {"id": snap_id if has_snapshot else None, "frozenAt": frozen if has_snapshot else None, "source": rule["source"],
+                     "records": r["match"], "currentRecords": r["match"] + drift, "period": r["period"],
+                     "samples": _doc_ids(src, 10) if has_snapshot else []},
+        "keyValues": [[k, v] for k, v in zip(KEY_BY_GROUP[r["type"][0]].split("·"),
+                      [r["dept"], f"{r['type']} 대상 {lprng.randint(2, 9)}개 코드", f"{lprng.randint(1, 4)}개 지정", "등록 시 지정", r["period"]])],
+        "calc": {"vars": vars_, "steps": steps, "recomputedEok": eok(recomputed), "diffEok": eok(diff), "ok": recompute_ok},
+        "approval": hist,
+        "years": years,
+        "checks": checks,
+        "registeredAt": reg_day.isoformat(),
+    }
 
 appr_counts = Counter(r["status"] for r in regs)
 type_amounts = defaultdict(float)
