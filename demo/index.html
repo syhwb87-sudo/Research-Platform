@@ -1228,6 +1228,29 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
       </div>
     </div>
   </div>
+  <!-- ⑦ 성과 원장 — 확정 순재무성과 원장(설계서 11.5). 렌더: 스크립트 하단 LG 모듈 -->
+  <div class="ppanel" id="pp-ledger" hidden>
+    <div class="card" style="margin-bottom:14px;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div><h3 style="font-size:16px;margin:0">순재무성과 원장 <span class="legend-note" style="font-weight:500">— 어디서, 어떤 유형으로, 얼마가 실현되고 있는가</span></h3>
+        <div class="sub" style="margin:2px 0 0">재무실 <b>확정</b> 건의 전사 원장입니다. 승인(확정 전) 건은 범위 토글로만 포함할 수 있고, 검토 중 금액은 집계하지 않습니다.</div></div>
+      <div class="lg-scope" role="group" aria-label="집계 범위" style="margin-left:auto;display:flex;gap:6px"><button type="button" class="er-fbtn" data-scope="fixed" aria-pressed="true">확정만</button><button type="button" class="er-fbtn" data-scope="appr" aria-pressed="false">승인 포함</button></div>
+    </div>
+    <div class="row" style="grid-template-columns:repeat(5,1fr)" id="lgKpis"></div>
+    <div class="card" style="margin-bottom:14px"><h3>전사 워터폴 <span class="legend-note">— 성과총액 → −역효과 → ×기여율 → −직접비 → 순재무성과 (2026, 억원)</span></h3><div class="chart short" id="lgWf"></div></div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>유형별 순재무성과 트리맵 <span class="legend-note">— 그룹 색상 · 타일 클릭 시 원장 필터</span></h3><div class="chart short" id="lgTree"></div></div>
+      <div class="card"><h3>월별 순재무성과 추이 <span class="legend-note">— 2026 확정 월 기준 · 전년 비교는 P-2(2025 확정 데이터 없음)</span></h3><div class="chart short" id="lgTrend"></div></div>
+    </div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>연구소 × 유형그룹 <span class="legend-note">— 순재무성과 스택(억원)</span></h3><div class="chart short" id="lgLab"></div></div>
+      <div class="card"><h3>효과 vs 역효과 <span class="legend-note">— 유형별 성과총액(+)과 역효과(−), 억원</span></h3><div class="chart short" id="lgEro"></div></div>
+    </div>
+    <div class="card">
+      <h3>성과 원장 <span class="legend-note" id="lgCount"></span></h3>
+      <div class="er-filters" id="lgFil" role="group" aria-label="원장 필터" style="margin-bottom:8px"></div>
+      <div style="overflow-x:auto"><table id="lgTable"><thead><tr><th>성과ID</th><th>과제</th><th>연구소</th><th>활용부서</th><th>유형</th><th class="num">성과총액</th><th class="num">역효과</th><th class="num">기여율</th><th class="num">직접비</th><th class="num">순재무성과</th><th>확정일</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
 </section>
 
 <!-- ─────────────── EXECUTIVE ─────────────── -->
@@ -2584,7 +2607,7 @@ const stPill = s => ({'확정':'<span class="pill g">확정</span>','승인':'<s
 
 /* 서브내비 */
 const PP_TABS = [['wb','① 자동산출 워크벤치'],['trace','② 산출 근거 추적'],['gross','③ 성과 총액'],
-  ['erosion','④ 역효과'],['contrib','⑤ 기여율'],['approval','⑥ 재무실 승인']];
+  ['erosion','④ 역효과'],['contrib','⑤ 기여율'],['approval','⑥ 재무실 승인'],['ledger','⑦ 성과 원장']];
 const ppNav = document.getElementById('ppNav');
 ppNav.innerHTML = PP_TABS.map(([k,t],i)=>
   `<button class="achip${i===0?' on':''}" data-k="${k}">${t}</button>`).join('');
@@ -2845,7 +2868,7 @@ const WB = (() => {
   }
   function refreshOthers(){
     if(typeof renderRegsTable === 'function') renderTable();
-    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
+    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST, typeof LG!=='undefined'&&LG].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
   }
 
   /* ── 이벤트 */
@@ -3987,6 +4010,7 @@ const CT = (() => {
     if(typeof WB !== 'undefined') WB.refresh();
     if(typeof LN !== 'undefined') LN.refresh();
     if(typeof APV !== 'undefined') APV.render();
+    if(typeof LG !== 'undefined') LG.refresh();
   }
   const root = $('pp-contrib');
   root.addEventListener('change', e => {
@@ -4033,7 +4057,76 @@ const CT = (() => {
   return {init, refreshRegs, select(id){ const i = PF.regs.findIndex(r => r.id === id); if(i >= 0){ cur = i; render(); } }, refresh: render};
 })();
 
+/* ⑦ 성과 원장 — 확정 순재무성과 원장(설계서 11.5). PF.regs 확정 건(옵션: 승인 포함)만 집계 */
+const LG = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const r1 = v => Math.round(v * 10) / 10, sum = (l,f) => r1(l.reduce((s,x)=>s+f(x),0));
+  const gname = {A:'A 판매·매출', B:'B 원가·생산', C:'C 판관비·클레임'};
+  let scope = 'fixed', typeFil = 'ALL', grpFil = 'ALL', ch = {wf:null, tree:null, trend:null, lab:null, ero:null};
+  const rows = () => PF.regs.filter(r => scope === 'fixed' ? r.status === '확정' : ['승인','확정'].includes(r.status));
+  const fixedDate = r => { const a = (r.lineage.approval||[]).find(x => x[0] === (r.status === '확정' ? '확정' : '승인')); return a ? a[2] : ''; };
+  function render(){
+    const R = rows(), gross = sum(R, r=>r.grossEok), ero = sum(R, r=>r.erosionEok), direct = sum(R, r=>r.directEok), net = sum(R, r=>r.netEok);
+    const adj = r1(R.reduce((s,r)=>s+(r.grossEok-r.erosionEok)*(100-r.contrib)/100,0)), base = r1(gross-ero);
+    const byG = {A:0,B:0,C:0}; R.forEach(r => { byG[r.type[0]] += r.netEok; });
+    const avgC = base ? Math.round((1 - adj/base) * 100) : 0;
+    $('lgKpis').innerHTML = kpiCard('금년 순재무성과', `${nf(net)} <small>억원</small>`, `2026 ${scope==='fixed'?'확정':'승인·확정'} ${R.length}건`)
+      + kpiCard('누적 순재무성과', `${nf(sum(R, r => (r.lineage.years||[]).reduce((s,y)=>s+(y[2]||0),0)) || net)} <small>억원</small>`, '연차 확정액 누계 (1년차)')
+      + kpiCard('효과 대비 역효과', `${gross?Math.round(ero/gross*100):0} <small>%</small>`, `역효과 ${nf(ero)}억 ÷ 성과총액 ${nf(gross)}억`)
+      + kpiCard('평균 연구기여율', `${avgC} <small>%</small>`, '(총액−역효과) 가중 평균')
+      + kpiCard('유형그룹 구성', ['A','B','C'].map(g=>`<span style="color:${gcOf(g+'-')}">${g} ${net?Math.round(byG[g]/net*100):0}%</span>`).join(' <small>·</small> '), '순재무성과 기준');
+    /* 전사 워터폴 — 기여율은 가중 평균으로 환산해 공통 워터폴 재사용 */
+    drawWaterfall('lgWf', {grossEok:gross, erosionEok:ero, contrib:avgC, directEok:direct, netEok:net, type:'A-1'}, ch.wf || (ch.wf = {c:null}));
+    /* 트리맵 */
+    const byT = {}; R.forEach(r => { byT[r.type] = (byT[r.type]||0) + r.netEok; });
+    const groups = ['A','B','C'].map(g => ({name:gname[g], itemStyle:{color:gcOf(g+'-')}, children:Object.entries(byT).filter(([t])=>t[0]===g).map(([t,v])=>({name:t, value:r1(v), itemStyle:{color:gcOf(t)}}))})).filter(g => g.children.length);
+    const tOpt = {tooltip:tip({formatter:p=>`${p.name}${p.data.children?'':' '+typeName(p.name)}<br><b>${nf(p.value)}</b>억원`}),
+      series:[{type:'treemap',roam:false,nodeClick:false,breadcrumb:{show:false},itemStyle:{gapWidth:2,borderColor:SURF},upperLabel:{show:true,height:18,fontSize:10,color:'#fff'},
+        label:{fontSize:11,formatter:p=>`${p.name} ${typeName(p.name)}\n${nf(p.value)}억`},levels:[{itemStyle:{gapWidth:3,borderWidth:2,borderColor:SURF}},{itemStyle:{gapWidth:1}}],data:groups}]};
+    if(!ch.tree){ ch.tree = mk('lgTree', tOpt); ch.tree.on('click', p => { if(p.data && !p.data.children){ typeFil = typeFil === p.name ? 'ALL' : p.name; renderTable(); } }); } else ch.tree.setOption(tOpt, true);
+    /* 월별 추이 */
+    const months = Array.from({length:8}, (_,i) => `2026-${String(i+1).padStart(2,'0')}`), byM = months.map(m => sum(R.filter(r => fixedDate(r).startsWith(m)), r=>r.netEok)); let acc = 0; const cum = byM.map(v => r1(acc += v));
+    const mOpt = {tooltip:tip({trigger:'axis',formatter:p=>p.map(x=>`${x.seriesName}: <b>${nf(x.value)}억</b>`).join('<br>')}), legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}}, grid:{left:8,right:16,top:12,bottom:28,containLabel:true},
+      xAxis:axisX({type:'category',data:months.map(m=>m.slice(5)+'월')}), yAxis:axisY({type:'value',name:'억원',nameTextStyle:{fontSize:10,color:INK3}}),
+      series:[{name:'월별',type:'bar',barMaxWidth:26,data:byM,itemStyle:{color:'#2a78d6',borderRadius:[4,4,0,0]}},{name:'누적',type:'line',data:cum,smooth:true,symbolSize:6,itemStyle:{color:'#1e8e5a'},lineStyle:{width:2}}]};
+    if(!ch.trend) ch.trend = mk('lgTrend', mOpt); else ch.trend.setOption(mOpt, true);
+    /* 연구소 × 그룹 */
+    const labs = [...new Set(R.map(r=>r.lab))].sort((a,b)=>sum(R.filter(r=>r.lab===b),r=>r.netEok)-sum(R.filter(r=>r.lab===a),r=>r.netEok));
+    const lOpt = {tooltip:tip({trigger:'axis',formatter:p=>p[0].axisValue+'<br>'+p.filter(x=>x.value).map(x=>`${x.seriesName}: <b>${nf(x.value)}</b>억`).join('<br>')}), legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}}, grid:{left:8,right:16,top:10,bottom:28,containLabel:true},
+      xAxis:axisX({type:'category',data:labs,axisLabel:{fontSize:10,interval:0,formatter:v=>v.length>8?v.slice(0,8)+'…':v}}), yAxis:axisY({type:'value',name:'억원',nameTextStyle:{fontSize:10,color:INK3}}),
+      series:['A','B','C'].map(g=>({name:gname[g],type:'bar',stack:'g',barMaxWidth:36,itemStyle:{color:gcOf(g+'-')},data:labs.map(l=>sum(R.filter(r=>r.lab===l&&r.type[0]===g),r=>r.netEok))}))};
+    if(!ch.lab) ch.lab = mk('lgLab', lOpt); else ch.lab.setOption(lOpt, true);
+    /* 효과 vs 역효과 */
+    const types = Object.keys(byT).sort();
+    const eOpt = {tooltip:tip({trigger:'axis',formatter:p=>`${p[0].axisValue} ${typeName(p[0].axisValue)}<br>`+p.map(x=>`${x.seriesName}: <b>${nf(Math.abs(x.value))}</b>억`).join('<br>')}), legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}}, grid:{left:8,right:16,top:10,bottom:28,containLabel:true},
+      xAxis:axisY({type:'value',axisLabel:{formatter:v=>nf(Math.abs(v))}}), yAxis:axisX({type:'category',data:types.slice().reverse()}),
+      series:[{name:'성과총액',type:'bar',stack:'e',barMaxWidth:18,itemStyle:{borderRadius:[0,4,4,0]},label:{show:true,position:'right',fontSize:10,color:INK2,formatter:p=>nf(p.value)},data:types.slice().reverse().map(t=>({value:sum(R.filter(r=>r.type===t),r=>r.grossEok),itemStyle:{color:gcOf(t)}}))},
+        {name:'역효과',type:'bar',stack:'e',barMaxWidth:18,itemStyle:{color:'#c53030',borderRadius:[4,0,0,4]},label:{show:true,position:'left',fontSize:10,color:'#c53030',formatter:p=>p.value?'−'+nf(Math.abs(p.value)):''},data:types.slice().reverse().map(t=>-sum(R.filter(r=>r.type===t),r=>r.erosionEok))}]};
+    if(!ch.ero) ch.ero = mk('lgEro', eOpt); else ch.ero.setOption(eOpt, true);
+    renderTable();
+  }
+  function renderTable(){
+    const R = rows().filter(r => (typeFil==='ALL' || r.type===typeFil) && (grpFil==='ALL' || r.type[0]===grpFil)).sort((a,b)=>b.netEok-a.netEok);
+    $('lgFil').innerHTML = [['ALL','전체'],['A','A 판매·매출'],['B','B 원가·생산'],['C','C 판관비·클레임']].map(([k,t])=>`<button type="button" class="er-fbtn" data-g="${k}" aria-pressed="${grpFil===k}">${t}</button>`).join('') + (typeFil!=='ALL' ? ` <button type="button" class="er-fbtn" data-clear="1" aria-pressed="true">${esc(typeFil)} ${esc(typeName(typeFil))} ✕</button>` : '');
+    $('lgCount').textContent = `— ${R.length}건 · 순재무성과 ${nf(sum(R, r=>r.netEok))}억원`;
+    $('lgTable').querySelector('tbody').innerHTML = R.map(r => `<tr><td><b>${esc(r.id)}</b></td><td>${esc(r.name.slice(0,26))}<div class="legend-note">${esc(r.code)}</div></td><td>${esc(r.lab)}</td><td>${esc(r.dept)}</td><td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${esc(r.type)}</span></td><td class="num">${nf(r.grossEok)}</td><td class="num" style="color:var(--bad)">${r.erosionEok?'−'+nf(r.erosionEok):'—'}</td><td class="num">${r.contrib}%</td><td class="num">−${nf(r.directEok)}</td><td class="num"><b>${nf(r.netEok)}</b></td><td>${esc(fixedDate(r))} ${stPill(r.status)}</td><td><button type="button" class="ln-act" data-trace="${PF.regs.indexOf(r)}" style="padding:2px 8px;font-size:11px">② 추적</button></td></tr>`).join('')
+      || `<tr><td colspan="12" class="legend-note" style="padding:12px">조건에 맞는 확정 성과가 없습니다.</td></tr>`;
+  }
+  function init(){
+    const root = $('pp-ledger');
+    root.addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return;
+      if(b.dataset.scope){ scope = b.dataset.scope; root.querySelectorAll('[data-scope]').forEach(x=>x.setAttribute('aria-pressed', x.dataset.scope===scope)); render(); return; }
+      if(b.dataset.g){ grpFil = b.dataset.g; renderTable(); return; }
+      if(b.dataset.clear){ typeFil = 'ALL'; renderTable(); return; }
+      if(b.dataset.trace != null){ LN.render(+b.dataset.trace, 9); goPp('trace'); } });
+    render();
+  }
+  return {init, refresh: render, refreshRegs: render};
+})();
+
 CT.init();   // ⑤ 기여율 — 저장된 결정을 PF.regs에 반영한 뒤 ①·② 재렌더
+LG.init();   // ⑦ 성과 원장 — 확정 건 집계
 GR.init();   // ③ 성과 총액 — 산식 카탈로그·미리계산기
 WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연 등록 반영)
 CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변경 시 refreshRegs
