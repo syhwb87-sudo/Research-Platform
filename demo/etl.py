@@ -12,7 +12,7 @@ import json
 import random
 import re
 from collections import Counter, defaultdict
-from datetime import date
+from datetime import timedelta, date
 from pathlib import Path
 
 BASE = Path(__file__).parent
@@ -288,6 +288,8 @@ for r in a1:
         "annual": annual, "persist": persist, "roi": money(r["투자효율"]),
         "useDept": r["활용부서"].split()[0] if r["활용부서"] else "미지정", "axis": axis,
         "qual": annual <= 0,
+        "effect": re.split(r"[,\s]", r.get("정량효과유형", "").strip() or "기타")[0] or "기타",
+        "start": r.get("착수일", ""), "rdept": r.get("연구부서", ""), "end": r.get("완료일", ""), "owner": r.get("활용책임자", ""),
     })
 
 util_year_status = defaultdict(Counter)          # 차수 -> 상태 -> n
@@ -309,24 +311,34 @@ for p in completed:
     exp_total = p["annual"] * min(n_years, p["persist"])
     real_total = 0.0
     last_status = None
+    traj = []
+    yrs = []
+    p_due = p_done = 0
     for yr in range(1, n_years + 1):
         evals_due += 1
+        p_due += 1
         if rng.random() < 0.12:            # 평가 미실시 시뮬레이션
+            yrs.append([yr, "미평가", None])
             continue
         evals_done_n += 1
+        p_done += 1
         pu, pp = STATUS_P[yr]
         x = rng.random()
         status = "활용중" if x < pu else ("부분활용" if x < pu + pp else "미활용")
         if last_status == "미활용" and rng.random() < 0.7:
             status = "미활용"               # 미활용은 관성이 강함
         last_status = status
+        traj.append(status)
         util_year_status[yr][status] += 1
         if p["qual"]:
+            yrs.append([yr, status, None])
             continue
         if yr > p["persist"]:
+            yrs.append([yr, status, 0.0])
             continue
         factor = {"활용중": rng.uniform(.65, 1.1), "부분활용": rng.uniform(.2, .55), "미활용": 0.0}[status]
         amt = p["annual"] * factor
+        yrs.append([yr, status, eok(amt)])
         real_total += amt
         realized_by_caly[p["cy"] + yr] += amt
         dept_realized[p["useDept"]] += amt
@@ -344,8 +356,11 @@ for p in completed:
             "code": p["code"], "name": p["name"][:30], "cy": p["cy"], "dept": p["useDept"],
             "exp": eok(exp_total), "real": eok(real_total),
             "achv": round(100 * real_total / exp_total),
-            "cost": eok(p["cost"]), "status": last_status or "미평가",
+            "cost": eok(p["cost"]), "status": last_status or "미평가", "traj": traj, "act": classify(p["code"]),
+            "effect": p.get("effect", "기타"), "lab": (p.get("rdept") or "기타").split()[0] if p.get("rdept") else "기타",
+            "evalDue": p_due, "evalDone": p_done, "yrs": yrs, "annualEok": eok(p["annual"]), "end": p.get("end", ""), "owner": p.get("owner", ""),
         })
+    p["_evalDue"], p["_evalDone"] = p_due, p_done
 
 tracked = [p for p in completed if CUR_YEAR - p["cy"] >= 1]
 latest_status = Counter()
@@ -650,14 +665,14 @@ PERF_TYPES = [
     ["A-4", "A", "주문외 판매감소"],
     ["B-1", "B", "구매단가 절감"], ["B-2", "B", "동일품목 원단위 절감"], ["B-3", "B", "저가원료 대체"],
     ["B-3(2)", "B", "부산물/배합비 변경"], ["B-4", "B", "변동가공비 절감"], ["B-5", "B", "변동가공비 단가절감"],
-    ["B-6", "B", "수율 개선"], ["B-7", "B", "공정생략"], ["B-8", "B", "고정가공비 절감"], ["B-9", "B", "생산량 증가"],
-    ["C-1", "C", "판관비 절감"], ["C-2", "C", "클레임 비용 절감"],
+    ["B-6", "B", "수율 개선"], ["B-6(2)", "B", "수율 개선(매출이익형)"], ["B-7", "B", "공정생략"], ["B-8", "B", "고정가공비 절감"], ["B-9", "B", "생산량 증가"],
+    ["C-1", "C", "판관비 절감"], ["C-1(2)", "C", "판관비 절감(총액형)"], ["C-2", "C", "클레임 비용 절감"],
 ]
 # 연구효과 14종 → 재무성과 후보 매핑 (설계서 3.1)
 EFFECT_MAP = {
     "신수요창출": ["A-1", "A-2", "A-3"],
     "제품개발/수입대체": ["A-1", "B-1", "B-3", "C-1"],
-    "실수율/품질향상": ["A-4", "B-6", "C-2"],
+    "실수율/품질향상": ["A-4", "B-6", "B-6(2)", "C-2"],
     "원단위절감": ["B-2", "B-4", "B-5", "B-9"],
     "생산성향상": ["B-9", "B-8"],
     "공정개선": ["B-7", "B-4"],
@@ -666,8 +681,8 @@ EFFECT_MAP = {
     "자동화에의한인력합리": ["B-8", "C-1"],
     "부산물/폐기물재활용": ["B-3(2)", "B-3"],
     "환경비용절감": ["B-4", "C-1"],
-    "장치제작개발": ["B-8"],
-    "분석기술개발": ["C-1"],
+    "장치제작개발": ["B-8", "C-1(2)"],
+    "분석기술개발": ["C-1", "C-1(2)"],
     "기타": [],
 }
 EROSION_CATALOG = {
@@ -678,59 +693,229 @@ EROSION_CATALOG = {
     "B-3": ["품질 저하 보정 비용", "후공정 처리비 증가분"],
     "B-7": ["품질 리스크 비용", "불량률 변동 × 처리비"],
 }
+# ── 성과 총액 산식 18종 (재무실 세부 산식 v1). 화면 명칭 "성과 총액", 식별자는 Rule Bank(RB-*) 유지.
+#    expr: 곱셈항 리스트의 합 (Σ Π term). term = {"d":[후, 전]} 차이 | {"v":변수} 값.
+#    varsDef: n 변수명 · u 단위 · s 원천 · lock 재무실 잠금 · r 목업 표본 범위 · dec 소수 · pct 백분율(계산 시 /100)
+#    solve: 목업에서 성과총액에 맞춰 역산하는 변수(곱셈항별 1개). keys: 대상 식별 Key(KEY_DICT 참조).
+KEY_DICT = {
+    "강종": ["MM 자재마스터 · 강종코드", "제품 강종"], "품명": ["SD 품목마스터 · 품명코드", "제품 품명"],
+    "규격약호": ["SD 품목마스터 · 규격약호", "치수·규격"], "고객사코드": ["SD 거래처마스터", "판매 고객"],
+    "용도코드": ["SD 수주 · 용도코드", "최종 용도"], "내수/수출구분": ["SD 수주 · 판매구분", "내수·수출"],
+    "신규고객여부": ["SD 거래처마스터 · 최초거래일", "신규 고객 판정"], "판매인식기간": ["등록 시 지정", "기준/검증 판매 인식기간"],
+    "Extra코드": ["SD 가격조건 · Extra 코드(사이즈/품질/성분/표면)", "Extra 가격 항목"], "FOB가격적용기간": ["SD 가격조건 · 적용기간", "FOB 적용기간"],
+    "고마진 제품군 코드": ["SD 품목마스터 · WIP 제품군", "고마진(WIP) 분류"], "일반재 대비 분류 기준": ["재무실 고시", "고마진/일반재 구분 기준"],
+    "강종군": ["MM 자재마스터 · 강종군", "강종 그룹"], "고객용도 코드": ["SD 수주 · 용도코드", "고객 용도"], "Mix측정기간": ["등록 시 지정", "구성비 측정기간"],
+    "주문외/등급하향 코드": ["품질 DW · 등급판정", "주문외·등급하향 사유"], "결함코드": ["품질 DW · 결함코드", "결함 유형"], "품질등급": ["품질 DW · 품질등급", "판정 등급"],
+    "측정기간": ["등록 시 지정", "기준/검증 측정기간"], "원료/재료 코드": ["MM 자재마스터", "원료·재료"], "공급사코드": ["MM 공급사마스터", "공급사"],
+    "구매계약기간": ["MM 구매계약", "계약 적용기간"], "대상 공장/공정": ["PP 작업장 · 공정코드", "적용 공장·공정"],
+    "대상 품목 코드": ["MM 자재마스터 (결함재/연료/용수/Roll/약품)", "원단위 관리 품목"], "공장/공정/설비": ["PP 설비마스터", "적용 설비"],
+    "고가/저가 원료코드": ["MM 자재마스터", "대체 전후 원료"], "대상 공정": ["PP 공정코드 (고로·소결 등)", "적용 공정"],
+    "배합 원료코드": ["MM 자재마스터 (분탄·무연탄·가공부산물)", "배합 원료"], "배합 공정": ["PP 공정코드", "배합 공정"],
+    "변동가공비 항목": ["CO 원가요소 (LNG/COG/용수/산세액/산소/약품)", "변동가공비 항목"], "공장/공정": ["PP 작업장", "적용 공장·공정"],
+    "공급 계약/요금제": ["MM 구매계약 · 요금제", "단가 계약"], "외주 항목": ["MM 외주계약", "외주 항목"],
+    "공정코드": ["PP 공정코드", "적용 공정"], "설비번호": ["PM 설비마스터", "적용 설비"], "수율/실수율 코드": ["생산 DW · 수율 지표코드", "수율 지표"],
+    "강종제품 코드": ["MM 자재마스터", "제품 코드"], "판매연계 인증 데이터": ["SD 판매실적 · 품질 DW 연계", "증량분 판매 인증"],
+    "생략 공정 코드": ["PP 공정코드 (소둔/산세/정정 등)", "생략 공정"], "대체 공정 코드": ["PP 공정코드", "대체 공정"], "강종제품": ["MM 자재마스터", "제품"],
+    "비용항목코드": ["CO 원가요소", "비용 항목"], "비용센터": ["CO 코스트센터", "비용 귀속 조직"], "원가계정": ["FI 계정과목", "회계 계정"], "대상 조직/설비": ["CO 코스트센터 · PM 설비", "적용 조직·설비"],
+    "공장/라인/설비번호": ["PP 작업장 · PM 설비", "적용 라인"], "생산성 코드": ["생산 DW (T/H, Ch/D)", "생산성 지표"], "가동률": ["생산 DW", "설비 가동률"], "작업률": ["생산 DW", "작업률"],
+    "판관비 항목": ["FI 판관비 계정 (물류/포장/검사/보관/수수료)", "판관비 항목"], "대상 제품/고객/물류 경로": ["SD 수주 · 물류 DW", "적용 대상"],
+    "Work Order/설비": ["PM 작업오더", "정비 대상"], "외주 계약 항목": ["MM 외주계약", "외주 항목"],
+    "클레임 코드": ["품질 DW · 클레임코드", "클레임 유형"], "결함 코드": ["품질 DW · 결함코드", "결함 유형"], "대상 제품/고객": ["SD 수주", "적용 제품·고객"],
+}
+def _v(n, u, s, r, dec=0, lock=False, pct=False):
+    return {"n": n, "u": u, "s": s, "r": r, "dec": dec, "lock": lock, "pct": pct}
 RULES = [
-    {"id": "RB-A1-003", "type": "A-1", "ver": "v2",
-     "formula": "성과총액 = (검증기간 판매량 − 기준기간 판매량) × 톤당 한계이익",
-     "vars": [["Q_v 검증기간 판매량", "ERP SD 판매실적 (지정 Key 필터)"],
-              ["Q_b 기준기간 판매량", "동일 Key · 착수 직전 12개월"],
-              ["CM_ton 톤당 한계이익", "CO 관리회계 공식값 (재무실 잠금)"]],
-     "period": "2026-01-01 ~", "source": "ERP SD · CO", "status": "승인",
+    {"id": "RB-A1-003", "type": "A-1", "ver": "v2", "status": "승인", "period": "2026-01-01 ~", "source": "ERP SD · CO",
+     "subtitle": "판매량 증대", "pattern": "DIFF",
+     "formula": "(개선 후 판매량 − 개선 전 판매량) × 톤당 한계이익",
+     "expr": [[{"d": ["개선 후 판매량", "개선 전 판매량"]}, {"v": "톤당 한계이익"}]],
+     "varsDef": [_v("개선 후 판매량", "톤", "ERP SD 판매실적 (검증기간·지정 Key)", [8000, 60000]), _v("개선 전 판매량", "톤", "ERP SD 판매실적 (착수 직전 12개월)", [8000, 60000]),
+                 _v("톤당 한계이익", "원/톤", "CO 관리회계 공식값", [120000, 300000], lock=True)],
+     "solve": ["개선 후 판매량"],
+     "keys": ["강종", "품명", "규격약호", "고객사코드", "용도코드", "내수/수출구분", "신규고객여부"], "periodKey": "판매인식기간",
+     "notes": ["기존 제품 잠식분은 역효과(④)에서 차감 — 총액 산식에는 반영하지 않는다", "신규고객여부 Key로 신수요 창출과 기존 고객 증량을 구분"],
      "history": ["v1 2025-01 최초 제정", "v2 2026-03 기준기간 정의 변경(재무실)"]},
-    {"id": "RB-A2-001", "type": "A-2", "ver": "v1",
-     "formula": "성과총액 = (검증기간 FOB − 기준기간 FOB) × 판매량",
-     "vars": [["FOB", "ERP SD 수출 단가"], ["판매량", "ERP SD 판매실적"]],
-     "period": "2025-01-01 ~", "source": "ERP SD", "status": "승인",
+    {"id": "RB-A2-001", "type": "A-2", "ver": "v1", "status": "승인", "period": "2025-01-01 ~", "source": "ERP SD",
+     "subtitle": "판매가격 인상", "pattern": "ADD",
+     "formula": "(개선 후 FOB − 개선 전 FOB) × 판매량 + Extra 인상액 × Extra 대상 판매량",
+     "expr": [[{"d": ["개선 후 FOB", "개선 전 FOB"]}, {"v": "판매량"}], [{"v": "Extra 인상액"}, {"v": "Extra 대상 판매량"}]],
+     "varsDef": [_v("개선 후 FOB", "원/톤", "ERP SD 수출단가 (검증기간)", [900000, 1500000]), _v("개선 전 FOB", "원/톤", "ERP SD 수출단가 (기준기간)", [900000, 1500000]),
+                 _v("판매량", "톤", "ERP SD 판매실적", [5000, 40000]), _v("Extra 인상액", "원/톤", "SD 가격조건 · Extra 코드", [3000, 20000]), _v("Extra 대상 판매량", "톤", "ERP SD 판매실적 (Extra 적용분)", [1000, 10000])],
+     "solve": ["개선 후 FOB", "Extra 대상 판매량"],
+     "keys": ["강종", "품명", "고객사코드", "Extra코드", "용도코드"], "periodKey": "FOB가격적용기간",
+     "notes": ["기본항(FOB 인상)과 가산항(Extra)을 분리 산출 — Extra 코드가 개발 기술과 직접 연동되면 기여율 상향 조건(⑤)", "시황에 의한 전반적 단가 상승은 공통-8 외부요인으로 점검"],
      "history": ["v1 2025-01 최초 제정"]},
-    {"id": "RB-A4-001", "type": "A-4", "ver": "v1",
-     "formula": "성과총액 = 주문외 전환량 × (정품 판매가 − 주문외 판매가)",
-     "vars": [["전환량", "품질 DW 주문외 실적"], ["가격차", "ERP SD 단가"]],
-     "period": "2025-07-01 ~", "source": "품질 DW · ERP SD", "status": "승인",
+    {"id": "RB-A3-001", "type": "A-3", "ver": "v1", "status": "승인", "period": "2026-01-01 ~", "source": "ERP SD · CO",
+     "subtitle": "고마진 Mix 확대", "pattern": "RATIO",
+     "formula": "(개선 후 고마진 구성비 − 개선 전 고마진 구성비) × 판매량 × (고마진 한계이익 − 일반 한계이익)",
+     "expr": [[{"d": ["개선 후 고마진 구성비", "개선 전 고마진 구성비"]}, {"v": "판매량"}, {"v": "한계이익 차이(고마진−일반)"}]],
+     "varsDef": [_v("개선 후 고마진 구성비", "%", "ERP SD 판매실적 · WIP 제품군 (검증기간)", [20, 60], dec=1, pct=True), _v("개선 전 고마진 구성비", "%", "ERP SD 판매실적 (기준기간)", [20, 60], dec=1, pct=True),
+                 _v("판매량", "톤", "ERP SD 판매실적 (강종군 전체)", [50000, 300000]), _v("한계이익 차이(고마진−일반)", "원/톤", "CO 관리회계 공식값", [40000, 150000], lock=True)],
+     "solve": ["개선 후 고마진 구성비"],
+     "keys": ["고마진 제품군 코드", "일반재 대비 분류 기준", "강종군", "고객용도 코드"], "periodKey": "Mix측정기간",
+     "notes": ["일반재 판매 축소·고정비 회수 저하는 역효과(④)에서 점검", "A-1 판매량 증대와 동일 물량 중복 계상 금지"],
+     "history": ["v1 2026-01 최초 제정"]},
+    {"id": "RB-A4-001", "type": "A-4", "ver": "v1", "status": "승인", "period": "2025-07-01 ~", "source": "품질 DW · ERP SD",
+     "subtitle": "주문외 판매 감소", "pattern": "RATIO",
+     "formula": "(개선 전 주문외율 − 개선 후 주문외율) × 판매량 × (정상가 − 주문외가)",
+     "expr": [[{"d": ["개선 전 주문외율", "개선 후 주문외율"]}, {"v": "판매량"}, {"v": "가격차(정상가−주문외가)"}]],
+     "varsDef": [_v("개선 전 주문외율", "%", "품질 DW 주문외 실적 (기준기간)", [2, 8], dec=2, pct=True), _v("개선 후 주문외율", "%", "품질 DW 주문외 실적 (검증기간)", [1, 6], dec=2, pct=True),
+                 _v("판매량", "톤", "ERP SD 판매실적", [50000, 300000]), _v("가격차(정상가−주문외가)", "원/톤", "ERP SD 단가", [30000, 90000])],
+     "solve": ["개선 전 주문외율"],
+     "keys": ["강종", "품명", "주문외/등급하향 코드", "결함코드", "용도코드", "품질등급"], "periodKey": "측정기간",
+     "notes": ["B-6 수율 개선과 동일한 불량 감소량을 이중 계상하지 않도록 결함코드 Key 일치 확인"],
      "history": ["v1 2025-07 최초 제정"]},
-    {"id": "RB-B2-002", "type": "B-2", "ver": "v3",
-     "formula": "성과총액 = (개선전 원단위 − 개선후 원단위) × 단가 × 생산량",
-     "vars": [["원단위", "생산 DW 원단위 실적"], ["단가", "MM 구매단가 (잠금)"], ["생산량", "생산 DW"]],
-     "period": "2026-04-01 ~", "source": "생산 DW · ERP MM", "status": "승인",
+    {"id": "RB-B1-001", "type": "B-1", "ver": "v1", "status": "승인", "period": "2026-01-01 ~", "source": "ERP MM",
+     "subtitle": "구매단가 절감", "pattern": "DIFF",
+     "formula": "(개선 전 단가 − 개선 후 단가) × 구매량",
+     "expr": [[{"d": ["개선 전 단가", "개선 후 단가"]}, {"v": "구매량"}]],
+     "varsDef": [_v("개선 전 단가", "원/톤", "ERP MM 구매단가 (기준기간)", [200000, 800000]), _v("개선 후 단가", "원/톤", "ERP MM 구매단가 (검증기간)", [200000, 800000]),
+                 _v("구매량", "톤", "ERP MM 입고실적", [10000, 200000])],
+     "solve": ["개선 전 단가"],
+     "keys": ["원료/재료 코드", "공급사코드", "대상 공장/공정"], "periodKey": "구매계약기간",
+     "notes": ["시황에 따른 원료가 하락(공통-8)과 협상·대체 검증에 의한 절감을 분리", "B-3 저가원료 대체와 동일 품목 중복 금지"],
+     "history": ["v1 2026-01 최초 제정"]},
+    {"id": "RB-B2-002", "type": "B-2", "ver": "v3", "status": "승인", "period": "2026-04-01 ~", "source": "생산 DW · ERP MM",
+     "subtitle": "동일품목 원단위 절감", "pattern": "DIFF",
+     "formula": "(개선 전 원단위 − 개선 후 원단위) × 단가 × 생산량",
+     "expr": [[{"d": ["개선 전 원단위", "개선 후 원단위"]}, {"v": "단가"}, {"v": "생산량"}]],
+     "varsDef": [_v("개선 전 원단위", "kg/톤", "생산 DW 원단위 실적 (기준기간)", [12, 40], dec=2), _v("개선 후 원단위", "kg/톤", "생산 DW 원단위 실적 (검증기간)", [12, 40], dec=2),
+                 _v("단가", "원/kg", "ERP MM 구매단가 (기준월 고정)", [300, 1200], lock=True), _v("생산량", "톤", "생산 DW", [50000, 400000])],
+     "solve": ["개선 전 원단위"],
+     "keys": ["대상 품목 코드", "공장/공정/설비", "강종군"], "periodKey": "측정기간",
+     "notes": ["동일 품목·동일 생산량 기준 비교 (품목 Mix 변화 효과 제외)", "단가는 기준월로 고정해 가격 변동 효과 배제"],
      "history": ["v1 2025-01", "v2 2025-09 에너지 원단위 포함", "v3 2026-04 단가 기준월 고정"]},
-    {"id": "RB-B6-002", "type": "B-6", "ver": "v1",
-     "formula": "성과총액 = 실수율 개선폭 × 생산량 × (판매가 − 스크랩가)",
-     "vars": [["실수율", "생산 DW 실수율"], ["가격차", "ERP SD·스크랩 시세"]],
-     "period": "2025-01-01 ~", "source": "생산 DW · ERP SD", "status": "승인",
+    {"id": "RB-B3-001", "type": "B-3", "ver": "v1", "status": "승인", "period": "2026-01-01 ~", "source": "생산 DW · ERP MM",
+     "subtitle": "저가원료 대체 ① (성분보정)", "pattern": "ADJ",
+     "formula": "(개선 후 저가품 원단위 − 개선 전 저가품 원단위) × 성분대체율 × 단가차 × 생산량",
+     "expr": [[{"d": ["개선 후 저가품 원단위", "개선 전 저가품 원단위"]}, {"v": "성분대체율"}, {"v": "단가차(고가−저가)"}, {"v": "생산량"}]],
+     "varsDef": [_v("개선 후 저가품 원단위", "kg/톤", "생산 DW 원료 원단위 (검증기간)", [50, 300], dec=1), _v("개선 전 저가품 원단위", "kg/톤", "생산 DW 원료 원단위 (기준기간)", [50, 300], dec=1),
+                 _v("성분대체율", "%", "기술 검증 보고 (성분 등가 환산)", [60, 95], dec=1, pct=True), _v("단가차(고가−저가)", "원/kg", "ERP MM 구매단가", [30, 200]), _v("생산량", "톤", "생산 DW", [100000, 500000])],
+     "solve": ["개선 후 저가품 원단위"],
+     "keys": ["고가/저가 원료코드", "대상 공정", "강종군"], "periodKey": "측정기간",
+     "notes": ["성분대체율은 등가 환산 계수 — 기술 검증 보고에 근거하며 재무실 확인 대상", "품질 저하·정련 부하는 역효과(④)에서 차감"],
+     "history": ["v1 2026-01 최초 제정"]},
+    {"id": "RB-B32-001", "type": "B-3(2)", "ver": "v1", "status": "승인", "period": "2026-01-01 ~", "source": "생산 DW · ERP MM",
+     "subtitle": "저가원료 대체 ② (배합비 변화)", "pattern": "ADJ",
+     "formula": "(개선 후 사용비 − 개선 전 사용비) × 성분대체율 × 단가차 × 생산량",
+     "expr": [[{"d": ["개선 후 사용비", "개선 전 사용비"]}, {"v": "성분대체율"}, {"v": "단가차(고가−저가)"}, {"v": "생산량"}]],
+     "varsDef": [_v("개선 후 사용비", "%", "생산 DW 배합 실적 (검증기간)", [10, 50], dec=1, pct=True), _v("개선 전 사용비", "%", "생산 DW 배합 실적 (기준기간)", [10, 50], dec=1, pct=True),
+                 _v("성분대체율", "%", "기술 검증 보고", [60, 95], dec=1, pct=True), _v("단가차(고가−저가)", "원/톤", "ERP MM 구매단가", [20000, 120000]), _v("생산량", "톤", "생산 DW", [100000, 500000])],
+     "solve": ["개선 후 사용비"],
+     "keys": ["배합 원료코드", "배합 공정", "강종군"], "periodKey": "측정기간",
+     "notes": ["사용비는 배합 중 저가 원료 비율 — 부산물 활용 성과와 환경비용 절감 성과의 중복 확인"],
+     "history": ["v1 2026-01 최초 제정"]},
+    {"id": "RB-B4-001", "type": "B-4", "ver": "v1", "status": "승인", "period": "2026-01-01 ~", "source": "생산 DW · ERP CO",
+     "subtitle": "변동가공비 원단위 절감", "pattern": "DIFF",
+     "formula": "(개선 전 원단위 − 개선 후 원단위) × 단가 × 생산량",
+     "expr": [[{"d": ["개선 전 원단위", "개선 후 원단위"]}, {"v": "단가"}, {"v": "생산량"}]],
+     "varsDef": [_v("개선 전 원단위", "단위/톤", "생산 DW 변동가공비 항목 원단위 (기준기간)", [5, 60], dec=2), _v("개선 후 원단위", "단위/톤", "생산 DW (검증기간)", [5, 60], dec=2),
+                 _v("단가", "원/단위", "CO 원가요소 단가 (기준월 고정)", [100, 2000], lock=True), _v("생산량", "톤", "생산 DW", [50000, 400000])],
+     "solve": ["개선 전 원단위"],
+     "keys": ["변동가공비 항목", "공장/공정"], "periodKey": "측정기간",
+     "notes": ["항목(LNG/COG/용수/산세액/산소/약품 등)을 먼저 선택하고 원단위를 정의", "절감 운전에 따른 설비 부하는 역효과(④)에서 점검"],
+     "history": ["v1 2026-01 최초 제정"]},
+    {"id": "RB-B5-001", "type": "B-5", "ver": "v1", "status": "승인", "period": "2026-01-01 ~", "source": "ERP MM · CO",
+     "subtitle": "변동가공비 단가 절감", "pattern": "DIFF",
+     "formula": "(개선 전 단가 − 개선 후 단가) × 원단위 × 생산량",
+     "expr": [[{"d": ["개선 전 단가", "개선 후 단가"]}, {"v": "원단위"}, {"v": "생산량"}]],
+     "varsDef": [_v("개선 전 단가", "원/단위", "MM 계약단가·요금제 (기준기간)", [100, 2000]), _v("개선 후 단가", "원/단위", "MM 계약단가·요금제 (검증기간)", [100, 2000]),
+                 _v("원단위", "단위/톤", "생산 DW (기준 원단위 고정)", [5, 60], dec=2, lock=True), _v("생산량", "톤", "생산 DW", [50000, 400000])],
+     "solve": ["개선 전 단가"],
+     "keys": ["변동가공비 항목", "공급 계약/요금제", "외주 항목"], "periodKey": "측정기간",
+     "notes": ["요금제·계약 협상이 주요 요인이면 기여율 하향 조건(⑤)", "타 에너지원 전이는 역효과(④)에서 점검"],
+     "history": ["v1 2026-01 최초 제정"]},
+    {"id": "RB-B6-002", "type": "B-6", "ver": "v1", "status": "승인", "period": "2025-01-01 ~", "source": "생산 DW · ERP CO",
+     "subtitle": "수율 개선 ① (고정비형)", "pattern": "RATIO",
+     "formula": "(개선 후 수율 − 개선 전 수율) × 처리량 × 해당 공정 가공비",
+     "expr": [[{"d": ["개선 후 수율", "개선 전 수율"]}, {"v": "처리량"}, {"v": "해당 공정 가공비"}]],
+     "varsDef": [_v("개선 후 수율", "%", "생산 DW 수율/실수율 (검증기간)", [90, 97], dec=3, pct=True), _v("개선 전 수율", "%", "생산 DW 수율/실수율 (기준기간)", [88, 95], dec=3, pct=True),
+                 _v("처리량", "톤", "생산 DW", [100000, 600000]), _v("해당 공정 가공비", "원/톤", "CO 공정원가 (잠금)", [150000, 400000], lock=True)],
+     "solve": ["개선 후 수율"],
+     "keys": ["공정코드", "설비번호", "강종군", "수율/실수율 코드"], "periodKey": "측정기간",
+     "notes": ["증량분이 판매로 이어져 매출이익이 발생하면 B-6(2) 매출이익형으로 등록 (중복 금지)"],
      "history": ["v1 2025-01 최초 제정"]},
-    {"id": "RB-B7-001", "type": "B-7", "ver": "v1",
-     "formula": "성과총액 = 생략 공정 처리량 × 공정 단위비용",
-     "vars": [["처리량", "생산 DW"], ["단위비용", "CO 공정원가 (잠금)"]],
-     "period": "2025-01-01 ~", "source": "생산 DW · CO", "status": "승인",
+    {"id": "RB-B62-001", "type": "B-6(2)", "ver": "v1", "status": "검토중", "period": "2026-07-01 ~", "source": "생산 DW · ERP SD",
+     "subtitle": "수율 개선 ② (매출이익형)", "pattern": "RATIO",
+     "formula": "(개선 후 수율 − 개선 전 수율) × 처리량 × (FOB − 추가판매비 − Scrap 단가)",
+     "expr": [[{"d": ["개선 후 수율", "개선 전 수율"]}, {"v": "처리량"}, {"v": "판매 마진(FOB−추가판매비−Scrap단가)"}]],
+     "varsDef": [_v("개선 후 수율", "%", "생산 DW 수율 (검증기간)", [90, 97], dec=3, pct=True), _v("개선 전 수율", "%", "생산 DW 수율 (기준기간)", [88, 95], dec=3, pct=True),
+                 _v("처리량", "톤", "생산 DW", [100000, 600000]), _v("판매 마진(FOB−추가판매비−Scrap단가)", "원/톤", "ERP SD 단가 · 판관비 · 스크랩 시세", [200000, 700000])],
+     "solve": ["개선 후 수율"],
+     "keys": ["공정코드", "설비번호", "강종제품 코드", "수율/실수율 코드", "판매연계 인증 데이터"], "periodKey": "측정기간",
+     "notes": ["증량분이 실제 판매되었음을 판매연계 인증 데이터로 입증해야 적용 — 인증 데이터 정의 재무실 검토중", "B-6 고정비형과 동일 증량분 중복 계상 금지"],
+     "history": ["v1 2026-07 제정안 (판매연계 인증 데이터 정의 검토중)"]},
+    {"id": "RB-B7-001", "type": "B-7", "ver": "v1", "status": "승인", "period": "2025-01-01 ~", "source": "생산 DW · CO",
+     "subtitle": "공정생략·변동가공비 절감", "pattern": "DIFF",
+     "formula": "공정생략 처리량 × 생략공정 변동가공비",
+     "expr": [[{"v": "공정생략 처리량"}, {"v": "생략공정 변동가공비"}]],
+     "varsDef": [_v("공정생략 처리량", "톤", "생산 DW (생략 공정 통과 예정 물량)", [20000, 300000]), _v("생략공정 변동가공비", "원/톤", "CO 공정원가 (잠금)", [3000, 15000], lock=True)],
+     "solve": ["공정생략 처리량"],
+     "keys": ["생략 공정 코드", "대체 공정 코드", "강종제품"], "periodKey": "측정기간",
+     "notes": ["대체 공정에서 늘어난 비용은 역효과(④) 후공정 부하 항목으로 차감"],
      "history": ["v1 2025-01 최초 제정"]},
-    {"id": "RB-B8-001", "type": "B-8", "ver": "v2",
-     "formula": "성과총액 = 절감 인시·수명연장 환산액 (고정비 계정 기준)",
-     "vars": [["고정비", "CO 고정가공비 계정"], ["환산계수", "재무실 고시"]],
-     "period": "2025-01-01 ~", "source": "ERP CO", "status": "검토중",
+    {"id": "RB-B8-001", "type": "B-8", "ver": "v2", "status": "검토중", "period": "2025-01-01 ~", "source": "ERP CO",
+     "subtitle": "고정가공비 금액 절감", "pattern": "TOTAL",
+     "formula": "개선 전 해당 비용 − 개선 후 해당 비용",
+     "expr": [[{"d": ["개선 전 해당 비용", "개선 후 해당 비용"]}]],
+     "varsDef": [_v("개선 전 해당 비용", "원", "CO 고정가공비 계정 (기준기간)", [1500000000, 6000000000]), _v("개선 후 해당 비용", "원", "CO 고정가공비 계정 (검증기간)", [1000000000, 5000000000])],
+     "solve": ["개선 전 해당 비용"],
+     "keys": ["비용항목코드", "비용센터", "원가계정", "대상 조직/설비"], "periodKey": "측정기간",
+     "notes": ["v2 개정안: 수명연장 환산계수 도입 검토중 — 확정 전까지 v1(계정 전후차)로 산출", "예방정비 축소에 따른 고장 증가는 역효과(④)"],
      "history": ["v1 2025-01", "v2 2026-06 수명연장 환산계수 개정안(검토중)"]},
-    {"id": "RB-B9-001", "type": "B-9", "ver": "v1",
-     "formula": "성과총액 = 증산량 × 톤당 한계이익 × 가동 기여계수",
-     "vars": [["증산량", "생산 DW"], ["CM_ton", "CO 관리회계 (잠금)"]],
-     "period": "2025-01-01 ~", "source": "생산 DW · CO", "status": "승인",
+    {"id": "RB-B9-001", "type": "B-9", "ver": "v1", "status": "승인", "period": "2025-01-01 ~", "source": "생산 DW · CO",
+     "subtitle": "생산량 증가", "pattern": "DIFF",
+     "formula": "(개선 후 생산량 − 개선 전 생산량) × 단위당 고정비",
+     "expr": [[{"d": ["개선 후 생산량", "개선 전 생산량"]}, {"v": "단위당 고정비"}]],
+     "varsDef": [_v("개선 후 생산량", "톤", "생산 DW (검증기간)", [200000, 900000]), _v("개선 전 생산량", "톤", "생산 DW (기준기간)", [200000, 900000]),
+                 _v("단위당 고정비", "원/톤", "CO 관리회계 (잠금)", [40000, 120000], lock=True)],
+     "solve": ["개선 후 생산량"],
+     "keys": ["공장/라인/설비번호", "강종군", "생산성 코드", "가동률", "작업률"], "periodKey": "측정기간",
+     "notes": ["증산분이 재고로 남으면 성과 미인정 — 판매·가동률 Key로 확인", "병목 이동·설비 부하는 역효과(④)"],
      "history": ["v1 2025-01 최초 제정"]},
-    {"id": "RB-C1-001", "type": "C-1", "ver": "v1",
-     "formula": "성과총액 = 대체된 외부 용역·분석 비용 실적",
-     "vars": [["비용계정", "ERP FI 판관비 계정"]],
-     "period": "2025-01-01 ~", "source": "ERP FI", "status": "승인",
+    {"id": "RB-C1-001", "type": "C-1", "ver": "v1", "status": "승인", "period": "2025-01-01 ~", "source": "ERP FI · SD",
+     "subtitle": "판관비 절감 (단위형)", "pattern": "DIFF",
+     "formula": "(개선 전 비용/톤 − 개선 후 비용/톤) × 판매량",
+     "expr": [[{"d": ["개선 전 비용/톤", "개선 후 비용/톤"]}, {"v": "판매량"}]],
+     "varsDef": [_v("개선 전 비용/톤", "원/톤", "FI 판관비 계정 ÷ 판매량 (기준기간)", [5000, 40000]), _v("개선 후 비용/톤", "원/톤", "FI 판관비 계정 ÷ 판매량 (검증기간)", [4000, 35000]),
+                 _v("판매량", "톤", "ERP SD 판매실적", [20000, 300000])],
+     "solve": ["개선 전 비용/톤"],
+     "keys": ["판관비 항목", "대상 제품/고객/물류 경로"], "periodKey": "측정기간",
+     "notes": ["포장 축소에 따른 파손·반품 증가는 역효과(④)", "총액으로 관리되는 외주·내재화 절감은 C-1(2)"],
      "history": ["v1 2025-01 최초 제정"]},
+    {"id": "RB-C12-001", "type": "C-1(2)", "ver": "v1", "status": "승인", "period": "2026-01-01 ~", "source": "ERP FI · CO",
+     "subtitle": "판관비 절감 (총액형)", "pattern": "TOTAL",
+     "formula": "개선 전 연간비용 − 개선 후 연간비용",
+     "expr": [[{"d": ["개선 전 연간비용", "개선 후 연간비용"]}]],
+     "varsDef": [_v("개선 전 연간비용", "원", "FI 원가계정·비용센터 (기준기간)", [300000000, 3000000000]), _v("개선 후 연간비용", "원", "FI 원가계정·비용센터 (검증기간)", [100000000, 2500000000])],
+     "solve": ["개선 전 연간비용"],
+     "keys": ["원가계정", "비용센터", "Work Order/설비", "외주 계약 항목"], "periodKey": "측정기간",
+     "notes": ["분석법·장치 제작 등 내재화 절감 — 내부 인력·유지보수 비용 증가는 역효과(④)"],
+     "history": ["v1 2026-01 최초 제정"]},
+    {"id": "RB-C2-001", "type": "C-2", "ver": "v1", "status": "승인", "period": "2026-01-01 ~", "source": "품질 DW · ERP SD",
+     "subtitle": "클레임 비용 절감", "pattern": "DIFF",
+     "formula": "(개선 전 톤당 클레임 − 개선 후 톤당 클레임) × 판매량",
+     "expr": [[{"d": ["개선 전 톤당 클레임", "개선 후 톤당 클레임"]}, {"v": "판매량"}]],
+     "varsDef": [_v("개선 전 톤당 클레임", "원/톤", "품질 DW 클레임 처리비 ÷ 판매량 (기준기간)", [1000, 15000]), _v("개선 후 톤당 클레임", "원/톤", "품질 DW (검증기간)", [500, 12000]),
+                 _v("판매량", "톤", "ERP SD 판매실적", [20000, 300000])],
+     "solve": ["개선 전 톤당 클레임"],
+     "keys": ["클레임 코드", "결함 코드", "대상 제품/고객"], "periodKey": "측정기간",
+     "notes": ["검사 강화·선별비 증가와 이연 클레임은 역효과(④)에서 위험추정으로 구분"],
+     "history": ["v1 2026-01 최초 제정"]},
 ]
+for _r in RULES:   # 호환 필드: vars [[변수, 원천]]
+    _r["vars"] = [[v["n"], v["s"]] for v in _r["varsDef"]]
+    for _k in _r["keys"] + [_r["periodKey"]]:
+        assert _k in KEY_DICT, f"KEY_DICT 누락: {_k}"
 RULE_BY_TYPE = {r["type"]: r for r in RULES}
 EFFECT_TO_TYPE = {k: v[0] for k, v in EFFECT_MAP.items() if v}
 EFFECT_TO_TYPE["실수율/품질향상"] = "B-6"   # 설계서 3.1 기본 추천 (목록 순서와 무관)
 
+def tech_major(t):
+    t = (t or "").strip()
+    m = re.match(r"^\((.+?)\)", t)
+    return m.group(1) if m else ("기타" if t in ("", "-") else t)
+TECH_OF = {r["과제코드"]: tech_major(r.get("기술분류")) for r in a3 if r.get("과제코드")}
 STATUSES = ["확정", "확정", "확정", "확정", "확정", "승인", "승인", "검토", "검토", "검토", "보완", "등록"]
 KEY_BY_GROUP = {
     "A": "제품군·강종·고객사·품질등급·판매기간",
@@ -783,9 +968,421 @@ for p, eff in picked:
         "match": prng.randint(180, 2400), "period": "2025-09 ~ 2026-08",
         "key": KEY_BY_GROUP[ptype[0]],
         "erosionName": ero_pair[0] if ero_pair else "해당 역효과 없음",
-        "dept": p["useDept"], "slaDay": prng.randint(1, 9),
+        "dept": p["useDept"], "slaDay": prng.randint(1, 9), "costEok": eok(p["cost"]),
+        "tech": TECH_OF.get(p["code"], "기타"), "act": classify(p["code"]),
+        "lab": ((p.get("rdept") or "").split() or ["기타"])[0], "grp": ((p.get("rdept") or "").split() + ["", "미지정"])[1] or "미지정",
         "utilY1": prng.choice(["활용중", "활용중", "부분활용"]),
     })
+
+
+# ── 연구 기여율: 유형별 표준 기여율 테이블 (⑥ 기여율 기준 데이터, 재무실 고시 v1)
+#    std 표준 · down 하향(활용부서장 판단) · up 상향(재무실 승인) · up 이 [min,max]면 범위 입력
+CONTRIB_TABLE = [
+    {"type": "A-1", "std": 50, "down": 30, "downCond": "판매·마케팅 주도로 수주하고, 연구는 품질 대응을 수행한 경우",
+     "up": [70, 100], "upCond": "고객이 해당 기술 때문에 발주했음을 입증한 경우"},
+    {"type": "A-2", "std": 50, "down": 30, "downCond": "가격 협상력이 주요 요인인 경우",
+     "up": 70, "upCond": "Extra 코드가 개발 기술에 직접 연동됨을 입증한 경우"},
+    {"type": "A-3", "std": 40, "down": 20, "downCond": "판매전략 주도의 Mix 전환인 경우",
+     "up": 60, "upCond": "신강종 개발이 Mix 전환의 직접 원인인 경우"},
+    {"type": "A-4", "std": 40, "down": 20, "downCond": "조업 조건 개선이 병행된 경우",
+     "up": 60, "upCond": "연구기술 단독 적용으로 개선되었음을 입증한 경우"},
+    {"type": "B-1", "std": 30, "down": 10, "downCond": "구매협상이 주요 요인이고, 연구는 대체 가능성을 검증한 경우",
+     "up": 50, "upCond": "연구가 대체재 검증표준 개정을 주도한 경우"},
+    {"type": "B-2", "std": 30, "down": 15, "downCond": "조업 최적화 활동이 병행된 경우",
+     "up": 50, "upCond": "연구기술에 의한 모델 또는 소재 변경이 단독 원인인 경우"},
+    {"type": "B-3", "std": 40, "down": 20, "downCond": "구매 주도의 원료 전환인 경우",
+     "up": 60, "upCond": "연구의 배합성분 기술이 대체를 가능하게 한 경우"},
+    {"type": "B-3(2)", "std": 40, "down": 20, "downCond": "구매 주도의 원료·배합 전환인 경우 (B-3 준용)",
+     "up": 60, "upCond": "연구의 배합성분 기술이 변경을 가능하게 한 경우 (B-3 준용)", "note": "B-3 기준 준용"},
+    {"type": "B-4", "std": 30, "down": 15, "downCond": "설비 투자 또는 조업 개선이 병행된 경우",
+     "up": 50, "upCond": "연구기술을 단독 적용한 경우"},
+    {"type": "B-5", "std": 20, "down": 10, "downCond": "요금제 또는 계약 협상이 주요 요인인 경우",
+     "up": 40, "upCond": "연구의 기술 검증이 단가 인하의 전제인 경우"},
+    {"type": "B-6", "std": 40, "down": 20, "downCond": "설비 교체 또는 조업표준 개정이 병행된 경우",
+     "up": 60, "upCond": "연구모델 또는 연구기술이 직접 원인인 경우", "note": "적용 전후 비교 가능"},
+    {"type": "B-6(2)", "std": 40, "down": 20, "downCond": "설비 교체 또는 조업표준 개정이 병행된 경우 (B-6 준용)",
+     "up": 60, "upCond": "연구모델 또는 연구기술이 직접 원인인 경우 (B-6 준용)", "note": "매출이익형 · B-6 기준 준용"},
+    {"type": "B-7", "std": 50, "down": 30, "downCond": "설비 투자가 동반된 공정 생략인 경우",
+     "up": 70, "upCond": "연구기술만으로 공정 생략을 달성한 경우"},
+    {"type": "B-8", "std": 30, "down": 15, "downCond": "조직 또는 예산 효율화가 병행된 경우",
+     "up": 50, "upCond": "연구기술이 비용 구조를 직접 변경한 경우"},
+    {"type": "B-9", "std": 30, "down": 15, "downCond": "설비 증설 또는 조업 개선이 병행된 경우",
+     "up": 50, "upCond": "연구기술에 의한 모델 또는 조업조건 최적화가 직접 원인인 경우"},
+    {"type": "C-1", "std": 30, "down": 15, "downCond": "물류구매 협상이 병행된 경우",
+     "up": 50, "upCond": "연구기술 또는 포장 사양 등이 직접 원인인 경우", "note": "단위형 (물류·포장 등 단위비 절감)"},
+    {"type": "C-1(2)", "std": 40, "down": 20, "downCond": "외주 계약 조정이 병행된 경우",
+     "up": 70, "upCond": "연구가 내재화 기술을 단독 개발한 경우", "note": "총액형 (분석법·장치 제작 등 외주 내재화)"},
+    {"type": "C-2", "std": 40, "down": 20, "downCond": "검사 강화 또는 공정관리가 병행된 경우",
+     "up": 60, "upCond": "연구의 품질기술이 결함 원인을 직접 제거한 경우"},
+]
+CONTRIB_BY_TYPE = {c["type"]: c for c in CONTRIB_TABLE}
+assert set(CONTRIB_BY_TYPE) == {t[0] for t in PERF_TYPES}, "표준 기여율 테이블과 재무성과 코드 불일치"
+
+# 등록 성과 12건의 기여율을 표준표 기준으로 재산정 (a1 연구기여도는 참고값으로만 보존). 별도 시드 → 기존 난수열 불변
+cprng = random.Random(20260903)
+CONTRIB_MODES = ["STANDARD"] * 7 + ["DOWN"] * 3 + ["UP"] * 2
+cprng.shuffle(CONTRIB_MODES)
+for r, mode in zip(regs, CONTRIB_MODES):
+    tbl = CONTRIB_BY_TYPE[r["type"]]
+    a1_ref = r["contrib"]
+    if mode == "DOWN":
+        applied = tbl["down"]
+        decision = {"mode": "DOWN", "applied": applied, "reason": f"하향 조건 해당 — {tbl['downCond']}",
+                    "judgedBy": f"{r['dept']} 부서장", "judgedAt": None, "evidence": "활용부서 판단서(과제 완료보고 첨부)"}
+    elif mode == "UP":
+        up = tbl["up"]
+        applied = cprng.choice([80, 90]) if isinstance(up, list) else up
+        approved = r["status"] in ("승인", "확정")   # 성과 승인과 함께 기여율 상향도 승인된 것으로 간주
+        decision = {"mode": "UP", "applied": applied, "reason": f"상향 조건 입증 — {tbl['upCond']}",
+                    "evidence": "고객 발주 사유서·기술 적용 확인서" if r["type"][0] == "A" else "적용 전후 조업 데이터·기술 적용 확인서",
+                    "approval": {"status": "승인" if approved else "승인대기", "requestedAt": None, "decidedAt": None, "by": "재무실"}}
+    else:
+        applied = tbl["std"]
+        decision = {"mode": "STANDARD", "applied": applied, "reason": "", "evidence": ""}
+    decision.update({"standard": tbl["std"], "a1Ref": a1_ref})
+    # 상향은 재무실 승인 전까지 표준 기여율이 유효값
+    effective = tbl["std"] if (mode == "UP" and decision["approval"]["status"] != "승인") else applied
+    decision["effective"] = effective
+    r["contrib"] = effective
+    r["contribution"] = decision
+    r["netEok"] = eok((r["grossEok"] - r["erosionEok"]) * 1e8 * effective / 100 - r["directEok"] * 1e8)
+
+# ── 산출 근거 추적(Lineage) 데이터: 성과 등록별 스냅샷·변수값·재계산·승인 이력·연차·건전성 (시드 고정)
+lprng = random.Random(20260902)
+STEP_ORDER = ["등록", "검토", "보완", "승인", "확정"]
+STEP_ACTOR = {"등록": "연구책임자 (과제 부서)", "검토": "재무실 검토자", "보완": "연구책임자 (과제 부서)",
+              "승인": "재무실 팀장", "확정": "재무실 (월마감)"}
+STEP_NOTE = {"등록": "성과 등록·입력 Key 지정, ERP 스냅샷 자동 생성", "검토": "Rule 변수·역효과 첨부 검토",
+             "보완": "역효과 산정 근거 보완 요청 → 재제출", "승인": "재계산 일치 확인, 기여율 적용 승인", "확정": "월마감 반영·누적성과 편입"}
+
+def _doc_ids(src, n):
+    pre = {"SD": "SD", "DW": "PD", "CO": "CO", "FI": "FI", "MM": "MM", "QD": "QD"}[src]
+    out = []
+    for _ in range(n):
+        m = lprng.randint(1, 12)
+        out.append(f"{pre}-2026{m:02d}-{lprng.randint(100000, 999999)}")
+    return out
+
+def _rnd(x, dec):
+    return round(x, dec) if dec else int(round(x))
+
+def _eval_expr(rule, val):
+    """expr(Σ Π term) 평가. pct 변수는 /100. 반환: 총액(원), 곱셈항별 [값]"""
+    pct = {v["n"] for v in rule["varsDef"] if v.get("pct")}
+    f = lambda n: val[n] / 100 if n in pct else val[n]
+    prods = []
+    for terms in rule["expr"]:
+        p = 1.0
+        for t in terms:
+            p *= (f(t["d"][0]) - f(t["d"][1])) if "d" in t else f(t["v"])
+        prods.append(p)
+    return sum(prods), prods
+
+def _calc(r, gross):
+    """산식 정의(expr·varsDef)를 읽어 성과총액이 재현되도록 변수값을 역산. 반환: (vars, steps, recomputed 원, 원천코드)"""
+    rule = RULE_BY_TYPE[r["type"]]
+    vd = {v["n"]: v for v in rule["varsDef"]}
+    pct = {n for n, v in vd.items() if v.get("pct")}
+    val = {}
+    # 1) 역산 대상이 아닌 변수는 표본 범위에서 추출 (차이항의 '전' 값 포함)
+    for v in rule["varsDef"]:
+        val[v["n"]] = _rnd(lprng.uniform(*v["r"]), v["dec"])
+    # 2) 곱셈항별 성과 배분 (가산형은 85:15)
+    n_prod = len(rule["expr"])
+    shares = [gross] if n_prod == 1 else [gross * 0.85, gross * 0.15]
+    for terms, solve, share in zip(rule["expr"], rule["solve"], shares):
+        others = 1.0
+        target = None
+        for t in terms:
+            if "d" in t and solve in t["d"]:
+                target = t
+            elif "v" in t and t["v"] == solve:
+                target = t
+            else:
+                x = (val[t["d"][0]] - val[t["d"][1]]) if "d" in t else val[t["v"]]
+                if "d" in t:
+                    x = (val[t["d"][0]] / 100 - val[t["d"][1]] / 100) if (t["d"][0] in pct) else x
+                elif t["v"] in pct:
+                    x = x / 100
+                others *= x
+        need = share / others           # 역산 대상 항의 값 (비율 변수는 소수)
+        if solve in pct:
+            need *= 100
+        dec = vd[solve]["dec"]
+        if "d" in target:               # 차이항: solve = 다른 쪽 ± need
+            a, b = target["d"]
+            if solve == a:
+                val[a] = _rnd(val[b] + need, dec)
+            else:
+                val[b] = _rnd(val[a] - need, dec)
+        else:
+            val[solve] = _rnd(need, dec)
+        # 반올림 오차가 허용치(0.5%)를 넘으면 소수 자릿수를 늘려 재역산
+        rec, _ = _eval_expr(rule, val)
+        if abs(rec - gross) > gross * 0.004 and n_prod == 1:
+            dec += 2
+            if "d" in target:
+                a, b = target["d"]
+                if solve == a: val[a] = _rnd(val[b] + need, dec)
+                else: val[b] = _rnd(val[a] - need, dec)
+            else:
+                val[solve] = _rnd(need, dec)
+    recomputed, prods = _eval_expr(rule, val)
+    vars_ = [[v["n"], val[v["n"]], v["u"], v["s"]] for v in rule["varsDef"]]
+    steps = []
+    for terms, pv in zip(rule["expr"], prods):
+        parts, subs = [], []
+        for t in terms:
+            if "d" in t:
+                a, b = t["d"]
+                d = val[a] - val[b]
+                steps.append([f"{a} − {b}", f"{val[a]:,} − {val[b]:,}", _rnd(d, vd[a]["dec"]), vd[a]["u"] + ("p" if a in pct else "")])
+                parts.append(f"({a} − {b})"); subs.append(f"{_rnd(d, vd[a]['dec']):,}" + ("%" if a in pct else ""))
+            else:
+                parts.append(t["v"]); subs.append(f"{val[t['v']]:,}" + ("%" if t["v"] in pct else ""))
+        steps.append([" × ".join(parts), " × ".join(subs), int(round(pv)), "원"])
+    if len(prods) > 1:
+        steps.append(["합계 (곱셈항 합)", " + ".join(f"{int(round(p)):,}" for p in prods), int(round(recomputed)), "원"])
+    src = {"A": "SD", "B": "DW", "C": "FI"}[r["type"][0]]
+    if r["type"] in ("B-8",): src = "CO"
+    if r["type"] in ("A-4",): src = "QD"
+    return vars_, steps, int(round(recomputed)), src
+
+for r, (p, eff) in zip(regs, picked):
+    gross = p["annual"]
+    vars_, steps, recomputed, src = _calc(r, gross)
+    rule = RULE_BY_TYPE[r["type"]]
+    # 승인 이력: 등록일부터 현재 상태까지, 각 단계 수일 간격
+    reg_day = date(2026, lprng.randint(3, 7), lprng.randint(1, 28))
+    upto = STEP_ORDER.index(r["status"]) + 1
+    if r["status"] == "확정":
+        upto = 5
+    hist, d = [], reg_day
+    for stp in STEP_ORDER[:upto]:
+        if stp == "보완" and r["status"] in ("승인", "확정") and lprng.random() < 0.5:
+            continue  # 보완 없이 승인된 건
+        hist.append([stp, STEP_ACTOR[stp], d.isoformat(), STEP_NOTE[stp]])
+        d = d + timedelta(days=lprng.randint(2, 9))
+    frozen = f"{reg_day.isoformat()} 02:{lprng.randint(10,59):02d}"
+    snap_id = f"SNAP-{reg_day.strftime('%Y%m%d')}-{r['id'][-3:]}"
+    has_snapshot = r["status"] != "등록"
+    drift = lprng.choice([0, 0, 0, lprng.randint(3, 40)])  # 스냅샷 이후 원천 변경 감지(일부 건)
+    diff = recomputed - gross
+    recompute_ok = abs(diff) <= max(gross * 0.005, 1)
+    checks = [
+        ["ERP 스냅샷 동결", "ok" if has_snapshot else "warn", f"{snap_id} · {frozen}" if has_snapshot else "등록 단계 — 스냅샷 미생성"],
+        ["산식 버전 잠금", "ok" if rule["status"] == "승인" else "warn", f"{rule['id']} {rule['ver']} 잠금" if rule["status"] == "승인" else f"{rule['id']} {rule['ver']} 개정 검토중 — 잠금 전"],
+        ["재계산 일치", "ok" if recompute_ok else "warn", f"재계산 {eok(recomputed)}억 vs 등록 {r['grossEok']}억 (차이 {eok(diff):+.1f}억)"],
+        ["원천 변경 감지", "ok" if drift == 0 else "info", "스냅샷 이후 원천 변경 없음" if drift == 0 else f"현재 ERP 재조회 {r['match']+drift:,}건 (스냅샷 {r['match']:,}건, +{drift}) — 산출은 스냅샷 기준 유지"],
+        ["승인 기록", "ok" if r["status"] in ("승인", "확정") else "info" if r["status"] in ("검토", "보완") else "warn",
+         f"{r['status']} · {hist[-1][2]}" if hist else "기록 없음"],
+    ]
+    years = []
+    for y in range(1, r["persist"] + 1):
+        if y == 1:
+            years.append([1, r["utilY1"], r["netEok"] if r["status"] in ("승인", "확정") else None, "1년차 실적" if r["status"] in ("승인", "확정") else "승인 전 — 산출값 미확정"])
+        else:
+            years.append([y, "예정", None, f"{2026+y-1}년 활용평가 예정"])
+    if any(h[0] == "보완" for h in hist):
+        r["supplementReason"] = lprng.choice(["역효과 산정 근거 미비", "입력 Key 불일치", "기여율 입증자료 부족", "스냅샷 기간 불일치"])
+    c = r["contribution"]
+    if c["mode"] == "DOWN":
+        c["judgedAt"] = hist[0][2] if hist else reg_day.isoformat()
+    if c["mode"] == "UP":
+        c["approval"]["requestedAt"] = hist[0][2] if hist else reg_day.isoformat()
+        c["approval"]["decidedAt"] = hist[-1][2] if c["approval"]["status"] == "승인" and len(hist) > 1 else None
+    r["lineage"] = {
+        "snapshot": {"id": snap_id if has_snapshot else None, "frozenAt": frozen if has_snapshot else None, "source": rule["source"],
+                     "records": r["match"], "currentRecords": r["match"] + drift, "period": r["period"],
+                     "samples": _doc_ids(src, 10) if has_snapshot else []},
+        "keyValues": [[k, (r["dept"] if ("공장" in k or "조직" in k or "센터" in k) else f"{lprng.randint(1, 6)}개 지정"), KEY_DICT[k][0]] for k in rule["keys"]]
+                     + [[rule["periodKey"], r["period"], KEY_DICT[rule["periodKey"]][0]]],
+        "calc": {"vars": vars_, "steps": steps, "recomputedEok": eok(recomputed), "diffEok": eok(diff), "ok": recompute_ok},
+        "approval": hist,
+        "years": years,
+        "checks": checks,
+        "registeredAt": reg_day.isoformat(),
+    }
+
+# ── ① 워크벤치 신규 등록 후보: 완료과제 중 미등록 건 (연간기대이익 1~80억, 상위 40건). a1 참고값 포함
+_reg_codes = {r["code"] for r in regs}
+candidates = []
+for p in sorted(completed, key=lambda x: -x["annual"]):
+    if p["code"] in _reg_codes or not (1e8 <= p["annual"] <= 8e9):
+        continue
+    r1 = a1_by_code.get(p["code"]) or {}
+    eff = re.split(r"[,\s]", (r1.get("정량효과유형") or "기타").strip())[0] or "기타"
+    candidates.append({"code": p["code"], "name": short(p["name"], 40), "dept": p["useDept"], "effect": eff,
+                       "annualEok": eok(p["annual"]), "costEok": eok(p["cost"]), "tech": TECH_OF.get(p["code"], "기타"), "act": classify(p["code"]), "lab": ((p.get("rdept") or "").split() or ["기타"])[0], "grp": ((p.get("rdept") or "").split() + ["", "미지정"])[1] or "미지정", "persist": max(1, round(p["persist"])) if p["persist"] else 3,
+                       "a1Contrib": round(money(r1.get("연구기여도", "")) or 70)})
+    if len(candidates) >= 40:
+        break
+
+# ── CTO Dashboard 데이터: 기술분류 × 성과유형, 기술분류별 전환율, 활동군별 실현 추이, 탐색→전략 후속화, Watch List
+_tech_cell = defaultdict(lambda: {"exp": 0.0, "n": 0})
+_tech_conv = defaultdict(lambda: {"n": 0, "exp": 0.0, "real": 0.0})
+_act_year = defaultdict(lambda: defaultdict(float))
+for pr in proj_results:
+    tmaj = TECH_OF.get(pr["code"], "기타")
+    ptype = EFFECT_TO_TYPE.get(pr["effect"])
+    if ptype:
+        c = _tech_cell[(tmaj, ptype)]; c["exp"] += pr["exp"]; c["n"] += 1
+    tc = _tech_conv[tmaj]; tc["n"] += 1; tc["exp"] += pr["exp"]; tc["real"] += pr["real"]
+    _act_year[pr["cy"]][pr["act"]] += pr["real"]
+tech_rows = [t for t, v in sorted(_tech_conv.items(), key=lambda x: -x[1]["exp"]) if v["n"] >= 3][:9]
+# 탐색(N/L) 완료과제 → 이후 동일 연구부서·기술분류에서 착수한 전략 과제 존재 여부 (근사 후속화율)
+_strat_starts = defaultdict(list)
+for r in a3:
+    if classify(r["과제코드"]) == 1 and r.get("착수일"):
+        _strat_starts[(dept_short(r.get("연구부서")), TECH_OF.get(r["과제코드"], "기타"))].append(r["착수일"])
+explore_done = [p for p in completed if classify(p["code"]) == 4]
+followed = 0
+for p in explore_done:
+    key = (dept_short(p.get("rdept")), TECH_OF.get(p["code"], "기타"))
+    done_at = f"{p['cy']}-12-31"
+    if any(st > done_at for st in _strat_starts.get(key, [])):
+        followed += 1
+_watch_unused = sorted([pr for pr in proj_results if pr["status"] == "미활용"], key=lambda x: -x["cost"])[:6]
+_watch_drop = sorted([pr for pr in proj_results if len(pr["traj"]) >= 2 and pr["traj"][-1] != "활용중" and pr["traj"][-2] == "활용중"], key=lambda x: -x["exp"])[:6]
+cto = {
+    "techRows": tech_rows,
+    "matrix": [[t, pt, round(v["exp"], 1), v["n"]] for (t, pt), v in _tech_cell.items() if t in tech_rows],
+    "techConv": [[t, _tech_conv[t]["n"], round(_tech_conv[t]["exp"], 1), round(_tech_conv[t]["real"], 1),
+                  round(100 * _tech_conv[t]["real"] / max(1e-9, _tech_conv[t]["exp"]))] for t in tech_rows],
+    "actYears": sorted(y for y in _act_year if y >= CUR_YEAR - 6),
+    "actSeries": {str(a): [round(_act_year[y].get(a, 0.0), 1) for y in sorted(y for y in _act_year if y >= CUR_YEAR - 6)] for a in (1, 3, 4)},
+    "followUp": {"explore": len(explore_done), "followed": followed, "rate": round(100 * followed / max(1, len(explore_done)))},
+    "watchUnused": [[pr["code"], pr["name"], pr["dept"], pr["cost"], pr["exp"], "·".join(pr["traj"])] for pr in _watch_unused],
+    "watchDrop": [[pr["code"], pr["name"], pr["dept"], pr["cost"], pr["exp"], "·".join(pr["traj"])] for pr in _watch_drop],
+}
+
+# ── 연구소장 Dashboard 데이터: 연구소별 전환율·활용평가 이행률, 다가오는 활용평가 일정(완료일 기준 연차 도래)
+_lab = defaultdict(lambda: {"n": 0, "exp": 0.0, "real": 0.0, "due": 0, "done": 0})
+for pr in proj_results:
+    L = _lab[pr["lab"]]; L["n"] += 1; L["exp"] += pr["exp"]; L["real"] += pr["real"]; L["due"] += pr["evalDue"]; L["done"] += pr["evalDone"]
+_sched = []
+for p in completed:
+    if not p.get("end") or p["qual"]:
+        continue
+    n_years = max(0, min(5, CUR_YEAR - p["cy"]))
+    nxt = n_years + 1
+    if nxt > min(5, max(1, round(p["persist"]))):
+        continue
+    try:
+        end = date.fromisoformat(p["end"][:10])
+    except ValueError:
+        continue
+    due = end.replace(year=end.year + nxt) if not (end.month == 2 and end.day == 29) else end.replace(year=end.year + nxt, day=28)
+    if TODAY <= due <= TODAY + timedelta(days=180):
+        rd = (p.get("rdept") or "").split()
+        _sched.append([p["code"], short(p["name"], 30), rd[0] if rd else "기타", rd[1] if len(rd) > 1 else "미지정", due.isoformat(), nxt, p.get("owner") or "미지정", p["useDept"]])
+_sched.sort(key=lambda x: x[4])
+lab = {
+    "labs": sorted(_lab, key=lambda k: -_lab[k]["n"]),
+    "byLab": {k: [v["n"], round(v["exp"], 1), round(v["real"], 1), round(100 * v["real"] / max(1e-9, v["exp"])), v["due"], v["done"]] for k, v in _lab.items()},
+    "company": {"conv": achievement, "evalRate": round(100 * evals_done_n / max(1, evals_due))},
+    "evalSchedule": _sched[:80],
+}
+
+# ── 장기 활용평가 Dashboard 데이터(설계서 11.6): 연차별 활용상태·실현액 → 성과상태(증가/유지/감소/종료) 파생, Sankey·매트릭스·코호트·캘린더
+def perf_state(prev, amt, status):
+    if amt is None:
+        return "미평가"
+    if status == "미활용" or amt <= 0:
+        return "종료"
+    if prev is None or prev <= 0:
+        return "증가"
+    if amt > prev * 1.05:
+        return "증가"
+    if amt < prev * 0.95:
+        return "감소"
+    return "유지"
+UTIL_ST = ["활용중", "부분활용", "미활용"]
+PERF_ST = ["증가", "유지", "감소", "종료"]
+util_projects = []
+sankey_links = Counter()
+matrix = Counter()
+cohort_curve = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0]))   # cy -> k -> [exp, real] 누적
+cal = defaultdict(lambda: {"done": 0, "wait": 0})
+for pr in proj_results:
+    prev = None
+    yrs_out = []
+    last_u = last_p = None
+    for yr, st, amt in pr["yrs"]:
+        ps = perf_state(prev, amt, st)
+        yrs_out.append([yr, st, amt, ps])
+        if amt is not None:
+            prev = amt
+        if st != "미평가":
+            last_u, last_p = st, ps
+    # Sankey: 완료 → 1년차 상태 → … (미평가는 직전 상태 유지로 간주)
+    chain = ["완료"]
+    for yr, st, amt, ps in yrs_out:
+        chain.append(f"{yr}년차 {st if st != '미평가' else '미평가'}")
+    for a, b in zip(chain, chain[1:]):
+        sankey_links[(a, b)] += 1
+    if last_u:
+        matrix[(last_u, last_p)] += 1
+    # 코호트 전환율 곡선: 완료연도별 k년차까지 누적 실현/기대
+    cum_e = cum_r = 0.0
+    for yr, st, amt, ps in yrs_out:
+        cum_e += pr["annualEok"] if yr <= 5 else 0
+        cum_r += (amt or 0)
+        cc = cohort_curve[pr["cy"]][yr]; cc[0] += cum_e; cc[1] += cum_r
+    # 2026 재산출 캘린더: 올해 도래 차수(완료월 기준) — 평가 실시 여부
+    due_yr = CUR_YEAR - pr["cy"]
+    if 1 <= due_yr <= 5 and pr.get("end"):
+        m = int(pr["end"][5:7]) if len(pr["end"]) >= 7 and pr["end"][5:7].isdigit() else 12
+        rec = next((y for y in yrs_out if y[0] == due_yr), None)
+        cal[m]["done" if rec and rec[1] != "미평가" else "wait"] += 1
+    util_projects.append({"code": pr["code"], "name": pr["name"], "lab": pr["lab"], "dept": pr["dept"], "cy": pr["cy"],
+                          "annual": pr["annualEok"], "cost": pr["cost"], "owner": pr.get("owner", ""),
+                          "years": yrs_out, "u": last_u or "미평가", "p": last_p or "미평가"})
+sankey_nodes = ["완료"] + [f"{y}년차 {s}" for y in range(1, 6) for s in UTIL_ST + ["미평가"]]
+used = {a for a, _ in sankey_links} | {b for _, b in sankey_links}
+util = {
+    "n": len(util_projects),
+    "sankey": {"nodes": [n for n in sankey_nodes if n in used], "links": [[a, b, v] for (a, b), v in sankey_links.items()]},
+    "matrix": [[u, p, matrix.get((u, p), 0)] for u in UTIL_ST for p in PERF_ST],
+    "cohortCurve": {str(cy): [[k, round(100 * v[1] / max(1e-9, v[0]))] for k, v in sorted(cohort_curve[cy].items())] for cy in sorted(cohort_curve) if cy >= CUR_YEAR - 6},
+    "calendar": [[m, cal[m]["done"], cal[m]["wait"]] for m in range(1, 13)],
+    "projects": util_projects,
+}
+
+# ── 연구 ROI Dashboard 데이터(설계서 11.7): 과제별 투입(연구비+MW) 대비 누적 실현(시뮬레이션), 코호트 BEP, 기술분류·활동군 ROI, 분포
+proj_mw = defaultdict(float)
+for _name, _codes in person_proj_mw.items():
+    for _code, _mw in _codes.items():
+        proj_mw[_code] += _mw
+roi_projects = []
+for pr in proj_results:
+    real = sum((y[2] or 0) for y in pr["yrs"])
+    cost = pr["cost"]
+    roi_projects.append({"code": pr["code"], "name": pr["name"], "lab": pr["lab"], "dept": pr["dept"], "act": pr["act"],
+                         "tech": TECH_OF.get(pr["code"], "기타"), "cy": pr["cy"], "cost": cost, "mw": round(proj_mw.get(pr["code"], 0.0), 1),
+                         "annual": pr["annualEok"], "exp": pr["exp"], "real": round(real, 1),
+                         "roi": round(real / cost, 2) if cost > 0 else None, "years": [[y[0], y[2]] for y in pr["yrs"] if y[2] is not None]})
+_cb = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0]))   # cy -> k -> [누적 실현, 투입]
+for rp in roi_projects:
+    acc = 0.0
+    for k in range(1, 6):
+        acc += next((a for y, a in rp["years"] if y == k), 0.0)
+        if k <= CUR_YEAR - rp["cy"]:
+            c = _cb[rp["cy"]][k]; c[0] += acc; c[1] += rp["cost"]
+_tech = defaultdict(lambda: [0.0, 0.0, 0])
+_actr = defaultdict(lambda: [0.0, 0.0, 0])
+for rp in roi_projects:
+    t = _tech[rp["tech"]]; t[0] += rp["cost"]; t[1] += rp["real"]; t[2] += 1
+    a = _actr[rp["act"]]; a[0] += rp["cost"]; a[1] += rp["real"]; a[2] += 1
+bins = [(0, 0.5, "0~0.5"), (0.5, 1, "0.5~1"), (1, 2, "1~2"), (2, 3, "2~3"), (3, 5, "3~5"), (5, 10, "5~10"), (10, 1e9, "10+")]
+hist = [[lab_, sum(1 for rp in roi_projects if rp["roi"] is not None and lo <= rp["roi"] < hi)] for lo, hi, lab_ in bins]
+roi = {
+    "projects": roi_projects,
+    "cohortBep": {str(cy): [[k, round(100 * v[0] / max(1e-9, v[1]))] for k, v in sorted(_cb[cy].items())] for cy in sorted(_cb) if cy >= CUR_YEAR - 6},
+    "techRoi": sorted([[t, round(v[0], 1), round(v[1], 1), round(v[1] / max(1e-9, v[0]), 2), v[2]] for t, v in _tech.items() if v[2] >= 3], key=lambda x: -x[3]),
+    "actRoi": {str(a): [round(v[0], 1), round(v[1], 1), round(v[1] / max(1e-9, v[0]), 2), v[2]] for a, v in _actr.items()},
+    "hist": hist,
+}
 
 appr_counts = Counter(r["status"] for r in regs)
 type_amounts = defaultdict(float)
@@ -795,8 +1392,14 @@ for r in regs:
 perf = {
     "types": PERF_TYPES,
     "effectMap": EFFECT_MAP,
-    "erosionCatalog": [[k, v[0], v[1]] for k, v in EROSION_CATALOG.items()],
     "rules": RULES,
+    "keyDict": KEY_DICT,
+    "contribTable": CONTRIB_TABLE,
+    "candidates": candidates,
+    "cto": cto,
+    "lab": lab,
+    "util": util,
+    "roi": roi,
     "regs": regs,
     "approval": {
         "wait": appr_counts.get("검토", 0) + appr_counts.get("보완", 0) + appr_counts.get("등록", 0),
@@ -825,7 +1428,7 @@ DATA_OUT = {
              "actNames": ACT, "rows": {"a1": len(a1), "a2": len(a2), "a3": len(a3),
                                         "a4": len(a4), "a5": len(a5), "a6": len(a6)}},
     "home": home, "support": support, "knowledge": knowledge, "promotion": promotion,
-    "longterm": longterm, "executive": executive, "mw": mwpage,
+    "longterm": longterm, "mw": mwpage,   # executive: Executive 탭은 perf.regs 확정 기준으로 직접 계산
     "detail": detail, "sim": sim, "me": me, "perf": perf,
 }
 
