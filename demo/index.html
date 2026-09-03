@@ -1282,7 +1282,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     </div>
     <div class="row" style="grid-template-columns:repeat(5,1fr)" id="roiKpis"></div>
     <div class="row" style="grid-template-columns:7fr 5fr">
-      <div class="card"><h3>ROI 산점도 <span class="legend-note">— X 투입 연구비(억) · Y 누적 실현(억) · 대각선 = BEP · 색 = 활동군</span></h3>
+      <div class="card"><h3>ROI 산점도 <span class="legend-note">— X 투입 연구비 · Y 누적 실현 (억, 로그축) · 대각선 = BEP · 색 = 활동군</span></h3>
         <div class="er-filters" id="roiFil" role="group" aria-label="산점도 필터" style="margin-bottom:6px"></div><div class="chart" id="roiScatter" style="height:340px"></div></div>
       <div class="card" id="roiCard" aria-live="polite"></div>
     </div>
@@ -4147,14 +4147,14 @@ const RO = (() => {
   }
   function renderScatter(){
     const regByCode = {}; PF.regs.filter(r=>r.status==='확정').forEach(r => { regByCode[r.code] = r; });
-    const pts = P().filter(p => p.cost > 0), mx = Math.max(1, ...pts.map(p=>Math.max(p.cost,p.real)));
-    const byAct = {1:[],3:[],4:[]}; pts.forEach(p => (byAct[p.act]||byAct[1]).push({value:[p.cost, p.real], code:p.code}));
+    const pts = P().filter(p => p.cost > 0), mx = Math.max(1, ...pts.map(p=>Math.max(p.cost,p.real))), LO = 0.1;   // 로그축: 실현 0은 0.1로 표시
+    const byAct = {1:[],3:[],4:[]}; pts.forEach(p => (byAct[p.act]||byAct[1]).push({value:[Math.max(LO,p.cost), Math.max(LO,p.real)], code:p.code}));
     const sOpt = {tooltip:tip({formatter:p=>{const q=R().projects.find(x=>x.code===p.data.code);return q?`<b>${esc(q.name)}</b><br>연구비 ${nf(q.cost)}억 · MW ${nf(q.mw)} · 누적 실현 ${nf(q.real)}억<br>ROI <b>${q.roi??'—'}배</b> · ${ACTN[q.act]}${p.seriesName==='재무실 확정'?'<br>◆ 확정 순재무성과 '+nf(p.data.net)+'억':''}`:p.name;}}),
       legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}}, grid:{left:8,right:16,top:12,bottom:28,containLabel:true},
-      xAxis:axisX({type:'value',name:'투입 연구비(억)',nameTextStyle:{fontSize:10,color:INK3},max:Math.ceil(mx)}), yAxis:axisY({type:'value',name:'누적 실현(억)',nameTextStyle:{fontSize:10,color:INK3},max:Math.ceil(mx)}),
+      xAxis:axisX({type:'log',name:'투입 연구비(억, 로그)',nameTextStyle:{fontSize:10,color:INK3},min:LO,max:Math.ceil(mx),axisLabel:{formatter:v=>nf(v)}}), yAxis:axisY({type:'log',name:'누적 실현(억, 로그 · 0은 0.1)',nameTextStyle:{fontSize:10,color:INK3},min:LO,max:Math.ceil(mx),axisLabel:{formatter:v=>nf(v)}}),
       series:[1,3,4].filter(a=>byAct[a].length).map(a=>({name:ACTN[a],type:'scatter',symbolSize:7,itemStyle:{color:C[a],opacity:.75},data:byAct[a],
-          markLine:a===[1,3,4].filter(x=>byAct[x].length)[0]?{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#c53030'},label:{formatter:'BEP',fontSize:10,color:'#c53030'},data:[[{coord:[0,0]},{coord:[Math.ceil(mx),Math.ceil(mx)]}]]}:undefined}))
-        .concat([{name:'재무실 확정',type:'scatter',symbol:'diamond',symbolSize:12,itemStyle:{color:'#0a4da2',borderColor:'#fff',borderWidth:1},data:Object.values(regByCode).filter(r=>act==='ALL'||String(r.act)===act).map(r=>({value:[r.costEok||0, r.netEok], code:r.code, net:r.netEok}))}])};
+          markLine:a===[1,3,4].filter(x=>byAct[x].length)[0]?{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#c53030'},label:{formatter:'BEP',fontSize:10,color:'#c53030'},data:[[{coord:[LO,LO]},{coord:[Math.ceil(mx),Math.ceil(mx)]}]]}:undefined}))
+        .concat([{name:'재무실 확정',type:'scatter',symbol:'diamond',symbolSize:12,itemStyle:{color:'#0a4da2',borderColor:'#fff',borderWidth:1},data:Object.values(regByCode).filter(r=>act==='ALL'||String(r.act)===act).map(r=>({value:[Math.max(LO,r.costEok||0), Math.max(LO,r.netEok)], code:r.code, net:r.netEok}))}])};
     if(!ch.sc){ ch.sc = mk('roiScatter', sOpt); ch.sc.on('click', p => { if(p.data && p.data.code){ cur = p.data.code; renderCard(cur); } }); } else ch.sc.setOption(sOpt, true);
   }
   function renderCard(code){
