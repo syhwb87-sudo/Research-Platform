@@ -56,6 +56,10 @@ def code_letter(code):
     return m.group(1) if m else ""
 
 
+def dept_short(s):
+    parts = (s or "").split()
+    return parts[0] if parts else "기타"
+
 def classify(code):
     # 설계 규칙: W→현업, N→탐색, 그 외→전략.
     # Demo 확장: a2(ManWeek)에는 N코드 과제가 없어 L코드(신사업 시험과제)를
@@ -177,7 +181,7 @@ for r in a3:
         running_act[act] += 1
         end = d(r.get("완료일"))
         if end and 0 <= (end - TODAY).days <= 90:
-            upcoming.append({"code": r["과제코드"], "name": r["과제명"][:34], "end": str(end)})
+            upcoming.append({"code": r["과제코드"], "name": r["과제명"][:34], "end": str(end), "dept": dept_short(r.get("연구부서")), "leader": r.get("연구책임자", "")})
 upcoming.sort(key=lambda x: x["end"])
 
 # ─────────────────────────── a4: 현업지원 ───────────────────────────
@@ -503,10 +507,6 @@ executive = {
 def short(s, n):
     s = (s or "").strip()
     return s if len(s) <= n else s[:n - 1] + "…"
-
-def dept_short(s):
-    parts = (s or "").split()
-    return parts[0] if parts else "기타"
 
 # 4.1 전략 프로젝트 상세 (a3, W/N/L 제외)
 strat_run = [r for r in a3 if classify(r["과제코드"]) == 1 and "진행중" in r.get("진행상태", "")]
