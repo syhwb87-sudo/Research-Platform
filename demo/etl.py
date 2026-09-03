@@ -948,7 +948,7 @@ for p, eff in picked:
         "match": prng.randint(180, 2400), "period": "2025-09 ~ 2026-08",
         "key": KEY_BY_GROUP[ptype[0]],
         "erosionName": ero_pair[0] if ero_pair else "해당 역효과 없음",
-        "dept": p["useDept"], "slaDay": prng.randint(1, 9),
+        "dept": p["useDept"], "slaDay": prng.randint(1, 9), "costEok": eok(p["cost"]),
         "utilY1": prng.choice(["활용중", "활용중", "부분활용"]),
     })
 
@@ -1189,7 +1189,7 @@ for p in sorted(completed, key=lambda x: -x["annual"]):
     r1 = a1_by_code.get(p["code"]) or {}
     eff = re.split(r"[,\s]", (r1.get("정량효과유형") or "기타").strip())[0] or "기타"
     candidates.append({"code": p["code"], "name": short(p["name"], 40), "dept": p["useDept"], "effect": eff,
-                       "annualEok": eok(p["annual"]), "persist": max(1, round(p["persist"])) if p["persist"] else 3,
+                       "annualEok": eok(p["annual"]), "costEok": eok(p["cost"]), "persist": max(1, round(p["persist"])) if p["persist"] else 3,
                        "a1Contrib": round(money(r1.get("연구기여도", "")) or 70)})
     if len(candidates) >= 40:
         break
@@ -1234,7 +1234,7 @@ DATA_OUT = {
              "actNames": ACT, "rows": {"a1": len(a1), "a2": len(a2), "a3": len(a3),
                                         "a4": len(a4), "a5": len(a5), "a6": len(a6)}},
     "home": home, "support": support, "knowledge": knowledge, "promotion": promotion,
-    "longterm": longterm, "executive": executive, "mw": mwpage,
+    "longterm": longterm, "mw": mwpage,   # executive: Executive 탭은 perf.regs 확정 기준으로 직접 계산
     "detail": detail, "sim": sim, "me": me, "perf": perf,
 }
 

@@ -590,6 +590,17 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #pp-wb .wb-tl li{position:relative;padding:4px 0 10px;font-size:12.5px}
 #pp-wb .wb-tl li::before{content:'';position:absolute;left:-17px;top:9px;width:8px;height:8px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 0 0 1px var(--brand)}
 #pp-wb .wb-tl .m{font-size:11px;color:var(--text-3)}
+/* ═════════ Executive (CEO) — 재무실 확정 기준 ═════════ */
+#p-exec .ex-print{border:1px solid var(--brand);background:var(--surface);color:var(--brand);font:inherit;font-size:12px;font-weight:600;border-radius:8px;padding:6px 12px;cursor:pointer}
+#p-exec .ex-print:hover{background:#f0f5fc}
+#p-exec .ex-card{border-top:3px solid var(--brand)}
+#p-exec .ex-card .stat{font-size:24px}
+#p-exec .ex-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.3px;color:#1a6b3a;background:#e6f4ec;border:1px solid #bfe3cc;border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:2px}
+#p-exec .ex-pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+#p-exec .ex-pipe div{border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center;font-size:11px;color:var(--text-2)}
+#p-exec .ex-pipe b{display:block;font-size:18px;color:var(--text-1);font-variant-numeric:tabular-nums}
+#p-exec .ex-pipe .on{border-color:var(--good);background:#e6f4ec} #p-exec .ex-pipe .on b{color:var(--good)}
+@media print{header,footer,#p-exec .ex-print{display:none !important} main{padding:0} .page{display:none} #p-exec{display:block !important}}
 </style>
 </head>
 <body>
@@ -1212,31 +1223,23 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 
 <!-- ─────────────── EXECUTIVE ─────────────── -->
 <section class="page" id="p-exec">
-  <div class="row" style="grid-template-columns:repeat(4,1fr)" id="exCards"></div>
-  <div class="card">
-    <h3>R&D Value Flow <span class="badge">DEMO</span></h3>
-    <div class="sub">연구비 → 활동군 → 완료·추적 → 활용상태 → 실현이익 (억원)</div>
-    <div class="chart" id="sankey"></div>
+  <div class="card" style="margin-bottom:14px;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div><h3 style="font-size:16px;margin:0">CEO Dashboard <span class="legend-note" style="font-weight:500">— R&D가 회사 손익에 얼마를 기여했고, 그 숫자는 재무실이 확정한 것인가</span></h3>
+      <div class="sub" style="margin:2px 0 0">모든 금액은 <b>재무실 확정 순재무성과</b> 기준입니다. 검토·승인 단계의 미확정 금액은 이 화면에 올리지 않습니다.</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="legend-note" id="exAsOf"></span><button type="button" class="ex-print" onclick="window.print()">인쇄 / PDF</button></div>
   </div>
-  <div class="row" style="grid-template-columns:6fr 6fr">
-    <div class="card">
-      <h3>누적 실현이익 vs 연구비</h3>
-      <div class="chart short" id="exBep"></div>
-    </div>
-    <div class="card">
-      <h3>활동군 포트폴리오 (활동 건수)</h3>
-      <div class="chart short" id="exTreemap"></div>
-    </div>
+  <div class="row" style="grid-template-columns:repeat(5,1fr)" id="exCards"></div>
+  <div class="row" style="grid-template-columns:8fr 4fr">
+    <div class="card"><h3>확정 순재무성과 추이 <span class="legend-note">— 2026 월별 확정액과 누적, 확정 과제 연구비 병기</span></h3><div class="chart short" id="exTrend"></div></div>
+    <div class="card"><h3>A/B/C 그룹 구성 <span class="legend-note">— 확정 순재무성과</span></h3><div class="chart short" id="exTree"></div></div>
   </div>
-  <div class="row" style="grid-template-columns:7fr 5fr">
-    <div class="card">
-      <h3>Top 5 Value Creators (a1 투자효율)</h3>
-      <table id="top5"><thead><tr><th>#</th><th>과제</th><th>활용부서</th>
-      <th class="num">연간기대이익</th><th class="num">투자효율</th></tr></thead><tbody></tbody></table>
-    </div>
-    <div class="card"><h3>Executive Alerts</h3><ul class="alist" id="alerts"></ul></div>
+  <div class="row" style="grid-template-columns:8fr 4fr;margin-bottom:0">
+    <div class="card"><h3>Top 5 가치창출 과제 <span class="legend-note">— 확정 순재무성과 기준</span></h3>
+      <table id="exTop5"><thead><tr><th>#</th><th>과제</th><th>활용부서</th><th>유형</th><th class="num">확정 순재무성과</th><th class="num">연구비</th><th class="num">ROI</th></tr></thead><tbody></tbody></table></div>
+    <div><div class="brief" id="exBrief" style="margin-bottom:14px"></div>
+      <div class="card"><h3>검증 파이프라인 <span class="legend-note">— 건수 (금액은 확정분만)</span></h3><div id="exPipe"></div>
+        <div class="legend-note" style="margin-top:8px">상세는 <a href="#" onclick="go('pp');goPp('approval');return false">⑥ 재무실 승인</a> · <a href="#" onclick="go('pp');goPp('trace');return false">② 산출 근거 추적</a></div></div></div>
   </div>
-  <div class="brief" id="brief"></div>
 </section>
 </main>
 <footer id="foot"></footer>
@@ -1597,44 +1600,64 @@ tb.innerHTML =
     <td class="num">${nf(p.exp)}억</td><td class="num">${nf(p.real)}억</td>
     <td class="num"><b>${p.achv}%</b></td><td>${pillFor(p.status)}</td></tr>`).join('');
 
-/* ── Executive page ── */
-const E = D.executive;
-document.getElementById('exCards').innerHTML = [
-  ['R&D 투입', nf(E.cards.invest)+'<small>억원</small>', nf(E.cards.investMW)+' MW'],
-  ['성과 실현(누적)', nf(E.cards.realized)+'<small>억원</small>', 'Achievement '+E.cards.achv+'%'],
-  ['장기 활용률', E.cards.utilRate+'<small>%</small>', '완료과제 사후추적'],
-  ['포트폴리오 균형', E.cards.balA+' : '+(100-E.cards.balA), '탐색 '+E.cards.explore+'% (목표 15%)'],
-].map(([t,v,s])=>`<div class="card"><div class="sub" style="margin:0 0 2px">${t}</div>
-  <div class="stat">${v}</div><div class="legend-note">${s}</div></div>`).join('');
-
-const nodeColor = {'연구비':INK3,'전략 프로젝트':C[1],'현업·고객 문제해결':C[3],'탐색·혁신':C[4],
-  '완료·추적':C[2],'활용중':'#1e8e5a','부분활용':'#eda100','미활용':'#98a2b3','실현이익':'#1e8e5a'};
-mk('sankey', {
-  tooltip:tip({formatter:p=>p.dataType==='edge'
-    ?`${p.data.source} → ${p.data.target}<br><b>${nf(p.data.value)}</b>억원`
-    :`<b>${p.name}</b>`}),
-  series:[{type:'sankey',left:16,right:110,top:14,bottom:14,nodeWidth:14,nodeGap:14,
-    label:{fontSize:12,color:INK1},
-    lineStyle:{color:'gradient',opacity:.28,curveness:.5},
-    itemStyle:{borderWidth:0},
-    data:E.sankey.nodes.map(n=>({name:n,itemStyle:{color:nodeColor[n]||INK3}})),
-    links:E.sankey.links.map(([s,t,v])=>({source:s,target:t,value:v}))}]
-});
-mk('exBep', bepOption(true));
-mk('exTreemap', {
-  tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b>건`}),
-  series:[{type:'treemap',roam:false,nodeClick:false,breadcrumb:{show:false},
-    itemStyle:{gapWidth:3,borderColor:SURF},
-    label:{fontSize:12,formatter:p=>`${p.name}\n${nf(p.value)}건`},
-    data:D.home.portfolio['건수'].map(i=>({name:ACT[i.act],value:Math.max(i.value,1),
-      itemStyle:{color:C[i.act]}}))}]
-});
-document.querySelector('#top5 tbody').innerHTML = E.top5.map((p,i)=>
-  `<tr><td>${i+1}</td><td>${p.name}</td><td>${p.dept}</td>
-   <td class="num">${nf(p.annual)}억/년</td><td class="num"><b>${nf(p.roi)}</b></td></tr>`).join('');
-document.getElementById('alerts').innerHTML = E.alerts.map(a=>
-  `<li><span class="dot" style="background:var(--${a.lv==='good'?'good':'warn'})"></span>${a.t}</li>`).join('');
-document.getElementById('brief').innerHTML = '<b>한 줄 브리핑</b> — ' + E.brief;
+/* ── Executive (CEO) — 재무실 확정 순재무성과 기준. PF.regs(성과 등록 원장)만 읽으며 미확정 금액은 표시하지 않는다. */
+const CEO = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const r1 = v => Math.round(v * 10) / 10;
+  const sum = (l, f) => r1(l.reduce((s, x) => s + f(x), 0));
+  let trend = null, tree = null;
+  const gname = {A:'A 판매·매출', B:'B 원가·생산', C:'C 판관비·클레임'};
+  const stats = () => {
+    const R = PF.regs, fixed = R.filter(r => r.status === '확정'), appr = R.filter(r => ['승인','확정'].includes(r.status));
+    const net = sum(fixed, r => r.netEok), cum = sum(fixed, r => (r.lineage.years||[]).reduce((s,y)=>s+(y[2]||0),0)) || net;
+    const cost = sum(fixed, r => r.costEok || 0), expect = sum(fixed, r => r.grossEok);
+    const allNet = sum(R, r => r.netEok);
+    return {R, fixed, appr, net, cum, cost, expect, roi: cost ? Math.round(net / cost * 100) / 100 : null,
+      conv: expect ? Math.round(net / expect * 100) : 0, coverage: allNet ? Math.round(sum(appr, r => r.netEok) / allNet * 100) : 0,
+      cnt: {등록:R.filter(r=>r.status==='등록').length, 검토:R.filter(r=>['검토','보완'].includes(r.status)).length, 승인:R.filter(r=>r.status==='승인').length, 확정:fixed.length}};
+  };
+  const fixedDate = r => { const a = (r.lineage.approval||[]).find(x => x[0] === '확정'); return a ? a[2] : null; };
+  function render(){
+    const S = stats(), tag = '<span class="ex-tag">재무실 확정</span>';
+    $('exAsOf').textContent = `기준일 ${D.meta && D.meta.asOf ? D.meta.asOf : '2026-08-31'} · 확정 ${S.cnt.확정}건`;
+    const card = (t, v, s) => `<div class="card ex-card"><div class="sub" style="margin:0 0 2px">${t}${tag}</div><div class="stat">${v}</div><div class="legend-note">${s}</div></div>`;
+    $('exCards').innerHTML = card('금년 순재무성과', `${nf(S.net)}<small>억원</small>`, `2026년 확정 ${S.cnt.확정}건`)
+      + card('누적 순재무성과', `${nf(S.cum)}<small>억원</small>`, '연차별 확정액 누계 (1년차)')
+      + card('R&D ROI', S.roi != null ? `${S.roi}<small>배</small>` : '—', `확정 순성과 ${nf(S.net)}억 ÷ 해당 과제 연구비 ${nf(S.cost)}억`)
+      + card('전환율', `${S.conv}<small>%</small>`, `확정 순성과 ÷ 완료평가 기대이익 ${nf(S.expect)}억`)
+      + card('검증 커버리지', `${S.coverage}<small>%</small>`, `등록 순재무성과 중 승인·확정 금액 비중`);
+    /* 월별 확정 추이 */
+    const months = Array.from({length:8}, (_,i) => `2026-${String(i+1).padStart(2,'0')}`);
+    const byM = months.map(m => sum(S.fixed.filter(r => (fixedDate(r)||'').startsWith(m)), r => r.netEok));
+    let acc = 0; const cumM = byM.map(v => r1(acc += v));
+    const tOpt = {tooltip:tip({trigger:'axis',formatter:p=>p.map(x=>`${x.seriesName}: <b>${nf(x.value)}억</b>`).join('<br>')}),
+      legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}}, grid:{left:8,right:16,top:14,bottom:28,containLabel:true},
+      xAxis:axisX({type:'category',data:months.map(m=>m.slice(5)+'월')}), yAxis:axisY({type:'value',name:'억원',nameTextStyle:{fontSize:10,color:INK3}}),
+      series:[{name:'월별 확정',type:'bar',barMaxWidth:26,data:byM,itemStyle:{color:'#2a78d6',borderRadius:[4,4,0,0]}},
+        {name:'누적 확정',type:'line',data:cumM,smooth:true,symbolSize:6,itemStyle:{color:'#1e8e5a'},lineStyle:{width:2},
+          markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:INK3},label:{formatter:`확정 과제 연구비 ${nf(S.cost)}억`,fontSize:10,color:INK3,position:'insideEndTop'},data:[{yAxis:S.cost}]}}]};
+    if(!trend) trend = mk('exTrend', tOpt); else trend.setOption(tOpt, true);
+    /* A/B/C 트리맵 */
+    const byT = {}; S.fixed.forEach(r => { byT[r.type] = (byT[r.type]||0) + r.netEok; });
+    const groups = ['A','B','C'].map(g => ({name:gname[g], itemStyle:{color:gcOf(g+'-')}, children:Object.entries(byT).filter(([t])=>t[0]===g).map(([t,v])=>({name:`${t} ${typeName(t)}`, value:r1(v), itemStyle:{color:gcOf(t)}}))})).filter(g => g.children.length);
+    const trOpt = {tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b>억원`}),
+      series:[{type:'treemap',roam:false,nodeClick:false,breadcrumb:{show:false},itemStyle:{gapWidth:2,borderColor:SURF},
+        upperLabel:{show:true,height:18,fontSize:10,color:'#fff'},label:{fontSize:11,formatter:p=>`${p.name}\n${nf(p.value)}억`},
+        levels:[{itemStyle:{gapWidth:3,borderWidth:2,borderColor:SURF}},{itemStyle:{gapWidth:1}}], data:groups}]};
+    if(!tree) tree = mk('exTree', trOpt); else tree.setOption(trOpt, true);
+    /* Top 5 */
+    const top = S.fixed.slice().sort((a,b)=>b.netEok-a.netEok).slice(0,5);
+    $('exTop5').querySelector('tbody').innerHTML = top.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}<div class="legend-note">${esc(r.id)} · ${esc(r.code)}</div></td><td>${esc(r.dept)}</td><td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${esc(r.type)}</span></td><td class="num"><b>${nf(r.netEok)}억</b></td><td class="num">${nf(r.costEok||0)}억</td><td class="num">${r.costEok?Math.round(r.netEok/r.costEok*100)/100+'배':'—'}</td></tr>`).join('')
+      || '<tr><td colspan="7" class="legend-note" style="padding:12px">확정된 성과가 없습니다.</td></tr>';
+    /* 파이프라인(건수) */
+    $('exPipe').innerHTML = `<div class="ex-pipe">${[['등록',S.cnt.등록],['검토·보완',S.cnt.검토],['승인',S.cnt.승인],['확정',S.cnt.확정]].map(([k,v],i)=>`<div class="${i===3?'on':''}"><b>${v}</b>${k}${i===3?`<div style="font-size:11px;color:var(--good);margin-top:2px">${nf(S.net)}억</div>`:''}</div>`).join('')}</div>`;
+    /* 한 줄 브리핑 */
+    const topG = Object.entries(byT).reduce((m,[t,v])=>{ const g=t[0]; m[g]=(m[g]||0)+v; return m; },{}), lead = Object.entries(topG).sort((a,b)=>b[1]-a[1])[0];
+    $('exBrief').innerHTML = `<b>한 줄 브리핑</b> — 2026년 재무실이 확정한 순재무성과는 <b>${nf(S.net)}억원</b>(${S.cnt.확정}건)으로 해당 과제 연구비 ${nf(S.cost)}억원 대비 ROI ${S.roi != null ? S.roi+'배' : '—'}, 완료평가 기대이익 대비 전환율 ${S.conv}%입니다. ${lead ? `${gname[lead[0]]} 그룹이 ${Math.round(lead[1]/Math.max(S.net,0.1)*100)}%를 차지하며, ` : ''}승인 후 확정 대기 ${S.cnt.승인}건과 검토 중 ${S.cnt.검토}건은 확정 전이라 금액을 집계하지 않았습니다.`;
+  }
+  return {init: render, refreshRegs: render};
+})();
 
 /* ══════════ 활동군 상세 탭 ══════════ */
 const DT = D.detail;
@@ -2612,7 +2635,7 @@ const WB = (() => {
     const id = `PF-2026-${String(n).padStart(3,'0')}`, t = today(), snapId = `SNAP-${t.replace(/-/g,'')}-${String(n).padStart(3,'0')}`;
     const std = stdOf(r.type), gross = m.grossEok, ero = m.erosionEok, direct = m.directEok, net = m.netEok;
     return {id, code:p.code, name:p.name, effect:p.effect, type:r.type, status:'검토', contrib:std, persist:m.persist, grossEok:gross, erosionEok:ero, directEok:direct, netEok:net,
-      rule:r.id, ruleVer:r.ver, match:m.matched.records, period:`${m.base} / ${m.ver}`, key:r.keys.join('·'), erosionName: ero ? '재무실 조정 차감' : '해당 역효과 없음 (④ 점검 전)', dept:p.dept, slaDay:10, utilY1:'예정', userCreated:true,
+      rule:r.id, ruleVer:r.ver, match:m.matched.records, period:`${m.base} / ${m.ver}`, key:r.keys.join('·'), costEok:p.costEok||0, erosionName: ero ? '재무실 조정 차감' : '해당 역효과 없음 (④ 점검 전)', dept:p.dept, slaDay:10, utilY1:'예정', userCreated:true,
       contribution:{mode:'STANDARD', applied:std, standard:std, effective:std, reason:'', evidence:'', a1Ref:p.a1Contrib},
       lineage:{snapshot:{id:snapId, frozenAt:`${t} ${new Date().toTimeString().slice(0,5)}`, source:r.source, records:m.matched.records, currentRecords:m.matched.records, period:`${m.base} / ${m.ver}`, samples:m.matched.samples},
         keyValues: r.keys.map(k => [k, m.keys[k], (PF.keyDict[k]||[])[0]||'']).concat([[r.periodKey, `${m.base} / ${m.ver}`, (PF.keyDict[r.periodKey]||[])[0]||'']]),
@@ -2624,7 +2647,7 @@ const WB = (() => {
   }
   function refreshOthers(){
     if(typeof renderRegsTable === 'function') renderTable();
-    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
+    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
   }
 
   /* ── 이벤트 */
@@ -3815,6 +3838,7 @@ const CT = (() => {
 CT.init();   // ⑤ 기여율 — 저장된 결정을 PF.regs에 반영한 뒤 ①·② 재렌더
 GR.init();   // ③ 성과 총액 — 산식 카탈로그·미리계산기
 WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연 등록 반영)
+CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변경 시 refreshRegs
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
 applyingRoute = false;
