@@ -651,7 +651,7 @@ PERF_TYPES = [
     ["B-1", "B", "구매단가 절감"], ["B-2", "B", "동일품목 원단위 절감"], ["B-3", "B", "저가원료 대체"],
     ["B-3(2)", "B", "부산물/배합비 변경"], ["B-4", "B", "변동가공비 절감"], ["B-5", "B", "변동가공비 단가절감"],
     ["B-6", "B", "수율 개선"], ["B-7", "B", "공정생략"], ["B-8", "B", "고정가공비 절감"], ["B-9", "B", "생산량 증가"],
-    ["C-1", "C", "판관비 절감"], ["C-2", "C", "클레임 비용 절감"],
+    ["C-1", "C", "판관비 절감"], ["C-1(2)", "C", "판관비 절감(총액형)"], ["C-2", "C", "클레임 비용 절감"],
 ]
 # 연구효과 14종 → 재무성과 후보 매핑 (설계서 3.1)
 EFFECT_MAP = {
@@ -666,8 +666,8 @@ EFFECT_MAP = {
     "자동화에의한인력합리": ["B-8", "C-1"],
     "부산물/폐기물재활용": ["B-3(2)", "B-3"],
     "환경비용절감": ["B-4", "C-1"],
-    "장치제작개발": ["B-8"],
-    "분석기술개발": ["C-1"],
+    "장치제작개발": ["B-8", "C-1(2)"],
+    "분석기술개발": ["C-1", "C-1(2)"],
     "기타": [],
 }
 EROSION_CATALOG = {
@@ -788,6 +788,76 @@ for p, eff in picked:
     })
 
 
+# ── 연구 기여율: 유형별 표준 기여율 테이블 (⑥ 기여율 기준 데이터, 재무실 고시 v1)
+#    std 표준 · down 하향(활용부서장 판단) · up 상향(재무실 승인) · up 이 [min,max]면 범위 입력
+CONTRIB_TABLE = [
+    {"type": "A-1", "std": 50, "down": 30, "downCond": "판매·마케팅 주도로 수주하고, 연구는 품질 대응을 수행한 경우",
+     "up": [70, 100], "upCond": "고객이 해당 기술 때문에 발주했음을 입증한 경우"},
+    {"type": "A-2", "std": 50, "down": 30, "downCond": "가격 협상력이 주요 요인인 경우",
+     "up": 70, "upCond": "Extra 코드가 개발 기술에 직접 연동됨을 입증한 경우"},
+    {"type": "A-3", "std": 40, "down": 20, "downCond": "판매전략 주도의 Mix 전환인 경우",
+     "up": 60, "upCond": "신강종 개발이 Mix 전환의 직접 원인인 경우"},
+    {"type": "A-4", "std": 40, "down": 20, "downCond": "조업 조건 개선이 병행된 경우",
+     "up": 60, "upCond": "연구기술 단독 적용으로 개선되었음을 입증한 경우"},
+    {"type": "B-1", "std": 30, "down": 10, "downCond": "구매협상이 주요 요인이고, 연구는 대체 가능성을 검증한 경우",
+     "up": 50, "upCond": "연구가 대체재 검증표준 개정을 주도한 경우"},
+    {"type": "B-2", "std": 30, "down": 15, "downCond": "조업 최적화 활동이 병행된 경우",
+     "up": 50, "upCond": "연구기술에 의한 모델 또는 소재 변경이 단독 원인인 경우"},
+    {"type": "B-3", "std": 40, "down": 20, "downCond": "구매 주도의 원료 전환인 경우",
+     "up": 60, "upCond": "연구의 배합성분 기술이 대체를 가능하게 한 경우"},
+    {"type": "B-3(2)", "std": 40, "down": 20, "downCond": "구매 주도의 원료·배합 전환인 경우 (B-3 준용)",
+     "up": 60, "upCond": "연구의 배합성분 기술이 변경을 가능하게 한 경우 (B-3 준용)", "note": "B-3 기준 준용"},
+    {"type": "B-4", "std": 30, "down": 15, "downCond": "설비 투자 또는 조업 개선이 병행된 경우",
+     "up": 50, "upCond": "연구기술을 단독 적용한 경우"},
+    {"type": "B-5", "std": 20, "down": 10, "downCond": "요금제 또는 계약 협상이 주요 요인인 경우",
+     "up": 40, "upCond": "연구의 기술 검증이 단가 인하의 전제인 경우"},
+    {"type": "B-6", "std": 40, "down": 20, "downCond": "설비 교체 또는 조업표준 개정이 병행된 경우",
+     "up": 60, "upCond": "연구모델 또는 연구기술이 직접 원인인 경우", "note": "적용 전후 비교 가능"},
+    {"type": "B-7", "std": 50, "down": 30, "downCond": "설비 투자가 동반된 공정 생략인 경우",
+     "up": 70, "upCond": "연구기술만으로 공정 생략을 달성한 경우"},
+    {"type": "B-8", "std": 30, "down": 15, "downCond": "조직 또는 예산 효율화가 병행된 경우",
+     "up": 50, "upCond": "연구기술이 비용 구조를 직접 변경한 경우"},
+    {"type": "B-9", "std": 30, "down": 15, "downCond": "설비 증설 또는 조업 개선이 병행된 경우",
+     "up": 50, "upCond": "연구기술에 의한 모델 또는 조업조건 최적화가 직접 원인인 경우"},
+    {"type": "C-1", "std": 30, "down": 15, "downCond": "물류구매 협상이 병행된 경우",
+     "up": 50, "upCond": "연구기술 또는 포장 사양 등이 직접 원인인 경우", "note": "단위형 (물류·포장 등 단위비 절감)"},
+    {"type": "C-1(2)", "std": 40, "down": 20, "downCond": "외주 계약 조정이 병행된 경우",
+     "up": 70, "upCond": "연구가 내재화 기술을 단독 개발한 경우", "note": "총액형 (분석법·장치 제작 등 외주 내재화)"},
+    {"type": "C-2", "std": 40, "down": 20, "downCond": "검사 강화 또는 공정관리가 병행된 경우",
+     "up": 60, "upCond": "연구의 품질기술이 결함 원인을 직접 제거한 경우"},
+]
+CONTRIB_BY_TYPE = {c["type"]: c for c in CONTRIB_TABLE}
+assert set(CONTRIB_BY_TYPE) == {t[0] for t in PERF_TYPES}, "표준 기여율 테이블과 재무성과 코드 불일치"
+
+# 등록 성과 12건의 기여율을 표준표 기준으로 재산정 (a1 연구기여도는 참고값으로만 보존). 별도 시드 → 기존 난수열 불변
+cprng = random.Random(20260903)
+CONTRIB_MODES = ["STANDARD"] * 7 + ["DOWN"] * 3 + ["UP"] * 2
+cprng.shuffle(CONTRIB_MODES)
+for r, mode in zip(regs, CONTRIB_MODES):
+    tbl = CONTRIB_BY_TYPE[r["type"]]
+    a1_ref = r["contrib"]
+    if mode == "DOWN":
+        applied = tbl["down"]
+        decision = {"mode": "DOWN", "applied": applied, "reason": f"하향 조건 해당 — {tbl['downCond']}",
+                    "judgedBy": f"{r['dept']} 부서장", "judgedAt": None, "evidence": "활용부서 판단서(과제 완료보고 첨부)"}
+    elif mode == "UP":
+        up = tbl["up"]
+        applied = cprng.choice([80, 90]) if isinstance(up, list) else up
+        approved = r["status"] in ("승인", "확정")   # 성과 승인과 함께 기여율 상향도 승인된 것으로 간주
+        decision = {"mode": "UP", "applied": applied, "reason": f"상향 조건 입증 — {tbl['upCond']}",
+                    "evidence": "고객 발주 사유서·기술 적용 확인서" if r["type"][0] == "A" else "적용 전후 조업 데이터·기술 적용 확인서",
+                    "approval": {"status": "승인" if approved else "승인대기", "requestedAt": None, "decidedAt": None, "by": "재무실"}}
+    else:
+        applied = tbl["std"]
+        decision = {"mode": "STANDARD", "applied": applied, "reason": "", "evidence": ""}
+    decision.update({"standard": tbl["std"], "a1Ref": a1_ref})
+    # 상향은 재무실 승인 전까지 표준 기여율이 유효값
+    effective = tbl["std"] if (mode == "UP" and decision["approval"]["status"] != "승인") else applied
+    decision["effective"] = effective
+    r["contrib"] = effective
+    r["contribution"] = decision
+    r["netEok"] = eok((r["grossEok"] - r["erosionEok"]) * 1e8 * effective / 100 - r["directEok"] * 1e8)
+
 # ── 산출 근거 추적(Lineage) 데이터: 성과 등록별 스냅샷·변수값·재계산·승인 이력·연차·건전성 (시드 고정)
 lprng = random.Random(20260902)
 STEP_ORDER = ["등록", "검토", "보완", "승인", "확정"]
@@ -891,6 +961,12 @@ for r, (p, eff) in zip(regs, picked):
             years.append([1, r["utilY1"], r["netEok"] if r["status"] in ("승인", "확정") else None, "1년차 실적" if r["status"] in ("승인", "확정") else "승인 전 — 산출값 미확정"])
         else:
             years.append([y, "예정", None, f"{2026+y-1}년 활용평가 예정"])
+    c = r["contribution"]
+    if c["mode"] == "DOWN":
+        c["judgedAt"] = hist[0][2] if hist else reg_day.isoformat()
+    if c["mode"] == "UP":
+        c["approval"]["requestedAt"] = hist[0][2] if hist else reg_day.isoformat()
+        c["approval"]["decidedAt"] = hist[-1][2] if c["approval"]["status"] == "승인" and len(hist) > 1 else None
     r["lineage"] = {
         "snapshot": {"id": snap_id if has_snapshot else None, "frozenAt": frozen if has_snapshot else None, "source": rule["source"],
                      "records": r["match"], "currentRecords": r["match"] + drift, "period": r["period"],
@@ -913,6 +989,7 @@ perf = {
     "types": PERF_TYPES,
     "effectMap": EFFECT_MAP,
     "rules": RULES,
+    "contribTable": CONTRIB_TABLE,
     "regs": regs,
     "approval": {
         "wait": appr_counts.get("검토", 0) + appr_counts.get("보완", 0) + appr_counts.get("등록", 0),

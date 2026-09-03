@@ -437,6 +437,67 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #pp-3 .ln-act{border:1px solid var(--brand);background:var(--surface);color:var(--brand);font:inherit;font-size:12px;font-weight:600;border-radius:8px;padding:5px 12px;cursor:pointer}
 #pp-3 .ln-act:hover{background:#f0f5fc} #pp-3 .ln-act:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 #pp-3 .ln-act[disabled]{opacity:.5;cursor:not-allowed}
+/* ═════════ 성과 플랫폼 ⑥ 기여율 — #pp-6 스코프 ═════════ */
+#pp-6 .ct-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+#pp-6 .ct-rule{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.55;border-top:3px solid var(--border)}
+#pp-6 .ct-rule.std{border-top-color:var(--brand)} #pp-6 .ct-rule.down{border-top-color:var(--warn)} #pp-6 .ct-rule.up{border-top-color:var(--good)}
+#pp-6 .ct-rule b{display:block;font-size:13px;margin-bottom:2px}
+#pp-6 .ct-who{display:inline-block;font-size:10.5px;font-weight:700;border-radius:4px;padding:1px 6px;letter-spacing:.2px;vertical-align:1px}
+#pp-6 .ct-who.dept{background:#fdf1d7;color:#7a4d00;border:1px solid #f0d9a0}
+#pp-6 .ct-who.fin{background:#e6f4ec;color:#1a6b3a;border:1px solid #bfe3cc}
+#pp-6 .ct-who.std{background:#e3ecfa;color:var(--brand);border:1px solid #c6d8f5}
+#pp-6 .ct-kpis{grid-template-columns:repeat(5,1fr)} #pp-6 .ct-kpis .stat{font-size:22px}
+#pp-6 .ct-top{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}
+#pp-6 .ct-top label{display:block;font-size:11px;color:var(--text-3);margin-bottom:3px}
+#pp-6 select,#pp-6 input[type=text],#pp-6 input[type=number],#pp-6 input[type=search],#pp-6 textarea{font:inherit;font-size:12.5px;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:var(--surface);color:var(--text-1)}
+#pp-6 select:focus-visible,#pp-6 input:focus-visible,#pp-6 textarea:focus-visible,#pp-6 button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+#pp-6 .ct-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:#f7f9fc;border:1px solid var(--border);border-radius:10px}
+#pp-6 .ct-head .std{margin-left:auto;text-align:right}
+#pp-6 .ct-head .std .n{font-size:26px;font-weight:800;color:var(--brand);line-height:1}
+#pp-6 .ct-head .std .l{font-size:11px;color:var(--text-3)}
+#pp-6 .ct-seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:12px 0 10px;padding:0}
+#pp-6 .ct-opt{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 8px;cursor:pointer;border-right:1px solid var(--border);font-size:12.5px;font-weight:600;color:var(--text-2);background:var(--surface)}
+#pp-6 .ct-opt:last-child{border-right:0}
+#pp-6 .ct-opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+#pp-6 .ct-opt small{font-weight:500;font-size:10.5px;opacity:.8}
+#pp-6 .ct-opt:has(input:checked){color:#fff}
+#pp-6 .ct-opt.std:has(input:checked){background:var(--brand)} #pp-6 .ct-opt.down:has(input:checked){background:var(--warn)} #pp-6 .ct-opt.up:has(input:checked){background:var(--good)}
+#pp-6 .ct-opt:has(input:focus-visible){outline:2px solid var(--brand);outline-offset:-2px;z-index:1}
+#pp-6 .ct-conds{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#pp-6 .ct-cond{border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:12.5px;border-left:4px solid var(--border)}
+#pp-6 .ct-cond.down{border-left-color:var(--warn)} #pp-6 .ct-cond.up{border-left-color:var(--good)}
+#pp-6 .ct-cond.on{background:#fbfcfe;box-shadow:var(--shadow)}
+#pp-6 .ct-cond h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
+#pp-6 .ct-cond h4 .r{margin-left:auto;font-size:15px;font-weight:800}
+#pp-6 .ct-cond .q{line-height:1.55;margin-bottom:6px}
+#pp-6 .ct-cond label.chk{display:flex;gap:8px;align-items:center;font-size:12.5px;cursor:pointer}
+#pp-6 .ct-cond label.chk input{width:16px;height:16px;margin:0}
+#pp-6 .ct-form{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)}
+#pp-6 .ct-form .f{display:flex;flex-direction:column;gap:3px;min-width:0} #pp-6 .ct-form .f.w{grid-column:1 / -1}
+#pp-6 .ct-form label{font-size:11px;color:var(--text-3)}
+#pp-6 .ct-form input,#pp-6 .ct-form textarea,#pp-6 .ct-form select{width:100%;min-width:0}
+#pp-6 .ct-form textarea{min-height:52px;resize:vertical;line-height:1.5}
+#pp-6 .ct-err{font-size:11px;color:var(--bad)}
+#pp-6 .ct-warn{font-size:12px;color:#7a4d00;background:#fdf1d7;border:1px solid #f0d9a0;border-radius:6px;padding:6px 10px;margin-top:10px}
+#pp-6 .ct-result{margin-top:12px;padding:10px 12px;border-radius:10px;background:#f0f5fc;border:1px solid #d4e2f5;font-size:12.5px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#pp-6 .ct-result .big{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+#pp-6 .ct-result .arrow{color:var(--text-3)}
+#pp-6 .ct-btn{border:1px solid var(--brand);background:var(--surface);color:var(--brand);font:inherit;font-size:12px;font-weight:600;border-radius:8px;padding:5px 12px;cursor:pointer}
+#pp-6 .ct-btn:hover{background:#f0f5fc} #pp-6 .ct-btn.ok{border-color:var(--good);color:var(--good)} #pp-6 .ct-btn.no{border-color:var(--bad);color:var(--bad)}
+#pp-6 .ct-btn[disabled]{opacity:.45;cursor:not-allowed}
+#pp-6 .ct-chart{width:100%;height:230px}
+#pp-6 .ct-pv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12.5px;align-items:baseline;margin-top:6px}
+#pp-6 .ct-pv dt{color:var(--text-3);font-size:11.5px;white-space:nowrap} #pp-6 .ct-pv dd{margin:0}
+#pp-6 .ct-fil{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+#pp-6 .ct-fbtn{border:1px solid var(--border);background:var(--surface);font:inherit;font-size:12px;font-weight:600;color:var(--text-2);border-radius:20px;padding:5px 12px;cursor:pointer}
+#pp-6 .ct-fbtn[aria-pressed="true"]{background:var(--brand);border-color:transparent;color:#fff}
+#pp-6 table.ct-tbl td{vertical-align:top;line-height:1.5}
+#pp-6 table.ct-tbl .pill{white-space:nowrap}
+#pp-6 table.ct-tbl tr.cur td{background:#f0f5fc}
+#pp-6 .ct-rate{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+#pp-6 .ct-rate.std{color:var(--brand)} #pp-6 .ct-rate.down{color:var(--warn)} #pp-6 .ct-rate.up{color:var(--good)}
+#pp-6 .ct-mode{display:inline-block;font-size:10.5px;font-weight:700;border-radius:20px;padding:1px 8px}
+#pp-6 .ct-mode.STANDARD{background:#e3ecfa;color:var(--brand)} #pp-6 .ct-mode.DOWN{background:#fdf1d7;color:var(--warn)} #pp-6 .ct-mode.UP{background:#e6f4ec;color:var(--good)}
 </style>
 </head>
 <body>
@@ -991,6 +1052,53 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
       <div class="er-cfil" id="erCatFilters"></div>
       <div class="er-ctab"><table class="er-cat" id="erCatalog"></table></div>
       <div class="legend-note" style="margin-top:8px">권장 산정의 금액은 검토 참고값이며 최종 재무성과에서 자동 차감되지 않습니다. 카탈로그가 없는 코드는 같은 그룹의 <b>일반 점검 사례</b>로 대체 표시됩니다.</div>
+    </div>
+  </div>
+  <!-- ⑥ 기여율 — 표준 기여율 테이블(PF.contribTable, etl.py CONTRIB_TABLE) 기준 산정 워크벤치. 렌더: 스크립트 하단 CT 모듈 -->
+  <div class="ppanel" id="pp-6" hidden>
+    <div class="card" style="margin-bottom:14px">
+      <h3 style="font-size:16px">연구 기여율 산정 <span class="legend-note" style="font-weight:500">— 유형별 표준 기여율 테이블 v1 (재무실 고시)</span></h3>
+      <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:4px 0 0">연구성과 유형을 고르면 <b>표준 기여율</b>이 기본값으로 적용됩니다. 연구 외 요인이 크면 <b>하향</b>, 연구기술이 성과의 직접 원인임을 입증하면 <b>상향</b>을 선택할 수 있으며, 각 조건은 참고 문구가 아니라 기여율 변경의 판단 기준입니다.</p>
+      <div class="ct-rules">
+        <div class="ct-rule std"><b>표준 적용 <span class="ct-who std">기본값</span></b>유형별 표준 기여율을 그대로 적용합니다. 별도 판단·승인이 필요 없습니다.</div>
+        <div class="ct-rule down"><b>하향 적용 <span class="ct-who dept">활용부서장 판단</span></b>연구 외 요인의 영향이 크거나 연구의 직접 기여도가 표준보다 낮은 경우. 판단 사유와 근거를 기록합니다.</div>
+        <div class="ct-rule up"><b>상향 적용 <span class="ct-who fin">재무실 승인</span></b>연구결과·연구기술이 성과 발생의 직접 원인임을 입증한 경우. 승인 전까지는 표준 기여율이 유효합니다.</div>
+      </div>
+    </div>
+    <div class="row ct-kpis" id="ctKpis" aria-live="polite"></div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card">
+        <h3>기여율 산정 워크벤치</h3>
+        <div class="sub">대상 성과를 고르면 유형의 표준 기여율이 기본 적용되고, 하향·상향 조건이 판단 기준으로 표시됩니다</div>
+        <div class="ct-top"><div><label for="ctReg">대상 성과 (등록 ID · 과제명)</label><select id="ctReg"></select></div></div>
+        <div id="ctWb"></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <h3>영향 미리보기 <span class="badge">검토용</span></h3>
+          <div class="sub">표준 기여율 적용 시와 현재 적용 시의 순재무성과 비교</div>
+          <div class="ct-chart" id="ctChart"></div>
+          <dl class="ct-pv" id="ctPv"></dl>
+        </div>
+        <div class="card">
+          <h3>상향 승인 요청 현황 <span class="ct-who fin">재무실 승인</span></h3>
+          <div class="sub">승인 전까지 표준 기여율 적용 · 승인/반려 버튼은 시연용 처리</div>
+          <div class="scroll" style="max-height:260px"><table id="ctUp"><thead><tr><th>성과</th><th>유형</th><th class="num">표준→요청</th><th>요청일</th><th>상태</th><th></th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="grid-template-columns:8fr 4fr">
+      <div class="card">
+        <h3>유형별 표준 기여율 테이블 <span class="legend-note">v1 · 2026-01 재무실 고시 · 코드 17종</span></h3>
+        <div class="sub">하향은 활용부서장 판단, 상향은 재무실 승인이 전제입니다. A-1 상향은 70~100% 범위에서 실제 적용값을 입력합니다.</div>
+        <div class="ct-fil" id="ctTblFil" role="group" aria-label="그룹 필터"></div>
+        <div style="overflow-x:auto"><table class="ct-tbl" id="ctTable"></table></div>
+      </div>
+      <div class="card">
+        <h3>부서별 적용 현황</h3>
+        <div class="sub">등록 성과 기준 · 상향 비율이 높은 부서는 재무실 검토 우선</div>
+        <table id="ctDept"><thead><tr><th>활용 부서</th><th class="num">건</th><th>표준/하향/상향</th><th class="num">평균 적용</th></tr></thead><tbody></tbody></table>
+      </div>
     </div>
   </div>
 </section>
@@ -2139,7 +2247,7 @@ const stPill = s => ({'확정':'<span class="pill g">확정</span>','승인':'<s
 
 /* 서브내비 */
 const PP_TABS = [['1','① 자동산출 워크벤치'],['2','② Rule Bank'],['3','③ 산출 근거 추적'],
-  ['4','④ 재무실 승인'],['5','⑤ 역효과(Erosion)']];
+  ['4','④ 재무실 승인'],['5','⑤ 역효과(Erosion)'],['6','⑥ 기여율']];
 const ppNav = document.getElementById('ppNav');
 ppNav.innerHTML = PP_TABS.map(([k,t],i)=>
   `<button class="achip${i===0?' on':''}" data-k="${k}">${t}</button>`).join('');
@@ -2209,7 +2317,7 @@ function renderWb(reg){
       <tr><td style="color:var(--text-2)">자동 추천</td><td>${recs.map(t=>
         `<span class="pill" style="background:${t===reg.type?gcOf(t):'#f0f2f5'};
          color:${t===reg.type?'#fff':'var(--text-2)'};margin-right:4px">${t} ${typeName(t)}${t===reg.type?' ✓':''}</span>`).join('')||'—'}</td></tr>
-      <tr><td style="color:var(--text-2)">연구기여율</td><td><b>${reg.contrib}%</b> <span class="legend-note">(유사과제 승인 밴드 내)</span></td></tr>
+      <tr><td style="color:var(--text-2)">연구기여율</td><td><b>${reg.contrib}%</b> <span class="legend-note">표준 ${reg.contribution.standard}% · ${({STANDARD:'표준 적용',DOWN:'하향 적용(활용부서장 판단)',UP:'상향 적용(재무실 '+(reg.contribution.approval&&reg.contribution.approval.status||'미요청')+')'})[reg.contribution.mode]}</span> <a href="#" onclick="CT.select('${reg.id}');goPp(6);return false" style="font-size:11px">⑥ 기여율 →</a></td></tr>
       <tr><td style="color:var(--text-2)">기술지속년수</td><td>${reg.persist}년 — 매년 자동 재산출</td></tr>
       <tr><td style="color:var(--text-2)">직접발생비</td><td>${nf(reg.directEok)}억원</td></tr>
       <tr><td style="color:var(--text-2)">역효과</td><td>${reg.erosionName} ${reg.erosionEok?`(−${nf(reg.erosionEok)}억, 자동 첨부)`:''}</td></tr>
@@ -2223,11 +2331,14 @@ function renderWb(reg){
     </div>`;
   drawWaterfall('ppWaterfall', reg, wfRef);
 }
-document.querySelector('#ppRegs tbody').innerHTML = PF.regs.map((r,i)=>
+function renderRegsTable(){   // ⑥ 기여율 변경 시에도 재호출
+  document.querySelector('#ppRegs tbody').innerHTML = PF.regs.map((r,i)=>
   `<tr data-i="${i}" style="cursor:pointer"><td>${r.id}</td><td>${r.name}</td>
    <td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${r.type}</span></td>
    <td class="num">${nf(r.grossEok)}억</td><td class="num"><b>${nf(r.netEok)}억</b></td>
    <td>${stPill(r.status)}</td></tr>`).join('');
+}
+renderRegsTable();
 document.querySelector('#ppRegs tbody').addEventListener('click', e=>{
   const tr = e.target.closest('tr'); if(tr) renderWb(PF.regs[+tr.dataset.i]);
 });
@@ -2288,7 +2399,7 @@ const LN = (() => {
       ['src','Rule 버전', `${r.rule} ${r.ruleVer}`, C.ok ? '재계산 일치' : `차이 ${C.diffEok}억`, '적용', [1,2]],
       ['amt','성과총액', eok(r.grossEok), `재계산 ${eok(C.recomputedEok)}`, '= Rule', [2]],
       ['amt','역효과', r.erosionEok ? '−'+eok(r.erosionEok) : '0억', r.erosionEok ? short(r.erosionName, 12) : '해당 없음', '−', [5]],
-      ['amt','연구기여율', `× ${r.contrib}%`, 'a1 완료평가 기여도', '×', null],
+      ['amt','연구기여율', `× ${r.contrib}%`, ({STANDARD:'표준 적용',DOWN:'하향 · 부서장 판단',UP:'상향 · 재무실 '+((r.contribution.approval||{}).status||'미요청')})[r.contribution.mode], '×', null],
       ['amt','직접비용', '−'+eok(r.directEok), '재무실 인정분', '−', null],
       ['amt','순재무성과', eok(r.netEok), stPillText(r.status), '=', null],
       ['amt','재무실 승인', r.status, L.approval.length ? L.approval[L.approval.length-1][2] : '—', '→', [4]],
@@ -2354,7 +2465,9 @@ const LN = (() => {
         return h('역효과 (Erosion)') + `<div class="stat" style="color:var(--warn)">${r.erosionEok ? '−'+eok(r.erosionEok) : '0억'}<small>원</small></div>`
         + kv([['자동 첨부 역효과', esc(r.erosionName)],['카탈로그 권장 산정', cat ? `<span style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px">${esc(cat.recommendedFormula[0])}</span>` : '—'],['⑤ 체크리스트 점검', s ? `<span class="ln-ok ${({NOT_STARTED:'warn',IN_PROGRESS:'info',COMPLETED:''})[s.status]}">${ER_ENUM.status[s.status]}</span> 해당 ${s.applicable}건 · 판단불가 ${s.undetermined}건 · 조정 검토 ${s.adjust}건` : `<span class="ln-ok warn">! 미작성</span>`]])
         + `<div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="ln-act" data-act="erosion">⑤ 역효과 점검 열기 →</button><span class="legend-note">체크리스트 '해당' 항목의 금액은 조정 검토용이며 자동 차감되지 않습니다.</span></div>`; }
-      case 7: return h('연구기여율') + `<div class="stat">${r.contrib}<small>%</small></div>` + kv([['근거', 'a1 완료평가 「연구기여도」 — 설비투자·조업개선 등 타 요인을 제외한 연구 기여분'],['적용', `(성과총액 ${eok(r.grossEok)} − 역효과 ${eok(r.erosionEok)}) × ${r.contrib}% = <b>${eok(Math.round((r.grossEok-r.erosionEok)*r.contrib)/100)}</b>`],['조정 권한', '재무실 승인 단계에서 조정 가능 (이력 보존)']]);
+      case 7: { const c = r.contribution, ap = c.approval || null;
+        return h('연구기여율') + `<div class="stat">${r.contrib}<small>% 유효</small></div>` + kv([['표준 기여율', `<b>${c.standard}%</b> (${esc(typeName(r.type))} 표준표 v1)`],['적용 구분', ({STANDARD:'표준 적용 — 별도 판단 없음',DOWN:`하향 적용 ${c.applied}% — 활용부서장 판단 (${esc(c.judgedBy||'판단자 미입력')}${c.judgedAt?' · '+esc(c.judgedAt):''})`,UP:`상향 적용 요청 ${c.applied}% — 재무실 ${esc(ap?ap.status:'미요청')}${ap&&ap.decidedAt?' · '+esc(ap.decidedAt):''}${ap&&ap.status!=='승인'?' (승인 전 표준 유효)':''}`})[c.mode]],['사유', esc(c.reason||'—')],['근거·입증자료', esc(c.evidence||'—')],['a1 완료평가 기여도', `${c.a1Ref}% (참고값 — 표준표 도입 전 기준)`],['적용', `(성과총액 ${eok(r.grossEok)} − 역효과 ${eok(r.erosionEok)}) × ${r.contrib}% = <b>${eok(Math.round((r.grossEok-r.erosionEok)*r.contrib)/100)}</b>`]])
+        + `<div style="margin-top:10px"><button type="button" class="ln-act" data-act="contrib">⑥ 기여율 산정 열기 →</button></div>`; }
       case 8: return h('직접비용') + `<div class="stat">−${eok(r.directEok)}<small>원</small></div>` + kv([['정의', '성과 실현을 위해 직접 투입된 비용 중 재무실 인정분 (설비 개조·시운전·외주 등)'],['출처', 'ERP CO 과제 원가 집계'],['참고', '공통-1(설비투자) 등 ⑤ 체크리스트 「해당」 금액과 중복되지 않도록 확인']]);
       case 9: return h('순재무성과') + `<div class="stat" style="color:var(--brand)">${eok(r.netEok)}<small>원</small></div>`
         + `<div class="ln-formula">순재무성과 = (성과총액 − 역효과) × 기여율 − 직접비용\n= (${eok(r.grossEok)} − ${eok(r.erosionEok)}) × ${r.contrib}% − ${eok(r.directEok)}\n= <b>${eok(r.netEok)}</b></div>`
@@ -2396,6 +2509,7 @@ const LN = (() => {
       const act = e.target.closest('[data-act]'); if(!act) return;
       if(act.dataset.act === 'erosion'){ ErosionView.select(PF.regs[cur].id); goPp(5); }
       if(act.dataset.act === 'approval'){ goPp(4); }
+      if(act.dataset.act === 'contrib'){ CT.select(PF.regs[cur].id); goPp(6); }
       if(!e.target.closest('.ln-search')) $('lnHits').hidden = true;
     });
     kpis(); render(0, 9);
@@ -2632,6 +2746,14 @@ const EROSION_DATA = (() => {
       requiredData:['불량률 및 불량비','검사·선별 공수','운송 파손 및 반품','재작업·폐기 실적'],
       adjustmentGuidance:'판관비 절감액에서 파손·반품·검사·폐기 비용 증가분을 차감 검토',
       caveats:['C-2 클레임 비용 절감과 같은 반품·클레임 건을 두 유형에 나눠 계상하지 않도록 확인','품질기준 완화는 실발생 전이면 위험추정으로 분류']}),
+    cat('C-1(2)', {erosionTitle:'내재화에 따른 내부 부하·유지비 증가', description:'외주 분석·장치 제작 등을 내재화해 판관비 총액을 줄이면서 내부 인력 부하, 장치 유지보수·교정 비용, 품질·정확도 리스크가 늘어나는 경우.',
+      erosions:['내부 인력 업무부하 증가','자체 장치·분석 설비 유지보수·교정비','외주 대비 정확도·재현성 저하 리스크','외주 축소에 따른 긴급 대응 비용'],
+      scenarios:['외주 분석을 자체 분석법으로 대체한 뒤 분석 인력 공수 증가','자체 제작 장치의 정비·소모품·교정 비용 발생','외주사 대비 분석 정확도 확인을 위한 병행 검증 비용'],
+      recommendedFormula:['추가 내부 작업시간 × 인건비율','장치 유지보수비 + 교정비 + 소모품비','병행 검증 건수 × 건당 외주 단가','긴급 외주 의뢰 건수 × 건당 비용'],
+      relatedChecklistIds:['C-2','COMMON-1','COMMON-2','COMMON-3'],
+      requiredData:['외주 계약·지급 실적','내부 작업시간','장치 정비·교정 이력','분석 정확도 검증 결과'],
+      adjustmentGuidance:'절감된 외주 총액에서 내부 인건비·유지보수·검증 비용 증가분을 차감한 순절감으로 검토',
+      caveats:['B-8 고정가공비 절감의 정비·인건비 항목과 중복 확인','자체 장치 제작비(공통-1)는 직접비용과 이중 계상하지 않도록 구분']}),
     cat('C-2', {erosionTitle:'검사 강화·클레임 이연', description:'클레임 비용이 줄었지만 검사·선별 강화, 내부 대응 인력 부하, 고객 대응 품질 저하, 잠재 클레임 이연이 동반되는 경우.',
       erosions:['검사 강화 및 선별비 증가','내부 인력 업무부하 증가','고객 대응 품질 저하','잠재 클레임의 이연'],
       scenarios:['전수검사·선별로 클레임은 줄었으나 검사비가 증가','클레임 대응을 내부 인력이 흡수하여 업무부하 증가','클레임 인정 기준 강화로 보상이 이연되어 잠재 부채 증가'],
@@ -3077,6 +3199,183 @@ const ErosionView = (() => {
 })();
 ErosionView.init();
 LN.init();   // ③ 산출 근거 추적 — ⑤ 점검 상태를 참조하므로 역효과 모듈 이후 초기화
+
+/* ⑥ 기여율 — PF.contribTable(etl.py CONTRIB_TABLE) 기준. 사용자 결정은 CtRepo(localStorage)에 저장하고 PF.regs에 반영해
+   ① 워크벤치·③ 산출 근거 추적이 같은 값을 읽는다. 실운영: CtRepo를 PRIDE 기여율 결정 API로 교체 */
+const CT = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const T = PF.contribTable, byType = new Map(T.map(t => [t.type, t]));
+  const MODE = {STANDARD:'표준 적용', DOWN:'하향 적용', UP:'상향 적용'};
+  const isRange = up => Array.isArray(up);
+  const upText = up => isRange(up) ? `${up[0]}~${up[1]}%` : `${up}%`;
+  const today = () => new Date().toISOString().slice(0,10);
+  const CtRepo = (() => { const KEY = 'pride.contrib.v1';
+    const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; } };
+    return { load: id => read()[id] || null, save(id, d){ const s = read(); s[id] = d; try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} },
+      remove(id){ const s = read(); delete s[id]; try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} } }; })();
+
+  /* 유효 기여율: 표준 → 표준값, 하향 → 하향값, 상향 → 승인 후에만 요청값 */
+  function effective(d, tbl){
+    if(d.mode === 'DOWN') return tbl.down;
+    if(d.mode === 'UP') return (d.approval && d.approval.status === '승인') ? d.applied : tbl.std;
+    return tbl.std;
+  }
+  const netOf = (r, rate) => Math.round(((r.grossEok - r.erosionEok) * rate / 100 - r.directEok) * 10) / 10;
+  /* 결정을 성과 등록건에 반영 — ①·③이 읽는 contrib/netEok 갱신 */
+  function apply(r, d){
+    const tbl = byType.get(r.type); d.standard = tbl.std; d.effective = effective(d, tbl);
+    r.contribution = d; r.contrib = d.effective; r.netEok = netOf(r, d.effective);
+  }
+  function issues(r, d){
+    const tbl = byType.get(r.type), out = [];
+    if(d.mode === 'DOWN'){ if(!d.reason) out.push('하향 판단 사유를 입력해 주세요 (활용부서장 판단 기록).'); if(!d.judgedBy) out.push('판단자(활용부서장)를 입력해 주세요.'); }
+    if(d.mode === 'UP'){ if(!d.evidence) out.push('상향은 입증자료가 있어야 재무실 승인을 요청할 수 있습니다.'); if(!d.reason) out.push('상향 사유를 입력해 주세요.');
+      if(isRange(tbl.up) && !(typeof d.applied === 'number' && d.applied >= tbl.up[0] && d.applied <= tbl.up[1])) out.push(`적용 기여율은 ${tbl.up[0]}~${tbl.up[1]}% 범위로 입력해 주세요.`); }
+    return out;
+  }
+
+  let cur = 0, chart = null, fil = 'ALL';
+  const reg = () => PF.regs[cur];
+  const decision = r => r.contribution;
+
+  function render(){
+    const r = reg(), d = decision(r), tbl = byType.get(r.type), probs = issues(r, d);
+    $('ctReg').value = cur;
+    const rate = m => m === 'DOWN' ? tbl.down : m === 'UP' ? upText(tbl.up) : tbl.std + '%';
+    const upApproved = d.mode === 'UP' && d.approval && d.approval.status === '승인';
+    $('ctWb').innerHTML = `
+      <div class="ct-head"><div><b>${esc(r.id)}</b> · ${esc(r.name)}<div class="legend-note">${esc(r.dept)} · 연구효과 ${esc(r.effect)} · a1 완료평가 연구기여도 ${d.a1Ref}% (참고)</div></div>
+        <span class="pill" style="background:${gcOf(r.type)};color:#fff;font-weight:700">${esc(r.type)} ${esc(typeName(r.type))}</span>
+        <div class="std"><div class="n">${tbl.std}%</div><div class="l">표준 기여율 · 기본 적용값</div></div></div>
+      <fieldset class="ct-seg" role="radiogroup" aria-label="적용 구분">
+        ${['STANDARD','DOWN','UP'].map(m => `<label class="ct-opt ${ {STANDARD:'std',DOWN:'down',UP:'up'}[m]}"><input type="radio" name="ct-mode" value="${m}" data-f="mode"${d.mode===m?' checked':''}>${MODE[m]} <small>${m==='STANDARD'?'기본값':m==='DOWN'?'활용부서장 판단':'재무실 승인'} · ${typeof rate(m)==='number'?rate(m)+'%':rate(m)}</small></label>`).join('')}
+      </fieldset>
+      <div class="ct-conds">
+        <div class="ct-cond down${d.mode==='DOWN'?' on':''}"><h4>하향 적용 조건 <span class="ct-who dept">활용부서장 판단</span><span class="r" style="color:var(--warn)">${tbl.down}%</span></h4>
+          <div class="q">${esc(tbl.downCond)}</div>
+          <label class="chk"><input type="checkbox" data-f="downMatch"${d.downMatch?' checked':''}> 이 조건에 해당함 (부서장 판단 기준)</label></div>
+        <div class="ct-cond up${d.mode==='UP'?' on':''}"><h4>상향 적용 조건 <span class="ct-who fin">재무실 승인</span><span class="r" style="color:var(--good)">${upText(tbl.up)}</span></h4>
+          <div class="q">${esc(tbl.upCond)}</div>
+          <label class="chk"><input type="checkbox" data-f="upMatch"${d.upMatch?' checked':''}> 입증자료로 조건 충족을 확인함</label></div>
+      </div>
+      ${d.mode === 'DOWN' ? `<div class="ct-form">
+        <div class="f w"><label for="ct-reason">하향 판단 사유</label><textarea id="ct-reason" data-f="reason">${esc(d.reason)}</textarea></div>
+        <div class="f"><label for="ct-judgedBy">판단자 (활용부서장)</label><input id="ct-judgedBy" type="text" data-f="judgedBy" value="${esc(d.judgedBy)}" placeholder="예: (광양)제강부 부서장"></div>
+        <div class="f"><label for="ct-judgedAt">판단일</label><input id="ct-judgedAt" type="text" data-f="judgedAt" value="${esc(d.judgedAt || today())}"></div>
+        <div class="f w"><label for="ct-evidence">판단 근거·첨부 (문서명·링크 — 업로드 연동 예정)</label><input id="ct-evidence" type="text" data-f="evidence" value="${esc(d.evidence)}" placeholder="예: 활용부서 판단서, 수주 경위 보고"></div></div>` : ''}
+      ${d.mode === 'UP' ? `<div class="ct-form">
+        ${isRange(tbl.up) ? `<div class="f"><label for="ct-applied">적용 기여율 (범위 ${tbl.up[0]}~${tbl.up[1]}%)</label><input id="ct-applied" type="number" min="${tbl.up[0]}" max="${tbl.up[1]}" step="1" data-f="applied" value="${d.applied ?? ''}" aria-describedby="ct-applied-err"><span class="ct-err" id="ct-applied-err" role="alert"></span></div>`
+          : `<div class="f"><label>적용 기여율</label><div class="ct-rate up" style="font-size:16px;padding:4px 0">${tbl.up}% <span class="legend-note" style="font-weight:500">(고정)</span></div></div>`}
+        <div class="f"><label>승인 상태</label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:3px">${d.approval ? `<span class="pill ${ {'승인':'g','승인대기':'y','반려':'r'}[d.approval.status]||''}">${esc(d.approval.status)}</span><span class="legend-note">요청 ${esc(d.approval.requestedAt||'—')}${d.approval.decidedAt?` · 처리 ${esc(d.approval.decidedAt)}`:''}</span>` : '<span class="pill n" style="background:#eef1f5;color:var(--text-2)">미요청</span>'}
+          ${!d.approval || d.approval.status === '반려' ? `<button type="button" class="ct-btn" data-act="request"${probs.length?' disabled title="사유·입증자료를 먼저 입력하세요"':''}>승인 요청</button>` : d.approval.status === '승인대기' ? `<button type="button" class="ct-btn ok" data-act="approve">재무실 승인 (시연)</button><button type="button" class="ct-btn no" data-act="reject">반려 (시연)</button>` : ''}</div></div>
+        <div class="f w"><label for="ct-reason">상향 사유</label><textarea id="ct-reason" data-f="reason">${esc(d.reason)}</textarea></div>
+        <div class="f w"><label for="ct-evidence">입증자료 (문서명·링크 — 업로드 연동 예정)</label><input id="ct-evidence" type="text" data-f="evidence" value="${esc(d.evidence)}" placeholder="예: 고객 발주 사유서, 기술 적용 확인서"></div></div>` : ''}
+      ${probs.length ? `<div class="ct-warn" role="status">⚠ ${probs.map(esc).join(' ')}</div>` : ''}
+      <div class="ct-result"><span class="ct-mode ${d.mode}">${MODE[d.mode]}</span>
+        <span>표준 <b class="big" style="color:var(--brand)">${tbl.std}%</b></span><span class="arrow">→</span>
+        <span>적용 <b class="big" style="color:${d.mode==='DOWN'?'var(--warn)':d.mode==='UP'?'var(--good)':'var(--brand)'}">${d.effective}%</b></span>
+        ${d.mode==='UP' && !upApproved ? `<span class="legend-note">요청 ${d.applied ?? '—'}% · 승인 전까지 표준 ${tbl.std}% 유효</span>` : ''}
+        ${d.mode!=='STANDARD' && d.reason ? `<span class="legend-note" style="flex-basis:100%">사유: ${esc(d.reason)}</span>` : ''}
+        <span style="margin-left:auto"><button type="button" class="ct-btn" data-act="lineage">③ 근거 추적에서 보기 →</button></span></div>`;
+    renderPreview(r, d, tbl); renderKpis(); renderUp(); renderTable(); renderDept();
+  }
+  function renderPreview(r, d, tbl){
+    const nStd = netOf(r, tbl.std), nCur = netOf(r, d.effective), nReq = d.mode==='UP' && typeof d.applied==='number' ? netOf(r, d.applied) : null;
+    const cats = ['표준 적용', '현재 유효'].concat(nReq != null && !(d.approval && d.approval.status==='승인') ? ['상향 승인 시'] : []);
+    const vals = [nStd, nCur].concat(nReq != null && !(d.approval && d.approval.status==='승인') ? [nReq] : []);
+    const cols = ['var(--brand)', d.mode==='DOWN'?'#eda100':d.mode==='UP'?'#1baf7a':'#2a78d6', '#9fd8bd'];
+    const opt = {grid:{left:8,right:16,top:28,bottom:8,containLabel:true}, tooltip:tip({trigger:'axis',formatter:p=>p.map(x=>`${x.name}: <b>${nf(x.value)}억</b>`).join('<br>')}),
+      xAxis:axisX({type:'category',data:cats}), yAxis:axisY({type:'value',name:'순재무성과(억)',nameTextStyle:{fontSize:10,color:INK3}}),
+      series:[{type:'bar',barMaxWidth:46,data:vals.map((v,i)=>({value:v,itemStyle:{color:i===0?'#2a78d6':i===1?(d.mode==='DOWN'?'#eda100':d.mode==='UP'?'#1baf7a':'#2a78d6'):'#9fd8bd',borderRadius:[4,4,0,0]}})),
+        label:{show:true,position:'top',fontSize:11,color:INK2,formatter:p=>nf(p.value)+'억'}}]};
+    if(!chart) chart = mk('ctChart', opt); else chart.setOption(opt, true);
+    $('ctPv').innerHTML = [['성과총액 − 역효과', `${nf(r.grossEok)} − ${nf(r.erosionEok)} = ${nf(Math.round((r.grossEok-r.erosionEok)*10)/10)}억`],['표준 적용 순재무성과', `<b>${nf(nStd)}억</b> (${tbl.std}%)`],['현재 유효 순재무성과', `<b>${nf(nCur)}억</b> (${d.effective}%) · 차이 ${nCur-nStd>=0?'+':''}${nf(Math.round((nCur-nStd)*10)/10)}억`]]
+      .concat(nReq != null ? [['상향 승인 시', `${nf(nReq)}억 (${d.applied}%) · +${nf(Math.round((nReq-nStd)*10)/10)}억`]] : [])
+      .map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('') + `<dt>산식</dt><dd class="legend-note">(성과총액 − 역효과) × 기여율 − 직접비용 ${nf(r.directEok)}억</dd>`;
+  }
+  function renderKpis(){
+    const R = PF.regs, ds = R.map(decision), cnt = m => ds.filter(d => d.mode === m).length;
+    const upWait = ds.filter(d => d.mode==='UP' && d.approval && d.approval.status==='승인대기').length, upOk = ds.filter(d => d.mode==='UP' && d.approval && d.approval.status==='승인').length;
+    const avg = a => Math.round(a.reduce((s,x)=>s+x,0)/a.length*10)/10;
+    $('ctKpis').innerHTML = kpiCard('표준 적용', `${cnt('STANDARD')} <small>/ ${R.length}건</small>`, '기본값 그대로 적용') + kpiCard('하향 적용', `${cnt('DOWN')} <small>건</small>`, '활용부서장 판단')
+      + kpiCard('상향 적용', `${cnt('UP')} <small>건</small>`, `승인 ${upOk} · 대기 ${upWait}`) + kpiCard('상향 승인 대기', `${upWait} <small>건</small>`, '승인 전 표준 기여율 유효')
+      + kpiCard('평균 유효 기여율', `${avg(R.map(r=>r.contrib))} <small>%</small>`, `표준 평균 ${avg(ds.map(d=>d.standard))}% · a1 참고 평균 ${avg(ds.map(d=>d.a1Ref))}%`);
+  }
+  function renderUp(){
+    const rows = PF.regs.map((r,i)=>[r,i]).filter(([r]) => decision(r).mode === 'UP');
+    $('ctUp').querySelector('tbody').innerHTML = rows.length ? rows.map(([r,i]) => { const d = decision(r), a = d.approval || {status:'미요청'};
+      return `<tr><td><b>${esc(r.id)}</b><div class="legend-note">${esc(r.name.slice(0,18))}</div></td><td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${esc(r.type)}</span></td><td class="num">${d.standard}% → <b>${d.applied ?? '—'}%</b></td><td>${esc(a.requestedAt||'—')}</td><td>${a.status==='승인'?'<span class="pill g">승인</span>':a.status==='승인대기'?'<span class="pill y">승인대기</span>':a.status==='반려'?'<span class="pill r">반려</span>':'<span class="pill" style="background:#eef1f5">미요청</span>'}</td>
+        <td>${a.status==='승인대기' ? `<button type="button" class="ct-btn ok" data-act="approve" data-i="${i}" style="padding:3px 8px">승인</button> <button type="button" class="ct-btn no" data-act="reject" data-i="${i}" style="padding:3px 8px">반려</button>` : `<button type="button" class="ct-btn" data-act="open" data-i="${i}" style="padding:3px 8px">열기</button>`}</td></tr>`; }).join('')
+      : `<tr><td colspan="6" class="legend-note" style="padding:12px">상향 적용을 선택한 성과가 없습니다.</td></tr>`;
+  }
+  function renderTable(){
+    const use = {}; PF.regs.forEach(r => { use[r.type] = (use[r.type]||0)+1; });
+    $('ctTblFil').innerHTML = [['ALL','전체'],['A','A 판매·매출'],['B','B 원가·생산'],['C','C 판매비·클레임']].map(([k,t])=>`<button type="button" class="ct-fbtn" data-fil="${k}" aria-pressed="${fil===k}">${t}</button>`).join('');
+    const rows = T.filter(t => fil === 'ALL' || t.type[0] === fil);
+    $('ctTable').innerHTML = `<thead><tr><th>코드</th><th>유형</th><th class="num">표준</th><th class="num">하향</th><th>하향 조건 <span class="ct-who dept">활용부서장 판단</span></th><th class="num">상향</th><th>상향 조건 <span class="ct-who fin">재무실 승인</span></th><th>비고</th><th class="num">등록</th></tr></thead><tbody>${
+      rows.map(t => `<tr class="${t.type===reg().type?'cur':''}"><td><span class="pill" style="background:${gcOf(t.type)};color:#fff">${esc(t.type)}</span></td><td><b>${esc(typeName(t.type))}</b></td>
+        <td class="num"><span class="ct-rate std">${t.std}%</span></td><td class="num"><span class="ct-rate down">${t.down}%</span></td><td>${esc(t.downCond)}</td>
+        <td class="num"><span class="ct-rate up">${upText(t.up)}</span></td><td>${esc(t.upCond)}</td><td class="legend-note">${esc(t.note||'')}</td><td class="num">${use[t.type]||0}</td></tr>`).join('')}</tbody>`;
+  }
+  function renderDept(){
+    const by = {}; PF.regs.forEach(r => { const b = by[r.dept] = by[r.dept] || {n:0, S:0, D:0, U:0, sum:0}; b.n++; b[{STANDARD:'S',DOWN:'D',UP:'U'}[decision(r).mode]]++; b.sum += r.contrib; });
+    $('ctDept').querySelector('tbody').innerHTML = Object.entries(by).sort((a,b)=>b[1].n-a[1].n).map(([d,b]) => `<tr><td>${esc(d)}${b.U/b.n>=0.5?' <span class="pill y">상향 편중</span>':''}</td><td class="num">${b.n}</td><td><span class="ct-rate std">${b.S}</span> / <span class="ct-rate down">${b.D}</span> / <span class="ct-rate up">${b.U}</span></td><td class="num">${Math.round(b.sum/b.n)}%</td></tr>`).join('');
+  }
+
+  /* 변경 반영: 저장 → 등록건 갱신 → ⑥·①·③ 재렌더 */
+  function commit(r){
+    const d = decision(r); apply(r, d); CtRepo.save(r.id, d);
+    render();
+    if(typeof renderRegsTable === 'function') renderRegsTable();
+    const wb = document.getElementById('ppReg'); if(wb && wb.textContent.includes(r.id)) renderWb(r);
+    if(typeof LN !== 'undefined') LN.refresh();
+  }
+  const root = $('pp-6');
+  root.addEventListener('change', e => {
+    const el = e.target, f = el.dataset.f; if(el.id === 'ctReg'){ cur = +el.value; render(); return; }
+    if(!f) return; const r = reg(), d = decision(r), tbl = byType.get(r.type);
+    if(f === 'mode'){ d.mode = el.value;
+      if(d.mode === 'STANDARD') d.applied = tbl.std;
+      if(d.mode === 'DOWN'){ d.applied = tbl.down; if(!d.judgedAt) d.judgedAt = today(); }
+      if(d.mode === 'UP') d.applied = isRange(tbl.up) ? (typeof d.applied === 'number' && d.applied >= tbl.up[0] && d.applied <= tbl.up[1] ? d.applied : tbl.up[0]) : tbl.up;
+      commit(r); return; }
+    if(f === 'downMatch' || f === 'upMatch'){ d[f] = el.checked; commit(r); return; }
+  });
+  root.addEventListener('input', e => {
+    const el = e.target, f = el.dataset.f; if(!f || f === 'mode' || el.type === 'checkbox') return;
+    const r = reg(), d = decision(r), tbl = byType.get(r.type);
+    if(f === 'applied'){ const v = Number(el.value), err = $('ct-applied-err'); if(el.value === '' || isNaN(v)){ d.applied = null; }
+      else if(v < tbl.up[0] || v > tbl.up[1]){ el.setAttribute('aria-invalid','true'); if(err) err.textContent = `${tbl.up[0]}~${tbl.up[1]}% 범위를 벗어났습니다.`; d.applied = Math.min(tbl.up[1], Math.max(tbl.up[0], v)); return; }
+      else { d.applied = v; el.setAttribute('aria-invalid','false'); if(err) err.textContent = ''; }
+      apply(r, d); CtRepo.save(r.id, d); renderPreview(r, d, tbl); renderUp(); return; }
+    d[f] = el.value; apply(r, d); CtRepo.save(r.id, d);
+    const w = root.querySelector('#ctWb .ct-warn'), probs = issues(r, d); if(w && !probs.length) w.remove();
+    const rq = root.querySelector('[data-act="request"]'); if(rq) rq.disabled = probs.length > 0;
+  });
+  root.addEventListener('click', e => {
+    const b = e.target.closest('button'); if(!b) return;
+    if(b.dataset.fil){ fil = b.dataset.fil; renderTable(); return; }
+    const act = b.dataset.act; if(!act) return;
+    const i = b.dataset.i != null ? +b.dataset.i : cur, r = PF.regs[i], d = decision(r);
+    if(act === 'open'){ cur = i; render(); return; }
+    if(act === 'lineage'){ if(typeof LN !== 'undefined') LN.render(cur, 7); goPp(3); return; }
+    if(act === 'request'){ if(issues(r, d).length) return; d.approval = {status:'승인대기', requestedAt: today(), decidedAt:null, by:'재무실'}; }
+    if(act === 'approve'){ d.approval = Object.assign(d.approval||{}, {status:'승인', decidedAt: today(), by:'재무실'}); }
+    if(act === 'reject'){ d.approval = Object.assign(d.approval||{}, {status:'반려', decidedAt: today(), by:'재무실'}); }
+    if(i !== cur) cur = i; commit(r);
+  });
+  function init(){
+    $('ctReg').innerHTML = PF.regs.map((r,i)=>`<option value="${i}">${esc(r.id)} · ${esc(r.name)}</option>`).join('');
+    let changed = false;
+    PF.regs.forEach(r => { const saved = CtRepo.load(r.id); if(saved){ apply(r, saved); changed = true; } else apply(r, r.contribution); });
+    if(changed){ if(typeof renderRegsTable === 'function') renderRegsTable(); renderWb(PF.regs[0]); if(typeof LN !== 'undefined') LN.refresh(); }
+    render();
+  }
+  return {init, select(id){ const i = PF.regs.findIndex(r => r.id === id); if(i >= 0){ cur = i; render(); } }, refresh: render};
+})();
+
+CT.init();   // ⑥ 기여율 — 저장된 결정을 PF.regs에 반영한 뒤 ①·③ 재렌더
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
 applyingRoute = false;
