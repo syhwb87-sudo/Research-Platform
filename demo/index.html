@@ -601,7 +601,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #p-exec .ex-pipe b{display:block;font-size:18px;color:var(--text-1);font-variant-numeric:tabular-nums}
 #p-exec .ex-pipe .on{border-color:var(--good);background:#e6f4ec} #p-exec .ex-pipe .on b{color:var(--good)}
 @media print{header,footer,#p-exec .ex-print{display:none !important} main{padding:0} .page{display:none} #p-exec{display:block !important}}
-/* Executive 서브탭(CEO/CTO) */
+/* Executive 서브탭(CEO/연구원장) */
 #p-exec .ex-nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
 #p-exec .cto-fil{display:flex;gap:6px;margin:4px 0 8px}
 #p-exec .cto-fil button{border:1px solid var(--border);background:var(--surface);font:inherit;font-size:12px;font-weight:600;color:var(--text-2);border-radius:20px;padding:4px 11px;cursor:pointer}
@@ -1252,9 +1252,9 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
         <div class="legend-note" style="margin-top:8px">상세는 <a href="#" onclick="go('pp');goPp('approval');return false">⑥ 재무실 승인</a> · <a href="#" onclick="go('pp');goPp('trace');return false">② 산출 근거 추적</a></div></div></div>
   </div>
   </div>
-  <div class="ex-panel" id="ex-cto" hidden>
+  <div class="ex-panel" id="ex-lab" hidden>
     <div class="card" style="margin-bottom:14px;padding:10px 16px">
-      <h3 style="font-size:16px;margin:0">CTO Dashboard <span class="legend-note" style="font-weight:500">— 성과의 양이 아니라 구조: 어떤 기술·활동군이 성과를 만들고, 파이프라인은 건강한가</span></h3>
+      <h3 style="font-size:16px;margin:0">연구원장 대시보드 <span class="legend-note" style="font-weight:500">— 성과의 양이 아니라 구조: 어떤 기술·활동군이 성과를 만들고, 파이프라인은 건강한가</span></h3>
       <div class="sub" style="margin:2px 0 0">확정 순재무성과(재무실)와 파이프라인 단계별 금액을 함께 보며, 기술분류·활동군 지표는 완료평가(a1)·활용평가 시뮬레이션 기준입니다 — 각 카드에 기준을 표기합니다.</div>
     </div>
     <div class="row" style="grid-template-columns:repeat(5,1fr)" id="ctoKpis"></div>
@@ -1321,7 +1321,7 @@ function syncHash(){
   if(applyingRoute) return;
   let h = '#page=' + currentPage;
   if(currentPage === 'act') h += '&activity=' + ACT_SLUG[currentAct];
-  if(currentPage === 'exec' && execView === 'cto') h += '&view=cto';
+  if(currentPage === 'exec' && execView === 'lab') h += '&view=lab';
   setHash(h);
 }
 function go(p, act){
@@ -1340,7 +1340,7 @@ function applyRoute(){
   if(!document.getElementById('p-' + page)) page = 'home';
   applyingRoute = true;
   go(page, act);
-  if(page === 'exec') goExec(q.get('view') === 'cto' ? 'cto' : 'ceo');
+  if(page === 'exec') goExec(['lab','cto'].includes(q.get('view')) ? 'lab' : 'ceo');   // 구 view=cto 링크 호환
   applyingRoute = false;
   syncHash();
 }
@@ -1697,7 +1697,7 @@ const CEO = (() => {
   return {init: render, refreshRegs: render};
 })();
 
-/* ── Executive › CTO Dashboard — 구조 관점. 확정 순성과(PF.regs)와 파이프라인은 재무실 기준, 기술·활동군 지표는 PF.cto(a1·활용평가 시뮬레이션) */
+/* ── Executive › 연구원장 대시보드 — 구조 관점. 확정 순성과(PF.regs)와 파이프라인은 재무실 기준, 기술·활동군 지표는 PF.cto(a1·활용평가 시뮬레이션) */
 const CTO = (() => {
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1763,12 +1763,12 @@ const CTO = (() => {
   return {init, refreshRegs: render};
 })();
 
-/* ── Executive 서브탭(CEO/CTO) — #page=exec&view=cto */
+/* ── Executive 서브탭(CEO/연구원장) — #page=exec&view=lab */
 let execView = 'ceo';
 const exNav = document.getElementById('exNav');
-exNav.innerHTML = [['ceo','CEO Dashboard · 전사 가치'],['cto','CTO Dashboard · 기술경영']].map(([k,t])=>`<button type="button" class="achip${k==='ceo'?' on':''}" data-v="${k}">${t}</button>`).join('');
+exNav.innerHTML = [['ceo','CEO Dashboard · 전사 가치'],['lab','연구원장 대시보드 · 기술경영']].map(([k,t])=>`<button type="button" class="achip${k==='ceo'?' on':''}" data-v="${k}">${t}</button>`).join('');
 function goExec(v){
-  execView = v === 'cto' ? 'cto' : 'ceo';
+  execView = v === 'lab' ? 'lab' : 'ceo';
   exNav.querySelectorAll('.achip').forEach(b=>{ const on = b.dataset.v===execView; b.classList.toggle('on', on); b.style.background = on ? 'var(--brand)' : ''; });
   document.querySelectorAll('.ex-panel').forEach(el=>el.hidden = el.id!=='ex-'+execView);
   charts.forEach(c=>c.resize());
