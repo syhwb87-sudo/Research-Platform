@@ -633,6 +633,30 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #p-my .g-badge .ic{font-size:23px}
 #p-my .g-badge .demo{display:inline-block;font-size:9px;font-weight:800;color:#92400E;background:#FEF3C7;border-radius:20px;padding:0 6px;margin-left:3px;vertical-align:1px}
 #p-my .g-quest{padding:11px 0}
+/* ── MW 분석 재구성: 조직 비교·과제 집중도·연구원 표 ── */
+#p-mw .mw-kpi{cursor:pointer} #p-mw .mw-kpi:hover{border-color:var(--brand)}
+#p-mw .mw-kpi .tr{font-size:11.5px;font-weight:700;margin-left:6px}
+#p-mw .mw-kpi .tr.up{color:var(--good)} #p-mw .mw-kpi .tr.down{color:var(--bad)}
+#p-mw table.mw-org,#p-mw table.mw-proj,#p-mw table.mw-ppl{width:100%;border-collapse:collapse;font-size:12.5px}
+#p-mw table.mw-org th,#p-mw table.mw-proj th,#p-mw table.mw-ppl th{font-size:11.5px;font-weight:700;color:var(--text-3);text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--surface)}
+#p-mw table.mw-org td,#p-mw table.mw-proj td,#p-mw table.mw-ppl td{padding:8px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+#p-mw table .num{text-align:right;font-variant-numeric:tabular-nums}
+#p-mw table.mw-org tbody tr,#p-mw table.mw-ppl tbody tr{cursor:pointer}
+#p-mw table.mw-org tbody tr:hover,#p-mw table.mw-ppl tbody tr:hover{background:#f6f9fe}
+#p-mw table.mw-org td:first-child{white-space:nowrap}
+#p-mw table.mw-org tbody tr.on{background:#eaf2fd} #p-mw table.mw-org tbody tr.on td:first-child{font-weight:700;color:var(--brand)}
+#p-mw .mbar{display:flex;align-items:center;gap:8px;min-width:120px}
+#p-mw .mbar .track{flex:1;height:8px;border-radius:99px;background:#eef2f7;overflow:hidden;position:relative}
+#p-mw .mbar .track i{display:block;height:100%;border-radius:99px;background:var(--brand)}
+#p-mw .mbar .track i.warn{background:#e0791e} #p-mw .mbar .track i.bad{background:var(--bad)}
+#p-mw .mbar .track b{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--text-2);opacity:.5}
+#p-mw .mbar .v{font-size:12px;font-weight:700;min-width:46px;text-align:right;font-variant-numeric:tabular-nums}
+#p-mw table.mw-ppl th[data-k]{cursor:pointer;user-select:none} #p-mw table.mw-ppl th[data-k]:hover{color:var(--brand)}
+#p-mw table.mw-ppl th.sorted::after{content:' ▾';color:var(--brand)} #p-mw table.mw-ppl th.sorted.asc::after{content:' ▴'}
+#p-mw table.mw-proj a.code,#p-mw table.mw-ppl td.name{color:var(--brand);font-weight:700;cursor:pointer}
+#p-mw table.mw-proj a.code:hover{text-decoration:underline}
+#p-mw .yoy.up{color:var(--good);font-weight:700} #p-mw .yoy.down{color:var(--bad);font-weight:700}
+#p-mw .pill.n{background:#eef1f5;color:var(--text-2)}
 </style>
 </head>
 <body>
@@ -989,13 +1013,13 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
   <div class="row" style="grid-template-columns:6fr 6fr">
     <div class="card">
       <h3>조직 부하율: 현재 → 신규 반영 후</h3>
-      <div class="sub">가용 = 인원 × 4.3 MW/월 · 적정 상한 90%</div>
+      <div class="sub">가용 = 인원 × <span class="simCap"></span> MW/월 · 적정 상한 90%</div>
       <div class="chart" id="simLoad"></div>
       <div class="brief" id="simVerdict" style="margin-top:8px"></div>
     </div>
     <div class="card">
       <h3>배정 후보 연구원 (여력 큰 순 15명)</h3>
-      <div class="sub">여력 = 4.3 − 최근 6개월 월평균 투입 MW</div>
+      <div class="sub">여력 = <span class="simCap"></span> − 최근 6개월 월평균 투입 MW</div>
       <div class="scroll" style="max-height:340px"><table id="simTable">
         <thead><tr><th>연구원</th><th>조직</th><th class="num">월평균 투입</th>
         <th class="num">여력 MW/월</th><th>상태</th></tr></thead><tbody></tbody></table></div>
@@ -1005,27 +1029,60 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 
 <!-- ─────────────── MW ─────────────── -->
 <section class="page" id="p-mw">
-  <div class="row" style="grid-template-columns:repeat(4,1fr)" id="mwKpis"></div>
-  <div class="row" style="grid-template-columns:6fr 6fr">
+  <div class="row" style="grid-template-columns:repeat(5,1fr)" id="mwKpis"></div>
+
+  <!-- ② 월 추이 / 조직 비교 -->
+  <div class="row" style="grid-template-columns:7fr 5fr">
     <div class="card">
-      <h3>조직별 MW × 활동군</h3>
-      <div class="sub">2023~2026 누적 투입 (a2 부서명 상위조직 기준)</div>
-      <div class="chart tall" id="orgStack"></div>
+      <h3>월 투입 추이 <span class="legend-note" id="mwTrendScope">— 전사</span></h3>
+      <div class="sub" id="mwTrendSub">최근 24개월 실적(활동군 스택) + 전년 동월 선 · 기준월 이후 12개월은 계획(점선 막대)으로 분리</div>
+      <div class="chart tall" id="mwTrend"></div>
     </div>
     <div class="card">
-      <h3>조직 × 월 투입 Heatmap</h3>
-      <div class="sub">최근 24개월 · 진한 셀 = 투입 집중</div>
-      <div class="chart tall" id="heatmap"></div>
+      <h3>조직 비교 <span class="legend-note">— 최근 12개월 · 행 클릭 시 필터</span></h3>
+      <div class="sub">인당 MW = 최근 12개월 실적 ÷ 활동 인원 · 전략 비중 = 누적 실적 중 전략 프로젝트 · 미입력 = 활동 인원 중 기준월 MW 없음</div>
+      <div class="scroll" style="max-height:330px"><table class="mw-org" id="mwOrgCmp">
+        <thead><tr><th>조직</th><th class="num">활동 인원</th><th class="num">12개월 MW</th><th>인당 MW / 년</th><th class="num">전략 비중</th><th class="num">전년 대비</th><th class="num">미입력</th></tr></thead>
+        <tbody></tbody></table></div>
     </div>
   </div>
+
+  <!-- ③ 히트맵 / 과제 집중도 -->
+  <div class="row" style="grid-template-columns:6fr 6fr">
+    <div class="card">
+      <h3>조직 × 월 투입 Heatmap
+        <span class="er-filters" id="heatMode" role="group" aria-label="히트맵 기준" style="float:right;margin:0">
+          <button type="button" class="er-fbtn" data-mode="abs" aria-pressed="true">절대값</button>
+          <button type="button" class="er-fbtn" data-mode="norm" aria-pressed="false">조직별 정규화</button>
+        </span></h3>
+      <div class="sub" id="heatSub">최근 24개월 실적 · 진한 셀 = 투입 집중</div>
+      <div class="chart tall" id="heatmap"></div>
+    </div>
+    <div class="card">
+      <h3>과제 집중도 <span class="legend-note" id="mwProjScope">— 투입 상위 과제</span></h3>
+      <div class="sub">실적 누적 MW 상위 · 최다 1인 비중 50% 이상은 인원 집중(단일 의존) 표시 · 코드 클릭 시 활동군 상세</div>
+      <div class="scroll" style="max-height:330px"><table class="mw-proj" id="mwProj">
+        <thead><tr><th>과제코드</th><th>과제명</th><th>조직</th><th class="num">투입 MW</th><th class="num">인원</th><th>최다 1인 비중</th></tr></thead>
+        <tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- ④ 연구원별 투입 현황 -->
   <div class="card">
     <h3>연구원별 투입 현황
-      <input class="search" id="pplSearch" placeholder="이름/조직 검색" style="float:right">
-    </h3>
-    <div class="sub">기간 누적 MW 상위 80명 · 부하율 = 연평균 MW ÷ 44MW 기준</div>
-    <div class="scroll"><table id="pplTable">
-      <thead><tr><th>연구원</th><th>조직</th><th class="num">전략</th><th class="num">현업</th>
-      <th class="num">탐색</th><th class="num">누적 MW</th><th class="num">참여과제</th><th>부하</th></tr></thead>
+      <span style="float:right;display:flex;gap:8px;align-items:center">
+        <select id="pplOrg" class="search" style="padding:6px 10px;font-size:12px;font:inherit"></select>
+        <label style="font-size:12px;color:var(--text-2);display:flex;gap:4px;align-items:center"><input type="checkbox" id="pplMissing"> 기준월 미입력만</label>
+        <input class="search" id="pplSearch" placeholder="이름/조직 검색">
+      </span></h3>
+    <div class="sub" id="pplSub"></div>
+    <div class="scroll" style="max-height:520px"><table id="pplTable" class="mw-ppl">
+      <thead><tr>
+        <th data-k="name">연구원</th><th data-k="org">조직</th>
+        <th class="num" data-k="a1">전략</th><th class="num" data-k="a3">현업</th><th class="num" data-k="a4">탐색</th>
+        <th class="num" data-k="total">누적 MW</th><th class="num" data-k="months">기록 개월</th>
+        <th class="num" data-k="annual">연환산 MW</th><th data-k="load">부하율</th>
+        <th class="num" data-k="cur">기준월</th><th class="num" data-k="projects">과제</th></tr></thead>
       <tbody></tbody></table></div>
   </div>
 </section>
@@ -1552,60 +1609,125 @@ const HM = (() => {
   return {init, refreshRegs: () => { renderKpis(); renderBalance(); renderPerf(); renderTodo(); }};
 })();
 
-/* ── MW page ── */
+/* ── MW page — 계획 분리(실적 = 기준월 이전), 재직 개월 기반 연환산 부하율(÷ capYear), 조직 필터 드릴다운 ── */
 const M = D.mw;
-document.getElementById('mwKpis').innerHTML = [
-  ['총 투입 MW', nf(Math.round(M.orgStack.reduce((s,o)=>s+o.a1+o.a3+o.a4,0)))+' <small>MW</small>','2023~2026 누적'],
-  ['활동 연구원', nf(M.peopleN)+' <small>명</small>','MW 입력 인원'],
-  ['인당 평균 MW', M.personYearAvg+' <small>MW/년</small>', M.latestYear+'년 기준'],
-  ['활동군 렌즈','전략 · 현업 · 탐색','a2 과제코드 W/N·L 분류'],
-].map(([t,v,s])=>`<div class="card"><div class="sub" style="margin:0 0 2px">${t}</div>
-  <div class="stat">${v}</div><div class="legend-note">${s}</div></div>`).join('');
+const MWV = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const CAP = M.capYear, ASOF = M.asOfYm;
+  let org = null, heatMode = 'abs', sortK = 'total', sortAsc = false, missingOnly = false, q = '';
+  let trend = null, heat = null;
+  const orgOf = o => M.orgs.find(x => x.org === o);
+  const loadPill = p => !p.active ? '<span class="pill n">기록 종료</span>'
+    : p.load >= 120 ? '<span class="pill r">과부하</span>' : p.load < 40 ? '<span class="pill y">저부하</span>' : '<span class="pill g">적정</span>';
+  const bar = (v, max, mark, cls) => `<div class="mbar"><div class="track"><i class="${cls||''}" style="width:${Math.min(100, 100*v/max).toFixed(1)}%"></i>${mark != null ? `<b style="left:${Math.min(100,100*mark/max).toFixed(1)}%"></b>` : ''}</div><span class="v">${nf(v)}</span></div>`;
 
-const orgs = M.orgStack.slice(0,9).reverse();
-mk('orgStack', {
-  tooltip:tip({trigger:'axis',axisPointer:{type:'shadow'},
-    formatter:ps=>ps[0].name+'<br>'+ps.map(p=>`${p.marker}${p.seriesName} <b>${nf(p.value)}</b> MW`).join('<br>')}),
-  legend:{top:0,right:0,itemWidth:12,itemHeight:8,textStyle:{fontSize:11,color:INK2}},
-  grid:{left:120,right:30,top:28,bottom:24},
-  xAxis:axisY({type:'value',name:'MW',nameTextStyle:{color:INK3}}),
-  yAxis:axisX({type:'category',data:orgs.map(o=>o.org)}),
-  series:[['a1',1],['a3',3],['a4',4]].map(([k,a],i,arr)=>({
-    name:ACT[a],type:'bar',stack:'o',barMaxWidth:22,color:C[a],
-    itemStyle:{borderColor:SURF,borderWidth:1,
-      borderRadius:i===arr.length-1?[0,4,4,0]:0},
-    data:orgs.map(o=>o[k])}))
-});
+  function renderKpis(){
+    const k = M.kpi, d = k.prev ? Math.round(100 * (k.cur - k.prev) / k.prev) : 0;
+    const cards = [
+      ['실적 누적 MW', `${nf(k.total)} <small>MW</small>`, `${M.yms[0]} ~ ${ASOF} · 계획 ${nf(Math.round(Object.values(M.planMonthly).reduce((s,a)=>s+a.reduce((x,y)=>x+y,0),0)))} MW 별도`, null],
+      ['기준월 투입', `${nf(k.cur)} <small>MW</small>`, `<span class="tr ${d>=0?'up':'down'}" style="margin:0 6px 0 0">${d>=0?'▲':'▼'} ${Math.abs(d)}%</span>${ASOF} · 전월 ${nf(k.prev)} MW`, null],
+      ['활동 연구원', `${nf(k.activePeople)} <small>명</small>`, `최근 12개월 기록 인원 · 전체 ${nf(k.peopleN)}명`, null],
+      ['기준월 미입력', `${nf(k.missing)} <small>명</small>`, `활동 인원 중 ${ASOF} MW 없음 · 클릭 시 목록`, () => { missingOnly = true; $('pplMissing').checked = true; renderPeople(); $('pplTable').scrollIntoView({behavior:'smooth', block:'start'}); }],
+      ['인당 연환산 MW', `${nf(k.perPersonYear)} <small>MW/년</small>`, `최근 12개월 ÷ 활동 인원 · 적정 상한 ${CAP} MW의 ${Math.round(100*k.perPersonYear/CAP)}%`, null],
+    ];
+    $('mwKpis').innerHTML = cards.map(([t,v,s,fn],i)=>`<div class="card${fn?' mw-kpi':''}" ${fn?`data-i="${i}" role="button" tabindex="0"`:''}><div class="sub" style="margin:0 0 2px">${t}</div>
+      <div class="stat">${v}</div><div class="legend-note">${s}</div></div>`).join('');
+    $('mwKpis').onclick = e => { const c = e.target.closest('.mw-kpi'); if(c) cards[+c.dataset.i][3](); };
+  }
 
-mk('heatmap', {
-  tooltip:tip({formatter:p=>`${M.heatOrgs[p.value[0]]} · ${M.heatYms[p.value[1]]}<br><b>${nf(p.value[2])}</b> MW`}),
-  grid:{left:120,right:14,top:10,bottom:70},
-  xAxis:axisX({type:'category',data:M.heatYms,axisLabel:{rotate:45,fontSize:10,color:INK3}}),
-  yAxis:axisX({type:'category',data:M.heatOrgs,axisLabel:{fontSize:11}}),
-  visualMap:{min:0,max:Math.max(...M.heatmap.map(h=>h[2])),orient:'horizontal',
-    left:'center',bottom:0,itemWidth:10,itemHeight:90,text:['많음','적음'],
-    textStyle:{fontSize:10,color:INK3},
-    inRange:{color:['#eef3fa','#bcd3ee','#6ea3dd','#2a78d6','#174a86']}},
-  series:[{type:'heatmap',data:M.heatmap.map(h=>[h[1],h[0],h[2]]),
-    itemStyle:{borderColor:SURF,borderWidth:1}}]
-});
+  function renderTrend(){
+    const n = 24, yms = M.yms.slice(-n), plan = M.planYms, x = yms.concat(plan);
+    const idx0 = M.yms.length - n;
+    const o = org ? orgOf(org) : null;
+    $('mwTrendScope').textContent = '— ' + (org || '전사');
+    const actual = a => (o ? null : M.monthly[a].slice(-n));
+    const totalAt = i => o ? o.monthly[i] : [1,3,4].reduce((s,a)=>s+M.monthly[a][i],0);
+    const planTotal = plan.map((_,i) => o ? o.plan[i] : [1,3,4].reduce((s,a)=>s+M.planMonthly[a][i],0));
+    const yoy = x.map(ym => { const j = M.yms.indexOf(String(+ym.slice(0,4) - 1) + ym.slice(4)); return j >= 0 ? Math.round(totalAt(j)*10)/10 : null; });
+    const series = o
+      ? [{name:o.org, type:'bar', barMaxWidth:18, stack:'m', data: yms.map((_,i)=>o.monthly[idx0+i]), itemStyle:{color:C[1], borderRadius:[3,3,0,0]}}]
+      : [[1,'1'],[3,'3'],[4,'4']].map(([a,k]) => ({name:ACT[a], type:'bar', stack:'m', barMaxWidth:18, data: actual(k).concat(plan.map(()=>null)), itemStyle:{color:C[a]}}));
+    series.push({name:'계획', type:'bar', stack:'m', barMaxWidth:18, data: yms.map(()=>null).concat(planTotal), itemStyle:{color:'#9fb9dc', opacity:.55, borderColor:'#2a78d6', borderWidth:1, borderType:'dashed', borderRadius:[3,3,0,0]}});
+    series.push({name:'전년 동월', type:'line', data: yoy, smooth:.2, symbol:'circle', symbolSize:4, lineStyle:{type:'dashed', width:1.6, color:INK2}, itemStyle:{color:INK2}, z:5,
+      markLine:{silent:true, symbol:'none', lineStyle:{type:'dotted', color:INK3}, label:{formatter:'기준월', fontSize:10, color:INK3}, data:[{xAxis: yms.length - 0.5}]}});
+    const opt = {
+      tooltip: tip({trigger:'axis', axisPointer:{type:'shadow'}, formatter: ps => `${ps[0].axisValue}${plan.includes(ps[0].axisValue)?' (계획)':''}<br>` + ps.filter(p=>p.value!=null).map(p=>`${p.marker}${p.seriesName} <b>${nf(p.value)}</b> MW`).join('<br>')}),
+      legend:{top:0, right:0, itemWidth:12, itemHeight:8, textStyle:{fontSize:11, color:INK2}},
+      grid:{left:52, right:16, top:30, bottom:28},
+      xAxis: axisX({type:'category', data:x, axisLabel:{fontSize:10, color:INK3, interval:2, formatter:v=>v.slice(2).replace('-','.')}}),
+      yAxis: axisY({type:'value', name:'MW', nameTextStyle:{color:INK3}}),
+      series,
+    };
+    trend = trend ? (trend.setOption(opt, {replaceMerge:['series']}), trend) : mk('mwTrend', opt);
+  }
 
-const tbody = document.querySelector('#pplTable tbody');
-function loadPill(p){
-  const yearly = p.total/3.7;
-  if(yearly>57) return '<span class="pill r">과부하</span>';
-  if(yearly<15) return '<span class="pill y">저부하</span>';
-  return '<span class="pill g">적정</span>';
-}
-function renderPeople(q){
-  const rows = M.people.filter(p=>!q || p.name.includes(q) || p.org.includes(q));
-  tbody.innerHTML = rows.map(p=>`<tr><td>${p.name}</td><td>${p.org}</td>
-    <td class="num">${nf(p.a1)}</td><td class="num">${nf(p.a3)}</td><td class="num">${nf(p.a4)}</td>
-    <td class="num"><b>${nf(p.total)}</b></td><td class="num">${p.projects}</td>
-    <td>${loadPill(p)}</td></tr>`).join('');
-}
-renderPeople('');
-document.getElementById('pplSearch').addEventListener('input', e=>renderPeople(e.target.value.trim()));
+  function renderOrgs(){
+    const maxPP = Math.max(CAP, ...M.orgs.map(o=>o.perPerson));
+    document.querySelector('#mwOrgCmp tbody').innerHTML = M.orgs.map(o => `<tr data-org="${esc(o.org)}" class="${org===o.org?'on':''}" tabindex="0">
+      <td>${esc(o.org)}</td><td class="num">${o.active}<span style="color:var(--text-3)"> / ${o.people}</span></td><td class="num">${nf(Math.round(o.recent12))}</td>
+      <td>${bar(o.perPerson, maxPP, CAP, o.perPerson >= CAP*1.2 ? 'bad' : o.perPerson >= CAP ? 'warn' : '')}</td>
+      <td class="num">${o.stratPct}%</td><td class="num"><span class="yoy ${o.yoy==null?'':o.yoy>=0?'up':'down'}">${o.yoy==null?'−':(o.yoy>=0?'▲ ':'▼ ')+Math.abs(o.yoy)+'%'}</span></td>
+      <td class="num">${o.missing ? `<span class="pill y">${o.missing}명</span>` : '<span class="pill g">0</span>'}</td></tr>`).join('');
+  }
+  function setOrg(o){ org = org === o ? null : o; if($('pplOrg')) $('pplOrg').value = org || ''; renderOrgs(); renderTrend(); renderProjects(); renderPeople(); }
+
+  function renderHeat(){
+    const rowRange = M.heatOrgs.map((_, oi) => { const vs = M.heatmap.filter(h => h[0] === oi).map(h => h[2]); const lo = Math.min(...vs), hi = Math.max(...vs); return [lo, Math.max(1e-9, hi - lo)]; });
+    const data = M.heatmap.map(h => [h[1], h[0], heatMode === 'norm' ? Math.round(100 * (h[2] - rowRange[h[0]][0]) / rowRange[h[0]][1]) : h[2], h[2]]);
+    $('heatSub').textContent = heatMode === 'norm' ? '최근 24개월 실적 · 셀 = 조직별 최소~최대 월 사이 위치 % (조직 규모 효과 제거, 월간 변동 강조)' : '최근 24개월 실적 · 진한 셀 = 투입 집중 (절대 MW)';
+    const opt = {
+      tooltip: tip({formatter: p => `${M.heatOrgs[p.value[1]]} · ${M.heatYms[p.value[0]]}<br><b>${nf(p.value[3])}</b> MW${heatMode==='norm'?` · 조직 내 상대 위치 ${p.value[2]}%`:''}`}),
+      grid:{left:120, right:14, top:10, bottom:64},
+      xAxis: axisX({type:'category', data:M.heatYms, axisLabel:{fontSize:10, color:INK3, interval:1, formatter:v=>v.slice(2).replace('-','.')}}),
+      yAxis: axisX({type:'category', data:M.heatOrgs, axisLabel:{fontSize:11}}),
+      visualMap:{min:0, max: heatMode === 'norm' ? 100 : Math.max(...M.heatmap.map(h=>h[2])), orient:'horizontal', left:'center', bottom:0, itemWidth:10, itemHeight:90, text:['많음','적음'], textStyle:{fontSize:10, color:INK3}, inRange:{color:['#eef3fa','#bcd3ee','#6ea3dd','#2a78d6','#174a86']}},
+      series:[{type:'heatmap', data, itemStyle:{borderColor:SURF, borderWidth:1}}],
+    };
+    heat = heat ? (heat.setOption(opt, {replaceMerge:['series','visualMap']}), heat) : mk('heatmap', opt);
+  }
+
+  function renderProjects(){
+    const rows = (org ? M.projects.filter(p => p.org === org) : M.projects).slice(0, 12);
+    $('mwProjScope').textContent = '— ' + (org ? org + ' 투입 상위' : '투입 상위 과제');
+    document.querySelector('#mwProj tbody').innerHTML = rows.map(p => `<tr>
+      <td><a class="code" data-act="${p.act}">${esc(p.code || '(코드 없음)')}</a></td><td>${esc(p.name)}</td><td style="white-space:nowrap">${esc(p.org)}</td>
+      <td class="num"><b>${nf(p.mw)}</b></td><td class="num">${p.people}</td>
+      <td>${bar(p.topShare, 100, 50, p.topShare >= 50 ? 'bad' : '')}${p.topShare >= 50 ? ' <span class="pill r">인원 집중</span>' : ''}</td></tr>`).join('')
+      || '<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:16px">해당 조직의 실적 과제 없음</td></tr>';
+  }
+
+  function renderPeople(){
+    const cmp = (a, b) => { const x = a[sortK], y = b[sortK]; const r = typeof x === 'string' ? x.localeCompare(y, 'ko') : (x - y); return sortAsc ? r : -r; };
+    const rows = M.people.filter(p => (!org || p.org === org) && (!missingOnly || (p.active && p.cur <= 0)) && (!q || p.name.includes(q) || p.org.includes(q))).sort(cmp);
+    $('pplSub').innerHTML = `${nf(rows.length)}명 표시${org ? ` · ${esc(org)}` : ''}${missingOnly ? ` · ${ASOF} 미입력만` : ''} · 부하율 = 연환산 MW(누적 ÷ 기록 개월 × 12) ÷ 적정 상한 ${CAP} MW · 과부하 ≥120% · 저부하 <40% · 행 클릭 → My Dashboard`;
+    document.querySelectorAll('#pplTable th[data-k]').forEach(th => { th.classList.toggle('sorted', th.dataset.k === sortK); th.classList.toggle('asc', th.dataset.k === sortK && sortAsc); });
+    document.querySelector('#pplTable tbody').innerHTML = rows.slice(0, 300).map(p => `<tr data-n="${esc(p.name)}" tabindex="0"><td class="name">${esc(p.name)}</td><td>${esc(p.org)}</td>
+      <td class="num">${nf(p.a1)}</td><td class="num">${nf(p.a3)}</td><td class="num">${nf(p.a4)}</td>
+      <td class="num"><b>${nf(p.total)}</b></td><td class="num">${p.months}<span style="color:var(--text-3);font-size:11px"> (${p.first.slice(2)}~)</span></td>
+      <td class="num">${nf(p.annual)}</td><td>${loadPill(p)}<span style="color:var(--text-3);font-size:11px;margin-left:4px">${p.load}%</span></td>
+      <td class="num">${p.cur > 0 ? nf(p.cur) : (p.active ? '<span class="pill y">미입력</span>' : '−')}</td><td class="num">${p.projects}</td></tr>`).join('')
+      + (rows.length > 300 ? `<tr><td colspan="11" style="text-align:center;color:var(--text-3)">상위 300명까지 표시 — 검색·필터로 좁혀 주세요</td></tr>` : '');
+  }
+
+  function init(){
+    renderKpis(); renderTrend(); renderOrgs(); renderHeat(); renderProjects();
+    $('pplOrg').innerHTML = '<option value="">전체 조직</option>' + M.orgs.map(o => `<option value="${esc(o.org)}">${esc(o.org)}</option>`).join('');
+    renderPeople();
+    document.querySelector('#mwOrgCmp tbody').addEventListener('click', e => { const tr = e.target.closest('tr[data-org]'); if(tr) setOrg(tr.dataset.org); });
+    document.querySelector('#mwOrgCmp tbody').addEventListener('keydown', e => { const tr = e.target.closest('tr[data-org]'); if(tr && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); setOrg(tr.dataset.org); } });
+    $('heatMode').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if(!b) return; heatMode = b.dataset.mode; $('heatMode').querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderHeat(); });
+    document.querySelector('#mwProj tbody').addEventListener('click', e => { const a = e.target.closest('a.code'); if(a) go('act', +a.dataset.act); });
+    $('pplOrg').addEventListener('change', e => { org = e.target.value || null; renderOrgs(); renderTrend(); renderProjects(); renderPeople(); });
+    $('pplMissing').addEventListener('change', e => { missingOnly = e.target.checked; renderPeople(); });
+    $('pplSearch').addEventListener('input', e => { q = e.target.value.trim(); renderPeople(); });
+    document.querySelector('#pplTable thead').addEventListener('click', e => { const th = e.target.closest('th[data-k]'); if(!th) return; if(sortK === th.dataset.k) sortAsc = !sortAsc; else { sortK = th.dataset.k; sortAsc = th.dataset.k === 'name' || th.dataset.k === 'org'; } renderPeople(); });
+    const open = tr => { if(tr && typeof MY !== 'undefined'){ MY.select(tr.dataset.n); go('my'); } };
+    document.querySelector('#pplTable tbody').addEventListener('click', e => open(e.target.closest('tr[data-n]')));
+    document.querySelector('#pplTable tbody').addEventListener('keydown', e => { const tr = e.target.closest('tr[data-n]'); if(tr && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); open(tr); } });
+  }
+  return {init, setOrg, get org(){ return org; }};
+})();
 
 /* ── 장기성과 page ── */
 const L = D.longterm;
@@ -2125,6 +2247,7 @@ document.querySelector('#prTable tbody').innerHTML = PRD.list.map(r=>
 
 /* ══════════ 시뮬레이터 탭 ══════════ */
 const SIM = D.sim;
+document.querySelectorAll('#p-sim .simCap').forEach(el => el.textContent = SIM.capPerPerson);
 document.getElementById('simSub').textContent =
   `최근 6개월(${SIM.window[0]} ~ ${SIM.window[1]}) 실적 기반 · 가용 기준 ${SIM.capPerPerson} MW/월·인 · 설계서 5.1 ④`;
 const simOrgSel = document.getElementById('simOrg');
@@ -2140,7 +2263,7 @@ function runSim(){
   const slack = o.cap - o.avgMonthly;
   document.getElementById('simKpis').innerHTML =
     kpiCard('조직 인원', o.people+' <small>명</small>', orgName)+
-    kpiCard('가용 MW/월', nf(o.cap)+' <small>MW</small>','인원 × 4.3')+
+    kpiCard('가용 MW/월', nf(o.cap)+' <small>MW</small>','인원 × '+SIM.capPerPerson)+
     kpiCard('현재 투입 MW/월', nf(o.avgMonthly)+' <small>MW</small>','최근 6개월 평균')+
     kpiCard('잔여 여력', nf(Math.round(slack*10)/10)+' <small>MW/월</small>',
       slack>=need?'✓ 신규 수용 가능':'⚠ 여력 부족');
@@ -2635,6 +2758,7 @@ mySel.value = `${myDefault} · ${ME.people[myDefault].o}`;
 const MY = {
   init(){ renderMe(myDefault); },
   refreshRegs(){ if(myCurrent) { const r = GX.map[myCurrent]; renderTodo(r); renderProjects(r); renderQuests(r); renderTimeline(r); } },
+  select(name){ if(!GX.map[name]) return; mySel.value = `${name} · ${ME.people[name].o}`; renderMe(name); },
 };
 
 /* ══════════ 성과 플랫폼 탭 (P-1 목업) ══════════ */
@@ -4343,6 +4467,7 @@ CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변�
 CTO.init();   // Executive(연구원장) — 구조 관점
 INST.init();  // Executive(연구소장) — 조직 실행 관점
 MY.init();    // My Dashboard — 성과 플랫폼 원장(등록·후보) 연결 후 렌더
+MWV.init();   // MW 분석 — 계획 분리·조직 필터·연구원 표 (행 클릭 → MY.select)
 HM.init();    // 홈 종합현황 — 모든 모듈 초기화 후 (등록 원장·역효과·승인 상태 참조)
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */

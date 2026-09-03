@@ -87,7 +87,15 @@ a6 = read_csv("a6_promotion.csv")
 # ─────────────────────────── a2: Man Week ───────────────────────────
 MONTH_COLS = [f"{m}월" for m in range(1, 13)]
 mw_monthly_act = defaultdict(lambda: defaultdict(float))   # ym -> act -> mw
-mw_org_act = defaultdict(lambda: defaultdict(float))       # org -> act -> mw
+CAP_MW_YEAR = 44                                            # 인당 적정 투입 상한 (MW/년) — MW 분석·시뮬레이터 공통
+CAP_MW_MONTH = round(CAP_MW_YEAR / 12, 2)                   # 3.67 MW/월
+ASOF_YM = f"{TODAY.year}-{TODAY.month:02d}"                 # 기준 월 — 이후 월은 계획(plan)으로 분리
+mw_org_act = defaultdict(lambda: defaultdict(float))       # org -> act -> mw (실적)
+mw_monthly_plan = defaultdict(lambda: defaultdict(float))  # ym(>기준월) -> act -> 계획 mw
+mw_org_ym_plan = defaultdict(lambda: defaultdict(float))   # org -> ym(>기준월) -> 계획 mw
+proj_people = defaultdict(set)                             # 과제코드 -> 연구원 집합 (실적)
+proj_org = defaultdict(lambda: defaultdict(float))         # 과제코드 -> org -> 실적 mw
+proj_person_mw = defaultdict(lambda: defaultdict(float))   # 과제코드 -> 연구원 -> 실적 mw
 mw_org_ym = defaultdict(lambda: defaultdict(float))        # org -> ym -> mw
 person = {}                                                # name -> dict
 person_projects = defaultdict(set)
@@ -119,12 +127,19 @@ for r in a2:
         if v <= 0:
             continue
         ym = f"{year}-{i:02d}"
+        if ym > ASOF_YM:                      # 계획 월: 실적 집계에서 분리
+            mw_monthly_plan[ym][act] += v
+            mw_org_ym_plan[org][ym] += v
+            continue
         mw_monthly_act[ym][act] += v
         mw_org_ym[org][ym] += v
         person_ym[name][ym] += v
         total += v
     if total <= 0:
         continue
+    proj_people[r["과제코드"]].add(name)
+    proj_org[r["과제코드"]][org] += total
+    proj_person_mw[r["과제코드"]][name] += total
     mw_org_act[org][act] += total
     p = person.setdefault(name, {"name": name, "org": org, "acts": defaultdict(float), "total": 0.0})
     p["acts"][act] += total
@@ -151,13 +166,37 @@ latest_year_mw = year_totals[latest_year]
 latest_year_people = {r["연구원성명"] for r in a2 if r.get("연도구분", "").strip() == latest_year
                       and any(money(r.get(c, "")) > 0 for c in MONTH_COLS)}
 
-people_rows = sorted(person.values(), key=lambda p: -p["total"])[:80]
-people_table = [{
-    "name": p["name"], "org": p["org"],
-    "a1": round(p["acts"].get(1, 0), 1), "a3": round(p["acts"].get(3, 0), 1),
-    "a4": round(p["acts"].get(4, 0), 1), "total": round(p["total"], 1),
-    "projects": len(person_projects[p["name"]]),
-} for p in people_rows]
+def _ym_add(ym, k):
+    y, m = int(ym[:4]), int(ym[5:7]) + k
+    while m <= 0:
+        m += 12; y -= 1
+    while m > 12:
+        m -= 12; y += 1
+    return f"{y}-{m:02d}"
+def _months_between(a, b):   # a <= b, 양 끝 포함 개월 수
+    return (int(b[:4]) - int(a[:4])) * 12 + int(b[5:7]) - int(a[5:7]) + 1
+LAST12 = [_ym_add(ASOF_YM, -k) for k in range(11, -1, -1)]
+PREV12 = [_ym_add(ASOF_YM, -k) for k in range(23, 11, -1)]
+people_rows = sorted(person.values(), key=lambda p: -p["total"])
+people_table = []
+for p in people_rows:
+    nm = p["name"]
+    yk = sorted(k for k, v in person_ym[nm].items() if v > 0)
+    first, last = yk[0], yk[-1]
+    months = _months_between(first, last)                     # 재직(기록) 개월 — 첫 기록 ~ 마지막 기록
+    annual = p["total"] / months * 12
+    recent12 = sum(person_ym[nm].get(ym, 0) for ym in LAST12)
+    people_table.append({
+        "name": nm, "org": p["org"],
+        "a1": round(p["acts"].get(1, 0), 1), "a3": round(p["acts"].get(3, 0), 1),
+        "a4": round(p["acts"].get(4, 0), 1), "total": round(p["total"], 1),
+        "projects": len(person_projects[nm]),
+        "first": first, "last": last, "months": months,
+        "annual": round(annual, 1), "load": round(100 * annual / CAP_MW_YEAR),
+        "recent12": round(recent12, 1),
+        "cur": round(person_ym[nm].get(ASOF_YM, 0), 1),
+        "active": last >= LAST12[0],                          # 최근 12개월 내 기록 있음
+    })
 
 orgs_sorted = sorted(mw_org_act.keys(), key=lambda o: -sum(mw_org_act[o].values()))
 org_stack = [{"org": o,
@@ -606,12 +645,12 @@ for o in orgs_sorted:
     if not ppl:
         continue
     sim_orgs.append({"org": o, "people": len(ppl), "avgMonthly": round(avg_m, 1),
-                     "cap": round(len(ppl) * 4.3, 1)})
+                     "cap": round(len(ppl) * CAP_MW_MONTH, 1)})
 sim_people = []
 for name, p in person.items():
     avg6 = sum(person_ym[name].get(ym, 0) for ym in SIM_WINDOW) / len(SIM_WINDOW)
     sim_people.append({"n": name, "o": p["org"], "a": round(avg6, 2)})
-sim = {"window": [SIM_WINDOW[0], SIM_WINDOW[-1]], "capPerPerson": 4.3,
+sim = {"window": [SIM_WINDOW[0], SIM_WINDOW[-1]], "capPerPerson": CAP_MW_MONTH, "capYear": CAP_MW_YEAR,
        "orgs": sim_orgs, "people": sim_people}
 
 detail = {"strategy": strategy_detail, "explore": explore_detail,
@@ -1421,10 +1460,59 @@ perf = {
     },
 }
 
+# ── MW 분석: 조직 비교(최근 12개월 정규화)·과제 집중도·계획 시계열 ──
+org_people = defaultdict(list)
+for pt in people_table:
+    org_people[pt["org"]].append(pt)
+org_cmp = []
+for o in orgs_sorted:
+    ppl = org_people.get(o, [])
+    active = [pt for pt in ppl if pt["active"]]
+    r12 = sum(mw_org_ym[o].get(ym, 0) for ym in LAST12)
+    p12 = sum(mw_org_ym[o].get(ym, 0) for ym in PREV12)
+    tot = sum(mw_org_act[o].values())
+    org_cmp.append({
+        "org": o, "people": len(ppl), "active": len(active),
+        "a1": round(mw_org_act[o].get(1, 0), 1), "a3": round(mw_org_act[o].get(3, 0), 1),
+        "a4": round(mw_org_act[o].get(4, 0), 1), "total": round(tot, 1),
+        "recent12": round(r12, 1), "prev12": round(p12, 1),
+        "yoy": round(100 * (r12 - p12) / p12) if p12 else None,
+        "perPerson": round(r12 / len(active), 1) if active else 0,
+        "stratPct": round(100 * mw_org_act[o].get(1, 0) / tot) if tot else 0,
+        "missing": sum(1 for pt in active if pt["cur"] <= 0),
+        "monthly": [round(mw_org_ym[o].get(ym, 0), 1) for ym in yms],
+        "plan": [round(mw_org_ym_plan[o].get(ym, 0), 1) for ym in sorted(mw_monthly_plan)[:12]],
+    })
+plan_yms = sorted(mw_monthly_plan)[:12]
+proj_conc = []
+for code, ppl in proj_people.items():
+    mw = proj_mw_total[code]
+    if mw <= 0:
+        continue
+    top_name, top_mw = max(proj_person_mw[code].items(), key=lambda x: x[1])
+    org_main = max(proj_org[code].items(), key=lambda x: x[1])[0]
+    proj_conc.append({"code": code, "name": short(proj_name_map.get(code, code), 34), "org": org_main,
+                      "act": classify(code), "mw": round(mw, 1), "people": len(ppl),
+                      "topShare": round(100 * top_mw / mw), "top": top_name,
+                      "status": a3_status.get(code, "-")})
+proj_conc.sort(key=lambda x: -x["mw"])
+active_people = [pt for pt in people_table if pt["active"]]
+recent12_total = sum(sum(mw_monthly_act[ym].values()) for ym in LAST12)
+cur_total = sum(mw_monthly_act[ASOF_YM].values())
+prev_total = sum(mw_monthly_act[_ym_add(ASOF_YM, -1)].values())
 mwpage = {
-    "orgStack": org_stack,
+    "asOfYm": ASOF_YM, "capYear": CAP_MW_YEAR, "capMonth": CAP_MW_MONTH,
+    "yms": yms, "monthly": {str(a): [round(mw_monthly_act[ym].get(a, 0), 1) for ym in yms] for a in (1, 3, 4)},
+    "planYms": plan_yms, "planMonthly": {str(a): [round(mw_monthly_plan[ym].get(a, 0), 1) for ym in plan_yms] for a in (1, 3, 4)},
+    "orgStack": org_stack, "orgs": org_cmp,
     "heatOrgs": heat_orgs, "heatYms": heat_yms, "heatmap": heatmap,
+    "projects": proj_conc[:15],
     "people": people_table,
+    "kpi": {"total": round(sum(act_mw_total.values())), "recent12": round(recent12_total),
+            "cur": round(cur_total, 1), "prev": round(prev_total, 1),
+            "activePeople": len(active_people), "peopleN": len(person),
+            "missing": sum(1 for pt in active_people if pt["cur"] <= 0),
+            "perPersonYear": round(recent12_total / max(1, len(active_people)), 1)},
     "latestYear": latest_year,
     "personYearAvg": home["balance"]["mwPerPerson"],
     "peopleN": len(person),
