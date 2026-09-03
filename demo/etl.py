@@ -289,7 +289,7 @@ for r in a1:
         "useDept": r["활용부서"].split()[0] if r["활용부서"] else "미지정", "axis": axis,
         "qual": annual <= 0,
         "effect": re.split(r"[,\s]", r.get("정량효과유형", "").strip() or "기타")[0] or "기타",
-        "start": r.get("착수일", ""), "rdept": r.get("연구부서", ""),
+        "start": r.get("착수일", ""), "rdept": r.get("연구부서", ""), "end": r.get("완료일", ""), "owner": r.get("활용책임자", ""),
     })
 
 util_year_status = defaultdict(Counter)          # 차수 -> 상태 -> n
@@ -312,11 +312,14 @@ for p in completed:
     real_total = 0.0
     last_status = None
     traj = []
+    p_due = p_done = 0
     for yr in range(1, n_years + 1):
         evals_due += 1
+        p_due += 1
         if rng.random() < 0.12:            # 평가 미실시 시뮬레이션
             continue
         evals_done_n += 1
+        p_done += 1
         pu, pp = STATUS_P[yr]
         x = rng.random()
         status = "활용중" if x < pu else ("부분활용" if x < pu + pp else "미활용")
@@ -349,8 +352,10 @@ for p in completed:
             "exp": eok(exp_total), "real": eok(real_total),
             "achv": round(100 * real_total / exp_total),
             "cost": eok(p["cost"]), "status": last_status or "미평가", "traj": traj, "act": classify(p["code"]),
-            "effect": p.get("effect", "기타"),
+            "effect": p.get("effect", "기타"), "lab": (p.get("rdept") or "기타").split()[0] if p.get("rdept") else "기타",
+            "evalDue": p_due, "evalDone": p_done,
         })
+    p["_evalDue"], p["_evalDone"] = p_due, p_done
 
 tracked = [p for p in completed if CUR_YEAR - p["cy"] >= 1]
 latest_status = Counter()
@@ -960,6 +965,7 @@ for p, eff in picked:
         "erosionName": ero_pair[0] if ero_pair else "해당 역효과 없음",
         "dept": p["useDept"], "slaDay": prng.randint(1, 9), "costEok": eok(p["cost"]),
         "tech": TECH_OF.get(p["code"], "기타"), "act": classify(p["code"]),
+        "lab": ((p.get("rdept") or "").split() or ["기타"])[0], "grp": ((p.get("rdept") or "").split() + ["", "미지정"])[1] or "미지정",
         "utilY1": prng.choice(["활용중", "활용중", "부분활용"]),
     })
 
@@ -1172,6 +1178,8 @@ for r, (p, eff) in zip(regs, picked):
             years.append([1, r["utilY1"], r["netEok"] if r["status"] in ("승인", "확정") else None, "1년차 실적" if r["status"] in ("승인", "확정") else "승인 전 — 산출값 미확정"])
         else:
             years.append([y, "예정", None, f"{2026+y-1}년 활용평가 예정"])
+    if any(h[0] == "보완" for h in hist):
+        r["supplementReason"] = lprng.choice(["역효과 산정 근거 미비", "입력 Key 불일치", "기여율 입증자료 부족", "스냅샷 기간 불일치"])
     c = r["contribution"]
     if c["mode"] == "DOWN":
         c["judgedAt"] = hist[0][2] if hist else reg_day.isoformat()
@@ -1200,7 +1208,7 @@ for p in sorted(completed, key=lambda x: -x["annual"]):
     r1 = a1_by_code.get(p["code"]) or {}
     eff = re.split(r"[,\s]", (r1.get("정량효과유형") or "기타").strip())[0] or "기타"
     candidates.append({"code": p["code"], "name": short(p["name"], 40), "dept": p["useDept"], "effect": eff,
-                       "annualEok": eok(p["annual"]), "costEok": eok(p["cost"]), "tech": TECH_OF.get(p["code"], "기타"), "act": classify(p["code"]), "persist": max(1, round(p["persist"])) if p["persist"] else 3,
+                       "annualEok": eok(p["annual"]), "costEok": eok(p["cost"]), "tech": TECH_OF.get(p["code"], "기타"), "act": classify(p["code"]), "lab": ((p.get("rdept") or "").split() or ["기타"])[0], "grp": ((p.get("rdept") or "").split() + ["", "미지정"])[1] or "미지정", "persist": max(1, round(p["persist"])) if p["persist"] else 3,
                        "a1Contrib": round(money(r1.get("연구기여도", "")) or 70)})
     if len(candidates) >= 40:
         break
@@ -1243,6 +1251,34 @@ cto = {
     "watchDrop": [[pr["code"], pr["name"], pr["dept"], pr["cost"], pr["exp"], "·".join(pr["traj"])] for pr in _watch_drop],
 }
 
+# ── 연구소장 Dashboard 데이터: 연구소별 전환율·활용평가 이행률, 다가오는 활용평가 일정(완료일 기준 연차 도래)
+_lab = defaultdict(lambda: {"n": 0, "exp": 0.0, "real": 0.0, "due": 0, "done": 0})
+for pr in proj_results:
+    L = _lab[pr["lab"]]; L["n"] += 1; L["exp"] += pr["exp"]; L["real"] += pr["real"]; L["due"] += pr["evalDue"]; L["done"] += pr["evalDone"]
+_sched = []
+for p in completed:
+    if not p.get("end") or p["qual"]:
+        continue
+    n_years = max(0, min(5, CUR_YEAR - p["cy"]))
+    nxt = n_years + 1
+    if nxt > min(5, max(1, round(p["persist"]))):
+        continue
+    try:
+        end = date.fromisoformat(p["end"][:10])
+    except ValueError:
+        continue
+    due = end.replace(year=end.year + nxt) if not (end.month == 2 and end.day == 29) else end.replace(year=end.year + nxt, day=28)
+    if TODAY <= due <= TODAY + timedelta(days=180):
+        rd = (p.get("rdept") or "").split()
+        _sched.append([p["code"], short(p["name"], 30), rd[0] if rd else "기타", rd[1] if len(rd) > 1 else "미지정", due.isoformat(), nxt, p.get("owner") or "미지정", p["useDept"]])
+_sched.sort(key=lambda x: x[4])
+lab = {
+    "labs": sorted(_lab, key=lambda k: -_lab[k]["n"]),
+    "byLab": {k: [v["n"], round(v["exp"], 1), round(v["real"], 1), round(100 * v["real"] / max(1e-9, v["exp"])), v["due"], v["done"]] for k, v in _lab.items()},
+    "company": {"conv": achievement, "evalRate": round(100 * evals_done_n / max(1, evals_due))},
+    "evalSchedule": _sched[:80],
+}
+
 appr_counts = Counter(r["status"] for r in regs)
 type_amounts = defaultdict(float)
 for r in regs:
@@ -1256,6 +1292,7 @@ perf = {
     "contribTable": CONTRIB_TABLE,
     "candidates": candidates,
     "cto": cto,
+    "lab": lab,
     "regs": regs,
     "approval": {
         "wait": appr_counts.get("검토", 0) + appr_counts.get("보완", 0) + appr_counts.get("등록", 0),

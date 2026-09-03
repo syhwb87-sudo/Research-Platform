@@ -1276,6 +1276,26 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
         <div class="legend-note" style="margin-top:8px">경보 기준: 전환율 40% 미만 · 상세는 <a href="#" onclick="go('act',2);return false">활동군 상세 › 장기 성과관리·확산</a></div></div>
     </div>
   </div>
+  <div class="ex-panel" id="ex-inst" hidden>
+    <div class="card" style="margin-bottom:14px;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div><h3 style="font-size:16px;margin:0">연구소장 대시보드 <span class="legend-note" style="font-weight:500">— 우리 연구소의 성과 등록·승인·실현 현황과 병목</span></h3>
+        <div class="sub" style="margin:2px 0 0">⑥ 승인·성과 원장·활용평가 데이터의 연구소 필터 뷰. 등록·승인·순재무성과는 재무실 기준, 전환율·활용평가는 a1·시뮬레이션 기준입니다.</div></div>
+      <div style="margin-left:auto"><label for="instSel" class="legend-note" style="margin-right:6px">연구소</label><select id="instSel" style="font:inherit;font-size:12.5px;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:var(--surface)"></select></div>
+    </div>
+    <div class="row" style="grid-template-columns:repeat(6,1fr)" id="instKpis"></div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>그룹별 성과 현황 <span class="legend-note">— 등록 / 대기(검토·보완) / 승인 / 확정 건수</span></h3><div class="chart short" id="instStack"></div></div>
+      <div class="card"><h3>보완·반려 사유 파레토 <span class="legend-note">— 우리 연구소 건 (P-1: 보완 요청 이력 기준)</span></h3><div class="chart short" id="instPareto"></div></div>
+    </div>
+    <div class="row" style="grid-template-columns:4fr 4fr 4fr;margin-bottom:0">
+      <div class="card"><h3>처리 지연 목록 <span class="legend-note">— SLA 잔여 3일 이하 또는 경과 10일 초과</span></h3>
+        <div class="scroll" style="max-height:260px"><table id="instDelay"><thead><tr><th>성과</th><th>상태</th><th class="num">경과</th><th class="num">SLA</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card"><h3>다가오는 활용평가 일정 <span class="legend-note">— 6개월 내 도래 차수</span></h3>
+        <div class="scroll" style="max-height:260px"><table id="instEval"><thead><tr><th>도래일</th><th>과제</th><th>차수</th><th>담당자</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card"><h3>전환율 · 이행률 벤치마크 <span class="legend-note">— 우리 연구소 vs 전사</span></h3><div class="chart short" id="instBench"></div>
+        <div id="instLead" class="legend-note" style="margin-top:6px"></div></div>
+    </div>
+  </div>
 </section>
 </main>
 <footer id="foot"></footer>
@@ -1321,7 +1341,7 @@ function syncHash(){
   if(applyingRoute) return;
   let h = '#page=' + currentPage;
   if(currentPage === 'act') h += '&activity=' + ACT_SLUG[currentAct];
-  if(currentPage === 'exec' && execView === 'lab') h += '&view=lab';
+  if(currentPage === 'exec' && execView !== 'ceo') h += '&view=' + execView;
   setHash(h);
 }
 function go(p, act){
@@ -1340,7 +1360,7 @@ function applyRoute(){
   if(!document.getElementById('p-' + page)) page = 'home';
   applyingRoute = true;
   go(page, act);
-  if(page === 'exec') goExec(['lab','cto'].includes(q.get('view')) ? 'lab' : 'ceo');   // 구 view=cto 링크 호환
+  if(page === 'exec') goExec(q.get('view') === 'inst' ? 'inst' : ['lab','cto'].includes(q.get('view')) ? 'lab' : 'ceo');   // 구 view=cto 링크 호환
   applyingRoute = false;
   syncHash();
 }
@@ -1763,12 +1783,73 @@ const CTO = (() => {
   return {init, refreshRegs: render};
 })();
 
-/* ── Executive 서브탭(CEO/연구원장) — #page=exec&view=lab */
+/* ── Executive › 연구소장 대시보드 — 조직 실행 관점. PF.regs(등록 원장)·PF.lab(연구소별 전환율·이행률·평가 일정)의 연구소 필터 뷰 */
+const INST = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const r1 = v => Math.round(v * 10) / 10, sum = (l,f) => r1(l.reduce((s,x)=>s+f(x),0));
+  const L = () => PF.lab, AS_OF = () => (D.meta && D.meta.asOf) || '2026-08-31';
+  let lab = null, stack = null, pareto = null, bench = null;
+  const days = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+  const labs = () => { const c = {}; PF.regs.forEach(r => { c[r.lab] = (c[r.lab]||0)+1; }); const fromRegs = Object.keys(c).sort((a,b)=>c[b]-c[a]); return [...new Set(fromRegs.concat(L().labs.filter(l => (L().byLab[l]||[0])[0] >= 5)))]; };
+  function render(){
+    const all = labs(); if(!lab || !all.includes(lab)) lab = all[0];
+    $('instSel').innerHTML = all.map(l => `<option value="${esc(l)}"${l===lab?' selected':''}>${esc(l)} (${PF.regs.filter(r=>r.lab===l).length}건)</option>`).join('');
+    const R = PF.regs.filter(r => r.lab === lab), fixed = R.filter(r => r.status === '확정'), appr = R.filter(r => ['승인','확정'].includes(r.status));
+    const supp = R.filter(r => r.supplementReason), reasons = {}; supp.forEach(r => { reasons[r.supplementReason] = (reasons[r.supplementReason]||0)+1; });
+    const top3 = Object.entries(reasons).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]).join(' · ');
+    const proc = R.map(r => { const h = r.lineage.approval||[]; return h.length > 1 ? days(h[0][2], h[h.length-1][2]) : null; }).filter(x => x != null);
+    const avgProc = proc.length ? r1(proc.reduce((s,x)=>s+x,0)/proc.length) : 0;
+    const LB = L().byLab[lab] || [0,0,0,0,0,0], comp = L().company;
+    const card = (t,v,s,fin) => `<div class="card cto-card" style="border-top-color:${fin?'var(--good)':'var(--border)'}"><div class="sub" style="margin:0 0 2px">${t}<span class="cto-src${fin?' fin':''}">${fin?'재무실':'a1·시뮬레이션'}</span></div><div class="stat">${v}</div><div class="legend-note">${s}</div></div>`;
+    $('instKpis').innerHTML = card('소속 성과 등록', `${R.length}<small>건</small>`, `확정 ${fixed.length} · 승인 ${appr.length-fixed.length} · 진행 ${R.length-appr.length}`, true)
+      + card('승인율', `${R.length?Math.round(appr.length/R.length*100):0}<small>%</small>`, '승인+확정 ÷ 등록', true)
+      + card('보완·반려율', `${R.length?Math.round(supp.length/R.length*100):0}<small>%</small>`, top3 ? `사유: ${top3}` : '보완 요청 없음', true)
+      + card('평균 처리기간', `${avgProc}<small>일</small>`, '등록 → 최근 단계 (SLA 10일)', true)
+      + card('소속 확정 순재무성과', `${nf(sum(fixed, r=>r.netEok))}<small>억원</small>`, `승인 포함 ${nf(sum(appr, r=>r.netEok))}억`, true)
+      + card('활용평가 이행률', `${LB[4]?Math.round(LB[5]/LB[4]*100):0}<small>%</small>`, `도래 ${LB[4]}차수 중 ${LB[5]} 실시 · 전사 ${comp.evalRate}%`);
+    /* 그룹별 스택 */
+    const grps = [...new Set(R.map(r => r.grp))], cnt = (g, st) => R.filter(r => r.grp === g && st.includes(r.status)).length;
+    const sOpt = {tooltip:tip({trigger:'axis',formatter:p=>p[0].axisValue+'<br>'+p.map(x=>`${x.seriesName}: <b>${x.value}</b>건`).join('<br>')}), legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}},
+      grid:{left:8,right:16,top:10,bottom:28,containLabel:true}, xAxis:axisX({type:'category',data:grps,axisLabel:{fontSize:10,interval:0,formatter:v=>v.length>9?v.slice(0,9)+'…':v}}), yAxis:axisY({type:'value',minInterval:1}),
+      series:[['등록',['등록'],'#a9bdef'],['대기(검토·보완)',['검토','보완'],'#eda100'],['승인',['승인'],'#4dbf95'],['확정',['확정'],'#1e8e5a']].map(([n,st,c])=>({name:n,type:'bar',stack:'s',barMaxWidth:34,itemStyle:{color:c},data:grps.map(g=>cnt(g,st))}))};
+    if(!stack) stack = mk('instStack', sOpt); else stack.setOption(sOpt, true);
+    /* 파레토 */
+    const pr = Object.entries(reasons).sort((a,b)=>b[1]-a[1]); let acc = 0; const tot = pr.reduce((s,x)=>s+x[1],0)||1;
+    const pOpt = pr.length ? {tooltip:tip({trigger:'axis'}), grid:{left:8,right:36,top:10,bottom:8,containLabel:true},
+      xAxis:axisX({type:'category',data:pr.map(x=>x[0]),axisLabel:{fontSize:10,interval:0,formatter:v=>v.length>8?v.slice(0,8)+'…':v}}),
+      yAxis:[axisY({type:'value',minInterval:1}), axisY({type:'value',max:100,axisLabel:{formatter:'{value}%'}})],
+      series:[{name:'건수',type:'bar',barMaxWidth:36,itemStyle:{color:'#eda100',borderRadius:[4,4,0,0]},data:pr.map(x=>x[1]),label:{show:true,position:'top',fontSize:10,color:INK2}},
+        {name:'누적 %',type:'line',yAxisIndex:1,symbolSize:6,itemStyle:{color:INK2},data:pr.map(x=>Math.round((acc+=x[1])/tot*100))}]}
+      : {title:{text:'보완·반려 요청 없음',left:'center',top:'middle',textStyle:{fontSize:12,color:INK3,fontWeight:500}}};
+    if(!pareto) pareto = mk('instPareto', pOpt); else pareto.setOption(pOpt, true);
+    /* 지연 목록 */
+    const delay = R.filter(r => ['등록','검토','보완'].includes(r.status)).map(r => ({r, el: days(r.lineage.registeredAt, AS_OF())})).filter(x => x.r.slaDay <= 3 || x.el > 10).sort((a,b)=>a.r.slaDay-b.r.slaDay);
+    $('instDelay').querySelector('tbody').innerHTML = delay.map(({r,el}) => `<tr><td><b>${esc(r.id)}</b><div class="legend-note">${esc(r.name.slice(0,20))}</div></td><td>${stPill(r.status)}</td><td class="num">${el}일</td><td class="num">${r.slaDay<=3?'<span class="pill r">D-'+r.slaDay+'</span>':'<span class="pill y">D-'+r.slaDay+'</span>'}</td></tr>`).join('')
+      || '<tr><td colspan="4" class="legend-note" style="padding:12px">지연 건이 없습니다.</td></tr>';
+    /* 평가 일정 */
+    const ev = L().evalSchedule.filter(e => e[2] === lab);
+    $('instEval').querySelector('tbody').innerHTML = ev.slice(0,20).map(e => `<tr><td style="white-space:nowrap">${esc(e[4])}</td><td>${esc(e[1])}<div class="legend-note">${esc(e[0])} · ${esc(e[3])}</div></td><td class="num">${e[5]}년차</td><td>${esc(e[6])}<div class="legend-note">${esc(e[7])}</div></td></tr>`).join('')
+      || '<tr><td colspan="4" class="legend-note" style="padding:12px">6개월 내 도래하는 평가가 없습니다.</td></tr>';
+    /* 벤치마크 */
+    const bOpt = {tooltip:tip({trigger:'axis',formatter:p=>p.map(x=>`${x.seriesName}: <b>${x.value}%</b>`).join('<br>')}), legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}},
+      grid:{left:8,right:16,top:10,bottom:28,containLabel:true}, xAxis:axisX({type:'category',data:['전환율(실현÷기대)','활용평가 이행률']}), yAxis:axisY({type:'value',max:100,axisLabel:{formatter:'{value}%'}}),
+      series:[{name:lab,type:'bar',barMaxWidth:36,itemStyle:{color:'#2a78d6',borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:INK2,formatter:'{c}%'},data:[LB[3], LB[4]?Math.round(LB[5]/LB[4]*100):0]},
+        {name:'전사',type:'bar',barMaxWidth:36,itemStyle:{color:'#c6d8f5',borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:INK2,formatter:'{c}%'},data:[comp.conv, comp.evalRate]}]};
+    if(!bench) bench = mk('instBench', bOpt); else bench.setOption(bOpt, true);
+    const lead = {}; appr.forEach(r => { lead[r.grp] = (lead[r.grp]||0) + r.netEok; });
+    $('instLead').innerHTML = '그룹별 순성과(승인·확정): ' + (Object.entries(lead).sort((a,b)=>b[1]-a[1]).map(([g,v],i)=>`${i+1}. ${esc(g)} <b>${nf(r1(v))}억</b>`).join(' · ') || '없음');
+  }
+  function init(){ $('instSel').addEventListener('change', e => { lab = e.target.value; render(); }); render(); }
+  return {init, refreshRegs: render, select(l){ lab = l; render(); }};
+})();
+
+/* ── Executive 서브탭(CEO/연구원장/연구소장) — #page=exec&view=lab|inst */
 let execView = 'ceo';
 const exNav = document.getElementById('exNav');
-exNav.innerHTML = [['ceo','CEO Dashboard · 전사 가치'],['lab','연구원장 대시보드 · 기술경영']].map(([k,t])=>`<button type="button" class="achip${k==='ceo'?' on':''}" data-v="${k}">${t}</button>`).join('');
+exNav.innerHTML = [['ceo','CEO Dashboard · 전사 가치'],['lab','연구원장 대시보드 · 기술경영'],['inst','연구소장 대시보드 · 조직 실행']].map(([k,t])=>`<button type="button" class="achip${k==='ceo'?' on':''}" data-v="${k}">${t}</button>`).join('');
 function goExec(v){
-  execView = v === 'lab' ? 'lab' : 'ceo';
+  execView = ['lab','inst'].includes(v) ? v : 'ceo';
   exNav.querySelectorAll('.achip').forEach(b=>{ const on = b.dataset.v===execView; b.classList.toggle('on', on); b.style.background = on ? 'var(--brand)' : ''; });
   document.querySelectorAll('.ex-panel').forEach(el=>el.hidden = el.id!=='ex-'+execView);
   charts.forEach(c=>c.resize());
@@ -2752,7 +2833,7 @@ const WB = (() => {
     const id = `PF-2026-${String(n).padStart(3,'0')}`, t = today(), snapId = `SNAP-${t.replace(/-/g,'')}-${String(n).padStart(3,'0')}`;
     const std = stdOf(r.type), gross = m.grossEok, ero = m.erosionEok, direct = m.directEok, net = m.netEok;
     return {id, code:p.code, name:p.name, effect:p.effect, type:r.type, status:'검토', contrib:std, persist:m.persist, grossEok:gross, erosionEok:ero, directEok:direct, netEok:net,
-      rule:r.id, ruleVer:r.ver, match:m.matched.records, period:`${m.base} / ${m.ver}`, key:r.keys.join('·'), costEok:p.costEok||0, tech:p.tech||'기타', act:p.act||1, erosionName: ero ? '재무실 조정 차감' : '해당 역효과 없음 (④ 점검 전)', dept:p.dept, slaDay:10, utilY1:'예정', userCreated:true,
+      rule:r.id, ruleVer:r.ver, match:m.matched.records, period:`${m.base} / ${m.ver}`, key:r.keys.join('·'), costEok:p.costEok||0, tech:p.tech||'기타', act:p.act||1, lab:p.lab||'기타', grp:p.grp||'미지정', erosionName: ero ? '재무실 조정 차감' : '해당 역효과 없음 (④ 점검 전)', dept:p.dept, slaDay:10, utilY1:'예정', userCreated:true,
       contribution:{mode:'STANDARD', applied:std, standard:std, effective:std, reason:'', evidence:'', a1Ref:p.a1Contrib},
       lineage:{snapshot:{id:snapId, frozenAt:`${t} ${new Date().toTimeString().slice(0,5)}`, source:r.source, records:m.matched.records, currentRecords:m.matched.records, period:`${m.base} / ${m.ver}`, samples:m.matched.samples},
         keyValues: r.keys.map(k => [k, m.keys[k], (PF.keyDict[k]||[])[0]||'']).concat([[r.periodKey, `${m.base} / ${m.ver}`, (PF.keyDict[r.periodKey]||[])[0]||'']]),
@@ -2764,7 +2845,7 @@ const WB = (() => {
   }
   function refreshOthers(){
     if(typeof renderRegsTable === 'function') renderTable();
-    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
+    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
   }
 
   /* ── 이벤트 */
@@ -3956,7 +4037,8 @@ CT.init();   // ⑤ 기여율 — 저장된 결정을 PF.regs에 반영한 뒤 �
 GR.init();   // ③ 성과 총액 — 산식 카탈로그·미리계산기
 WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연 등록 반영)
 CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변경 시 refreshRegs
-CTO.init();   // Executive(CTO) — 구조 관점
+CTO.init();   // Executive(연구원장) — 구조 관점
+INST.init();  // Executive(연구소장) — 조직 실행 관점
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
 applyingRoute = false;
