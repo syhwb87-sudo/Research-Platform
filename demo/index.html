@@ -610,6 +610,25 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #p-exec .cto-card{border-top:3px solid var(--border)} #p-exec .cto-card .stat{font-size:22px}
 #p-exec .cto-src{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:2px;background:#eef1f5;color:var(--text-2);border:1px solid var(--border)}
 #p-exec .cto-src.fin{background:#e6f4ec;color:#1a6b3a;border-color:#bfe3cc}
+/* ═════════ 홈 종합현황 (개편) ═════════ */
+#p-home .hm-kpi{cursor:pointer;border-top:3px solid var(--border);transition:box-shadow .15s}
+#p-home .hm-kpi:hover{box-shadow:0 4px 12px rgb(16 24 40 / .08)} #p-home .hm-kpi:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#p-home .hm-kpi .name{font-size:12px;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:6px}
+#p-home .hm-kpi .v1{font-size:21px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums}
+#p-home .hm-kpi .v2{font-size:12px;color:var(--text-2);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#p-home .hm-src{display:inline-block;font-size:9.5px;font-weight:700;border-radius:4px;padding:0 5px;background:#eef1f5;color:var(--text-2);border:1px solid var(--border);margin-left:auto}
+#p-home .hm-src.fin{background:#e6f4ec;color:#1a6b3a;border-color:#bfe3cc}
+#p-home .hm-tr{font-size:11px;font-weight:700;border-radius:20px;padding:0 7px}
+#p-home .hm-tr.up{background:#e6f4ec;color:var(--good)} #p-home .hm-tr.dn{background:#fdecec;color:var(--bad)} #p-home .hm-tr.flat{background:#eef1f5;color:var(--text-2)}
+#p-home .hm-legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;justify-content:center;gap:4px}
+#p-home .hm-legend li{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:5px 8px;border-radius:8px;cursor:pointer}
+#p-home .hm-legend li:hover{background:#f0f5fc} #p-home .hm-legend .sw{width:10px;height:10px;border-radius:3px;flex:none}
+#p-home .hm-legend .v{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700} #p-home .hm-legend .p{color:var(--text-3);font-size:11px;min-width:44px;text-align:right}
+#p-home .bal-item .who{display:inline-block;font-size:9.5px;font-weight:700;border-radius:4px;padding:0 5px;background:#eef1f5;color:var(--text-2);border:1px solid var(--border);margin-left:6px;vertical-align:1px}
+#p-home .bal-item .who.fin{background:#e6f4ec;color:#1a6b3a;border-color:#bfe3cc}
+#p-home .hm-todo li{cursor:pointer;border-radius:6px} #p-home .hm-todo li:hover{background:#f7f9fc}
+#p-home .hm-todo .go{margin-left:auto;color:var(--brand);font-weight:600;white-space:nowrap;padding-left:8px}
+#p-home .hm-ps{display:flex;flex-direction:column} #p-home .hm-ps .n{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1} #p-home .hm-ps .l{font-size:11px;color:var(--text-3)}
 </style>
 </head>
 <body>
@@ -630,48 +649,46 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 
 <!-- ─────────────── HOME ─────────────── -->
 <section class="page on" id="p-home">
-  <div class="row kpis" id="kpiStrip"></div>
+  <div class="row" style="grid-template-columns:repeat(6,1fr)" id="hmKpis"></div>
 
   <div class="row" style="grid-template-columns:7fr 5fr">
     <div class="card">
-      <h3>연구활동 포트폴리오
-        <span style="float:right;font-weight:500;font-size:12px">
-          렌즈 <select id="lens"><option>건수</option><option>MW</option><option>예산</option></select>
-        </span></h3>
-      <div class="sub" id="lensSub">Man Week 투입 기준 (a2) · 타일 hover 시 상세</div>
-      <div class="chart tall" id="treemap"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin:0">연구활동 포트폴리오</h3>
+        <div class="er-filters" id="hmLens" role="group" aria-label="포트폴리오 렌즈" style="margin:0 0 0 auto"></div></div>
+      <div class="sub" id="lensSub"></div>
+      <div style="display:grid;grid-template-columns:minmax(0,3fr) minmax(200px,2fr);gap:12px;align-items:stretch">
+        <div class="chart tall" id="treemap" style="height:330px"></div>
+        <ul class="hm-legend" id="hmPortList"></ul>
+      </div>
+      <div class="legend-note">타일·목록 클릭 시 활동군 상세로 이동</div>
     </div>
     <div class="card">
-      <h3>포트폴리오 균형 진단</h3>
-      <div class="sub">목표 대비 상태 · 목표값은 관리자 설정(데모 기본값)</div>
+      <h3>포트폴리오 · 성과 균형 진단</h3>
+      <div class="sub">활동 투입(a2)과 성과 파이프라인(재무실)을 함께 봅니다 · 목표값은 관리자 설정(데모 기본값)</div>
       <div id="balance"></div>
+      <div class="legend-note" style="margin-top:8px">※ 전략 : 현업 MW 비율과 탐색·혁신 MW 비중은 현업지원(a4)·탐색(N코드) MW가 원천에 집계되지 않아 표시하지 않습니다 — P-2 데이터 연동 후 복원</div>
     </div>
   </div>
 
   <div class="row" style="grid-template-columns:7fr 5fr">
     <div class="card">
-      <h3>Man Week 투입 추이</h3>
-      <div class="sub">월별 활동군 투입 MW (a2, 계획월 제외)</div>
+      <h3>Man Week 투입 추이 <span class="legend-note">— 최근 12개월 vs 전년 동월 (a2, 계획월 제외)</span></h3>
       <div class="chart" id="mwFlow"></div>
     </div>
     <div class="card">
-      <h3>장기 성과실현 요약 <span class="badge">DEMO 시뮬레이션</span></h3>
-      <div class="sub">완료과제 사후추적 (a1 + 활용평가 시뮬레이션)</div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <div class="chart short" id="achvGauge" style="width:46%"></div>
-        <div class="chart short" id="statusDonut" style="width:54%"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline">
-        <div><span class="stat" id="cumReal"></span><small style="color:var(--text-2)">누적 실현이익</small></div>
-        <a href="#" onclick="go('act',2);return false" style="font-size:12px">장기성과 대시보드 →</a>
-      </div>
+      <h3>성과 실현 요약</h3>
+      <div class="sub">주 지표는 재무실 <b>확정</b> 순재무성과(2026 월별 누적) · 장기 활용률은 활용평가 시뮬레이션(DEMO)</div>
+      <div id="hmPerfStats" style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap"></div>
+      <div class="chart short" id="hmPerfTrend" style="height:190px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:12px;font-size:12px"><a href="#" onclick="go('pp');goPp('ledger');return false">⑦ 성과 원장 →</a><a href="#" onclick="go('pp');goPp('util');return false">⑧ 장기 활용평가 →</a></div>
     </div>
   </div>
 
   <div class="row" style="grid-template-columns:1fr 1fr 1fr">
-    <div class="card"><h3>⚠ Attention Needed</h3><ul class="alist" id="attn"></ul></div>
-    <div class="card"><h3>📅 완료 임박 과제 (90일 내)</h3><ul class="alist" id="upcoming"></ul></div>
-    <div class="card"><h3>📰 최근 활동 Feed</h3><ul class="alist" id="feed"></ul></div>
+    <div class="card"><h3>할 일 <span class="legend-note">— 지금 막힌 것, 누르면 해당 화면으로</span></h3><ul class="alist hm-todo" id="attn"></ul></div>
+    <div class="card"><h3>완료 임박 과제 <span class="legend-note">— 90일 내</span></h3><ul class="alist" id="upcoming"></ul>
+      <div class="legend-note" style="margin-top:6px"><span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--act1)"></span> 전략 <span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--act3);margin-left:6px"></span> 현업 <span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--act4);margin-left:6px"></span> 탐색</div></div>
+    <div class="card"><h3>최근 활동 <span class="legend-note">— 기준일 이전 · 중복 제거</span></h3><ul class="alist" id="feed"></ul></div>
   </div>
 </section>
 
@@ -1445,102 +1462,117 @@ document.getElementById('foot').innerHTML =
   `a4 현업지원 ${nf(D.meta.rows.a4)}건 · a5 학회활동 ${nf(D.meta.rows.a5)}건 · a6 기술홍보 ${nf(D.meta.rows.a6)}건<br>`+
   `※ ${D.meta.note}`;
 
-/* ── HOME: KPI strip ── */
-document.getElementById('kpiStrip').innerHTML = D.home.cards.map(c=>`
-  <div class="card kpi" style="border-top-color:${C[c.act]}">
-    <div class="name">${ACT[c.act]}</div>
-    <div class="v1">${c.l1}</div><div class="v2">${c.l2}</div>
-    ${c.warn?`<span class="warn">⚠ ${c.warn}</span>`:''}
-  </div>`).join('');
+/* ── 홈 종합현황 — 활동(a1~a6)과 성과 플랫폼(PF.regs, 재무실 기준)을 한 화면에. 등록 원장 변경 시 refreshRegs */
+const HM = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const r1 = v => Math.round(v * 10) / 10, sum = (l,f) => r1(l.reduce((s,x)=>s+f(x),0));
+  const H = D.home, asOf = D.meta.asOf;
+  const lensSubs = {MW:'Man Week 투입 기준 (a2) — 지식자산·조직역량은 MW 미집계로 건수 렌즈에서 표시', '예산':'진행·계획 과제 연구비 기준 (a3), 억원', '건수':'활동 건수 기준 (a1~a6 전체)'};
+  let lens = '건수', tm = null, mwc = null, pf = null;
+  const trend = (cur, prev, unit='') => { if(prev == null || cur == null) return ''; const d = cur - prev; const pct = prev ? Math.round(d/Math.abs(prev)*100) : 0; const cls = Math.abs(pct) < 3 ? 'flat' : d > 0 ? 'up' : 'dn'; return `<span class="hm-tr ${cls}" title="전월 ${nf(r1(prev))}${unit}">${d>0?'▲':d<0?'▼':'—'} ${Math.abs(pct)}%</span>`; };
+  const last = (arr, k=1) => arr[arr.length - k];
 
-/* ── HOME: Treemap ── */
-const lensSubs = {MW:'Man Week 투입 기준 (a2) — 지식자산·조직역량은 MW 미집계로 건수 렌즈에서 표시',
-  '예산':'진행·계획 과제 연구비 기준 (a3), 억원','건수':'활동 건수 기준 (a1~a6 전체)'};
-const tm = mk('treemap', {});
-function drawTreemap(lens){
-  const items = D.home.portfolio[lens];
-  const total = items.reduce((s,i)=>s+i.value,0);
-  tm.setOption({
-    tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b> ${lens==='예산'?'억원':lens} · ${(100*p.value/total).toFixed(1)}%`}),
-    series:[{type:'treemap',roam:false,nodeClick:false,breadcrumb:{show:false},
-      itemStyle:{gapWidth:3,borderColor:SURF},
-      label:{fontSize:13,formatter:p=>`${p.name}\n${(100*p.value/total).toFixed(1)}%`},
-      data:items.map(i=>({name:ACT[i.act],value:Math.max(i.value,0.01),
-        itemStyle:{color:C[i.act]}}))}]
-  }, {replaceMerge:['series']});
-  document.getElementById('lensSub').textContent = lensSubs[lens];
-}
-drawTreemap('건수');
-document.getElementById('lens').addEventListener('change', e=>drawTreemap(e.target.value));
-
-/* ── HOME: 균형 진단 ── */
-const B = D.home.balance;
-const st = (ok,txtOk,txtNo)=> ok?`<span class="ok">✓ ${txtOk}</span>`:`<span class="caution">⚠ ${txtNo}</span>`;
-document.getElementById('balance').innerHTML = `
-  <div class="bal-item"><div class="lbl"><span>전략 : 현업 (MW)</span>
-    <b>${B.strategy} : ${B.support}</b></div>
-    <div class="track"><i style="width:${B.strategy}%;background:${C[1]}"></i>
-      <i style="width:${B.support}%;background:${C[3]}"></i></div>
-    <div class="legend-note">현업 과제(W코드) MW 비중이 매우 낮음 — 현업지원(a4) 활동은 MW 미집계</div></div>
-  <div class="bal-item"><div class="lbl"><span>탐색·혁신 비중 (목표 ${B.exploreTarget}%)</span>
-    <b>${B.explore}%</b></div>
-    <div class="track"><i style="width:${Math.min(100,B.explore/B.exploreTarget*100)}%;background:${C[4]}"></i></div>
-    ${st(B.explore>=B.exploreTarget,'목표 달성',`목표 대비 ${(B.exploreTarget-B.explore).toFixed(1)}%p 미달`)}</div>
-  <div class="bal-item"><div class="lbl"><span>지식자산 증감 (금년-전년)</span>
-    <b>${B.knowYoY>=0?'+':''}${B.knowYoY}건</b></div>
-    ${st(B.knowYoY>=0,'증가 추세','감소 — 원인 점검 필요')}</div>
-  <div class="bal-item"><div class="lbl"><span>인당 MW 부하 (기준연 44MW)</span>
-    <b>${B.mwPerPerson} MW</b></div>
-    <div class="track"><i style="width:${Math.min(100,B.mwPerPerson/44*100)}%;background:${C[1]}"></i></div>
-    ${st(B.mwPerPerson<=57&&B.mwPerPerson>=20,'적정 범위','범위 이탈 — 배분 점검')}</div>`;
-
-/* ── HOME: MW 추이 ── */
-mk('mwFlow', {
-  tooltip:tip({trigger:'axis'}),
-  legend:{top:0,right:0,itemWidth:12,itemHeight:8,textStyle:{color:INK2,fontSize:11}},
-  grid:{left:50,right:10,top:28,bottom:24},
-  xAxis:axisX({type:'category',data:D.home.mwYms}),
-  yAxis:axisY({type:'value',name:'MW',nameTextStyle:{color:INK3}}),
-  series:[1,3,4].map(a=>({name:ACT[a],type:'line',stack:'mw',areaStyle:{opacity:.55},
-    symbol:'none',lineStyle:{width:2},color:C[a],data:D.home.mwMonthly[a]}))
-});
-
-/* ── HOME: 장기성과 요약 ── */
-mk('achvGauge', {series:[{type:'gauge',startAngle:210,endAngle:-30,min:0,max:100,
-  radius:'95%',center:['50%','60%'],
-  progress:{show:true,width:12,itemStyle:{color:C[2]}},
-  axisLine:{lineStyle:{width:12,color:[[1,'#edf0f4']]}},
-  pointer:{show:false},axisTick:{show:false},splitLine:{show:false},axisLabel:{show:false},
-  detail:{fontSize:24,fontWeight:700,color:INK1,offsetCenter:[0,4],formatter:'{value}%'},
-  title:{show:true,offsetCenter:[0,'62%'],fontSize:11,color:INK2},
-  data:[{value:D.longterm.achievement,name:'Achievement'}]}]});
-const SS = D.longterm.statusShare, ssTotal = SS['활용중']+SS['부분활용']+SS['미활용'];
-mk('statusDonut', {
-  tooltip:tip({formatter:p=>`${p.name} <b>${nf(p.value)}건</b> (${p.percent}%)`}),
-  legend:{orient:'vertical',right:0,top:'middle',itemWidth:10,itemHeight:10,
-    textStyle:{fontSize:11,color:INK2},
-    formatter:n=>`${n} ${(100*SS[n]/ssTotal).toFixed(0)}%`},
-  series:[{type:'pie',radius:['52%','78%'],center:['32%','52%'],
-    itemStyle:{borderColor:SURF,borderWidth:2},label:{show:false},
-    data:[{name:'활용중',value:SS['활용중'],itemStyle:{color:'#1e8e5a'}},
-          {name:'부분활용',value:SS['부분활용'],itemStyle:{color:'#eda100'}},
-          {name:'미활용',value:SS['미활용'],itemStyle:{color:'#98a2b3'}}]}]});
-document.getElementById('cumReal').textContent = nf(D.longterm.cumRealized)+'억';
-
-/* ── HOME: Attention ── */
-const A = D.home.attention;
-document.getElementById('attn').innerHTML = [
-  [`현업지원 지연 ${A.delayedSupport}건`,'bad'],
-  [`활용평가 미실시 ${nf(A.evalMissed)}건 (누적)`,'warn'],
-  [`미활용 상태 과제 ${A.unusedOld}건`,'warn'],
-  [`현업지원 미결 ${D.support.open}건 진행중`,'warn'],
-].map(([t,lv])=>`<li><span class="dot" style="background:var(--${lv})"></span>${t}</li>`).join('');
-document.getElementById('upcoming').innerHTML = A.upcoming.map(u=>
-  `<li><span class="dot" style="background:${C[u.code.includes('W')?3:u.code.includes('N')?4:1]}"></span>
-   ${u.name}<span class="meta">${u.end}</span></li>`).join('') || '<li>없음</li>';
-document.getElementById('feed').innerHTML = A.feed.map(f=>
-  `<li><span class="dot" style="background:${f.t==='논문발표'?C[5]:C[6]}"></span>
-   <span>[${f.t}] ${f.s}</span><span class="meta">${f.d}</span></li>`).join('');
+  function renderKpis(){
+    const mw = H.mwMonthly, c = H.cards, R = PF.regs, fixed = R.filter(r=>r.status==='확정'), wait = R.filter(r=>['등록','검토','보완'].includes(r.status));
+    const sup = D.support, supRecv = sup.recv || [];
+    const items = [
+      {act:1, name:ACT[1], v1:c[0].l1, v2:`${c[0].l2} 누적`, tr:trend(last(mw['1']), last(mw['1'],2), ' MW'), trl:'월 MW 전월비', src:'a2·a3', go:()=>go('act',1)},
+      {act:3, name:ACT[3], v1:c[2].l1, v2:c[2].l2 + (c[2].warn?` · <span style="color:var(--bad)">⚠ ${c[2].warn}</span>`:''), tr:trend(last(supRecv), last(supRecv,2), '건'), trl:'월 접수 전월비', src:'a4', go:()=>go('act',3)},
+      {act:4, name:ACT[4], v1:c[3].l1, v2:`${c[3].l2} 누적`, tr:trend(last(mw['4']), last(mw['4'],2), ' MW'), trl:'월 MW 전월비', src:'a2', go:()=>go('act',4)},
+      {act:5, name:ACT[5], v1:c[4].l1, v2:c[4].l2, tr:trend(D.knowledge.cur, D.knowledge.prev, '건'), trl:'전년비', src:'a5', go:()=>go('act',5)},
+      {fin:true, name:'확정 순재무성과', v1:`${nf(sum(fixed,r=>r.netEok))}억`, v2:`2026 확정 ${fixed.length}건 · 승인 포함 ${nf(sum(R.filter(r=>['승인','확정'].includes(r.status)),r=>r.netEok))}억`, tr:'', src:'재무실 확정', go:()=>{go('pp');goPp('ledger');}},
+      {fin:true, name:'재무실 승인 대기', v1:`${wait.length}건`, v2:wait.length?`최소 SLA D-${Math.min(...wait.map(r=>r.slaDay))} · 보완 ${wait.filter(r=>r.status==='보완').length}건`:'대기 없음', tr:'', src:'재무실', go:()=>{go('pp');goPp('approval');}},
+    ];
+    $('hmKpis').innerHTML = items.map((it,i) => `<div class="card hm-kpi" role="button" tabindex="0" data-i="${i}" style="border-top-color:${it.fin?'var(--good)':C[it.act]}">
+      <div class="name">${esc(it.name)}<span class="hm-src${it.fin?' fin':''}">${esc(it.src)}</span></div>
+      <div class="v1">${it.v1}</div><div class="v2">${it.tr}${it.tr?`<span class="legend-note">${it.trl}</span>`:''}</div><div class="v2">${it.v2}</div></div>`).join('');
+    $('hmKpis').onclick = e => { const k = e.target.closest('.hm-kpi'); if(k) items[+k.dataset.i].go(); };
+    $('hmKpis').onkeydown = e => { const k = e.target.closest('.hm-kpi'); if(k && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); items[+k.dataset.i].go(); } };
+  }
+  function renderPortfolio(){
+    const items = H.portfolio[lens], total = items.reduce((s,i)=>s+i.value,0), unit = lens==='예산'?'억원':lens==='MW'?'MW':'건';
+    $('hmLens').innerHTML = ['건수','MW','예산'].map(l => `<button type="button" class="er-fbtn" data-lens="${l}" aria-pressed="${lens===l}">${l}</button>`).join('');
+    $('lensSub').textContent = lensSubs[lens];
+    const opt = {tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b> ${unit} · ${(100*p.value/total).toFixed(1)}%`}),
+      series:[{type:'treemap',roam:false,nodeClick:false,breadcrumb:{show:false},itemStyle:{gapWidth:3,borderColor:SURF},
+        label:{fontSize:12,formatter:p=>(p.value/total>=0.08?`${p.name}\n${(100*p.value/total).toFixed(1)}%`:'')},
+        data:items.map(i=>({name:ACT[i.act],value:Math.max(i.value,0.01),act:i.act,itemStyle:{color:C[i.act]}}))}]};
+    if(!tm){ tm = mk('treemap', opt); tm.on('click', p => { if(p.data && p.data.act) go('act', p.data.act); }); } else tm.setOption(opt, {replaceMerge:['series']});
+    $('hmPortList').innerHTML = items.slice().sort((a,b)=>b.value-a.value).map(i => `<li data-act="${i.act}" tabindex="0"><span class="sw" style="background:${C[i.act]}"></span>${esc(ACT[i.act])}<span class="v">${nf(i.value)}<small style="font-weight:500;color:var(--text-3)"> ${unit}</small></span><span class="p">${(100*i.value/total).toFixed(1)}%</span></li>`).join('');
+  }
+  function renderBalance(){
+    const B = H.balance, R = PF.regs, fixed = R.filter(r=>r.status==='확정'), gross = sum(R,r=>r.grossEok), net = sum(fixed,r=>r.netEok);
+    const open = R.filter(r=>['등록','검토','보완'].includes(r.status)), erDone = open.filter(r => { const s = typeof ErosionService!=='undefined' ? ErosionService.assessmentSummary(r.id) : null; return s && s.status==='COMPLETED'; }).length;
+    const upWait = R.filter(r => r.contribution && r.contribution.mode==='UP' && r.contribution.approval && r.contribution.approval.status==='승인대기').length;
+    const st = (ok,txtOk,txtNo)=> ok?`<span class="ok">✓ ${txtOk}</span>`:`<span class="caution">⚠ ${txtNo}</span>`;
+    $('balance').innerHTML = `
+      <div class="bal-item"><div class="lbl"><span>성과 파이프라인 (등록 총액 → 확정 순액)<span class="who fin">재무실</span></span><b>${nf(net)} / ${nf(gross)}억</b></div>
+        <div class="track"><i style="width:${gross?Math.min(100,net/gross*100):0}%;background:var(--good)"></i></div>
+        <div class="legend-note">확정 ${fixed.length}건 · 승인 대기 ${open.length}건 · 확정률 ${gross?Math.round(net/gross*100):0}% (역효과·기여율 반영 후)</div></div>
+      <div class="bal-item"><div class="lbl"><span>역효과 점검 완료율 (검토 중 건)<span class="who">④ 체크리스트</span></span><b>${open.length?Math.round(erDone/open.length*100):0}%</b></div>
+        <div class="track"><i style="width:${open.length?erDone/open.length*100:0}%;background:var(--warn)"></i></div>
+        ${st(open.length===0||erDone===open.length,'검토 중 건 점검 완료',`미작성 ${open.length-erDone}건 — 승인 전 점검 필요`)}</div>
+      <div class="bal-item"><div class="lbl"><span>기여율 상향 승인 대기<span class="who fin">재무실</span></span><b>${upWait}건</b></div>
+        ${st(upWait===0,'대기 없음','승인 전까지 표준 기여율 적용')}</div>
+      <div class="bal-item"><div class="lbl"><span>인당 MW 부하 (기준연 44MW)<span class="who">a2</span></span><b>${B.mwPerPerson} MW</b></div>
+        <div class="track"><i style="width:${Math.min(100,B.mwPerPerson/44*100)}%;background:${C[1]}"></i></div>
+        ${st(B.mwPerPerson<=57&&B.mwPerPerson>=20,'적정 범위','범위 이탈 — 배분 점검')}</div>
+      <div class="bal-item"><div class="lbl"><span>지식자산 증감 (금년−전년)<span class="who">a5</span></span><b>${B.knowYoY>=0?'+':''}${B.knowYoY}건</b></div>
+        ${st(B.knowYoY>=0,'증가 추세','감소 — 원인 점검 필요')}</div>`;
+  }
+  function renderMw(){
+    const yms = H.mwYms, tot = yms.map((_,i)=>r1((H.mwMonthly['1'][i]||0)+(H.mwMonthly['3'][i]||0)+(H.mwMonthly['4'][i]||0)));
+    const n = yms.length, idx = Array.from({length:12},(_,i)=>n-12+i).filter(i=>i>=0), labels = idx.map(i=>yms[i].slice(2).replace('-','.'));
+    const cur = idx.map(i=>tot[i]), prev = idx.map(i=> i-12>=0 ? tot[i-12] : null);
+    const opt = {tooltip:tip({trigger:'axis',formatter:p=>p[0].axisValue+'<br>'+p.map(x=>`${x.seriesName}: <b>${x.value==null?'—':nf(x.value)}</b> MW`).join('<br>')}), legend:{top:0,right:0,itemWidth:12,itemHeight:8,textStyle:{color:INK2,fontSize:11}},
+      grid:{left:50,right:10,top:28,bottom:24}, xAxis:axisX({type:'category',data:labels}), yAxis:axisY({type:'value',name:'MW',nameTextStyle:{color:INK3}}),
+      series:[{name:'최근 12개월',type:'bar',barMaxWidth:28,itemStyle:{color:C[1],borderRadius:[4,4,0,0]},data:cur},{name:'전년 동월',type:'line',symbolSize:6,itemStyle:{color:INK3},lineStyle:{type:'dashed',width:2},data:prev}]};
+    if(!mwc) mwc = mk('mwFlow', opt); else mwc.setOption(opt, true);
+  }
+  function renderPerf(){
+    const R = PF.regs, fixed = R.filter(r=>r.status==='확정'), net = sum(fixed,r=>r.netEok), LT = D.longterm;
+    $('hmPerfStats').innerHTML = `<div class="hm-ps"><span class="n" style="color:var(--brand)">${nf(net)}<small style="font-size:12px;font-weight:600">억원</small></span><span class="l">2026 확정 순재무성과 · ${fixed.length}건 <span class="hm-src fin" style="margin:0">재무실 확정</span></span></div>
+      <div class="hm-ps"><span class="n">${LT.utilRate}<small style="font-size:12px;font-weight:600">%</small></span><span class="l">장기 활용률 (${nf(LT.tracked)}건 추적) <span class="hm-src" style="margin:0">DEMO 시뮬레이션</span></span></div>
+      <div class="hm-ps"><span class="n">${LT.achievement}<small style="font-size:12px;font-weight:600">%</small></span><span class="l">전환율 (기대 대비 실현) <span class="hm-src" style="margin:0">DEMO 시뮬레이션</span></span></div>`;
+    const months = Array.from({length:8},(_,i)=>`2026-${String(i+1).padStart(2,'0')}`), fd = r => { const a=(r.lineage.approval||[]).find(x=>x[0]==='확정'); return a?a[2]:''; };
+    const byM = months.map(m => sum(fixed.filter(r=>fd(r).startsWith(m)),r=>r.netEok)); let acc=0; const cum = byM.map(v=>r1(acc+=v));
+    const opt = {tooltip:tip({trigger:'axis',formatter:p=>p.map(x=>`${x.seriesName}: <b>${nf(x.value)}억</b>`).join('<br>')}), grid:{left:8,right:12,top:8,bottom:4,containLabel:true},
+      xAxis:axisX({type:'category',data:months.map(m=>m.slice(5)+'월'),axisLabel:{fontSize:10}}), yAxis:axisY({type:'value',axisLabel:{fontSize:10}}),
+      series:[{name:'월별 확정',type:'bar',barMaxWidth:18,data:byM,itemStyle:{color:'#2a78d6',borderRadius:[3,3,0,0]}},{name:'누적',type:'line',data:cum,smooth:0.3,smoothMonotone:'x',symbolSize:5,itemStyle:{color:'#1e8e5a'},lineStyle:{width:2}}]};
+    if(!pf) pf = mk('hmPerfTrend', opt); else pf.setOption(opt, true);
+  }
+  function renderTodo(){
+    const R = PF.regs, A = H.attention, items = [];
+    const sla = R.filter(r=>['등록','검토','보완'].includes(r.status) && r.slaDay<=3).sort((a,b)=>a.slaDay-b.slaDay);
+    if(sla.length) items.push(['bad', `승인 SLA 임박 ${sla.length}건 (최소 D-${sla[0].slaDay})`, ()=>{go('pp');APV.select(sla[0].id);goPp('approval');}, '⑥ 승인']);
+    const supp = R.filter(r=>r.status==='보완'); if(supp.length) items.push(['bad', `재무실 보완 요청 ${supp.length}건 — 재제출 필요`, ()=>{go('pp');WB.openReg(supp[0]);goPp('wb');}, '① 워크벤치']);
+    const open = R.filter(r=>['등록','검토','보완'].includes(r.status)), erMiss = open.filter(r => { const s = typeof ErosionService!=='undefined' ? ErosionService.assessmentSummary(r.id) : null; return !s || s.status!=='COMPLETED'; });
+    if(erMiss.length) items.push(['warn', `역효과 체크리스트 미작성 ${erMiss.length}건`, ()=>{go('pp');ErosionView.select(erMiss[0].id);goPp('erosion');}, '④ 역효과']);
+    const up = R.filter(r=>r.contribution&&r.contribution.mode==='UP'&&r.contribution.approval&&r.contribution.approval.status==='승인대기'); if(up.length) items.push(['warn', `기여율 상향 승인 대기 ${up.length}건 (표준값 적용 중)`, ()=>{go('pp');CT.select(up[0].id);goPp('contrib');}, '⑤ 기여율']);
+    const cal = (PF.util.calendar||[]).find(c=>c[0]===new Date(asOf).getMonth()+1); if(cal && cal[2]) items.push(['warn', `이번 달 활용평가 재산출 대기 ${cal[2]}건 (완료 ${cal[1]}건)`, ()=>{go('pp');goPp('util');}, '⑧ 활용평가']);
+    if(A.delayedSupport) items.push(['warn', `현업지원 지연 ${A.delayedSupport}건 · 미결 ${D.support.open}건`, ()=>go('act',3), '활동군 상세']);
+    if(typeof WbRepo!=='undefined' && WbRepo.loadDraft()) items.push(['info', '작성 중인 신규 성과 등록 초안 1건', ()=>{go('pp');goPp('wb');}, '① 워크벤치']);
+    $('attn').innerHTML = items.length ? items.map(([lv,t,_,g],i)=>`<li data-i="${i}" tabindex="0"><span class="dot" style="background:var(--${lv==='info'?'brand':lv})"></span><span>${esc(t)}</span><span class="go">${esc(g)} →</span></li>`).join('') : '<li><span class="dot" style="background:var(--good)"></span>막힌 항목이 없습니다.</li>';
+    $('attn').onclick = e => { const li = e.target.closest('li[data-i]'); if(li) items[+li.dataset.i][2](); };
+    $('attn').onkeydown = e => { const li = e.target.closest('li[data-i]'); if(li && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); items[+li.dataset.i][2](); } };
+  }
+  function renderLists(){
+    const A = H.attention, day = s => Math.round((new Date(s) - new Date(asOf)) / 86400000);
+    $('upcoming').innerHTML = A.upcoming.map(u => { const a = u.code.includes('W')?3:(u.code.includes('N')||u.code.includes('L'))?4:1, dd = day(u.end);
+      return `<li><span class="dot" style="background:${C[a]}"></span><span>${esc(u.name)}<div class="legend-note">${esc(u.dept||'')}${u.leader?' · '+esc(u.leader):''}</div></span><span class="meta">${esc(u.end)}<br><b style="color:${dd<=14?'var(--bad)':'var(--text-2)'}">D-${dd}</b></span></li>`; }).join('') || '<li>없음</li>';
+    const seen = new Set(), feed = A.feed.filter(f => f.d && f.d <= asOf).filter(f => { const k = f.t+'|'+f.s+'|'+f.d; if(seen.has(k)) return false; seen.add(k); return true; }).sort((a,b)=>b.d.localeCompare(a.d));
+    $('feed').innerHTML = feed.map(f => `<li><span class="dot" style="background:${f.t==='논문발표'?C[5]:C[6]}"></span><span>[${esc(f.t)}] ${esc(f.s)}</span><span class="meta">${esc(f.d)}</span></li>`).join('') || '<li>기준일 이전 활동 없음</li>';
+  }
+  function render(){ renderKpis(); renderPortfolio(); renderBalance(); renderMw(); renderPerf(); renderTodo(); renderLists(); }
+  function init(){
+    $('hmLens').addEventListener('click', e => { const b = e.target.closest('[data-lens]'); if(b){ lens = b.dataset.lens; renderPortfolio(); } });
+    $('hmPortList').addEventListener('click', e => { const li = e.target.closest('li[data-act]'); if(li) go('act', +li.dataset.act); });
+    $('hmPortList').addEventListener('keydown', e => { const li = e.target.closest('li[data-act]'); if(li && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); go('act', +li.dataset.act); } });
+    render();
+  }
+  return {init, refreshRegs: () => { renderKpis(); renderBalance(); renderPerf(); renderTodo(); }};
+})();
 
 /* ── MW page ── */
 const M = D.mw;
@@ -2914,7 +2946,7 @@ const WB = (() => {
   }
   function refreshOthers(){
     if(typeof renderRegsTable === 'function') renderTable();
-    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST, typeof LG!=='undefined'&&LG, typeof RO!=='undefined'&&RO].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
+    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST, typeof LG!=='undefined'&&LG, typeof RO!=='undefined'&&RO, typeof HM!=='undefined'&&HM].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
   }
 
   /* ── 이벤트 */
@@ -4338,6 +4370,7 @@ WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연
 CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변경 시 refreshRegs
 CTO.init();   // Executive(연구원장) — 구조 관점
 INST.init();  // Executive(연구소장) — 조직 실행 관점
+HM.init();    // 홈 종합현황 — 모든 모듈 초기화 후 (등록 원장·역효과·승인 상태 참조)
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
 applyingRoute = false;
