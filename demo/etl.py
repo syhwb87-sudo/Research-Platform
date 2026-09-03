@@ -312,11 +312,13 @@ for p in completed:
     real_total = 0.0
     last_status = None
     traj = []
+    yrs = []
     p_due = p_done = 0
     for yr in range(1, n_years + 1):
         evals_due += 1
         p_due += 1
         if rng.random() < 0.12:            # 평가 미실시 시뮬레이션
+            yrs.append([yr, "미평가", None])
             continue
         evals_done_n += 1
         p_done += 1
@@ -329,11 +331,14 @@ for p in completed:
         traj.append(status)
         util_year_status[yr][status] += 1
         if p["qual"]:
+            yrs.append([yr, status, None])
             continue
         if yr > p["persist"]:
+            yrs.append([yr, status, 0.0])
             continue
         factor = {"활용중": rng.uniform(.65, 1.1), "부분활용": rng.uniform(.2, .55), "미활용": 0.0}[status]
         amt = p["annual"] * factor
+        yrs.append([yr, status, eok(amt)])
         real_total += amt
         realized_by_caly[p["cy"] + yr] += amt
         dept_realized[p["useDept"]] += amt
@@ -353,7 +358,7 @@ for p in completed:
             "achv": round(100 * real_total / exp_total),
             "cost": eok(p["cost"]), "status": last_status or "미평가", "traj": traj, "act": classify(p["code"]),
             "effect": p.get("effect", "기타"), "lab": (p.get("rdept") or "기타").split()[0] if p.get("rdept") else "기타",
-            "evalDue": p_due, "evalDone": p_done,
+            "evalDue": p_due, "evalDone": p_done, "yrs": yrs, "annualEok": eok(p["annual"]), "end": p.get("end", ""), "owner": p.get("owner", ""),
         })
     p["_evalDue"], p["_evalDone"] = p_due, p_done
 
@@ -1279,6 +1284,71 @@ lab = {
     "evalSchedule": _sched[:80],
 }
 
+# ── 장기 활용평가 Dashboard 데이터(설계서 11.6): 연차별 활용상태·실현액 → 성과상태(증가/유지/감소/종료) 파생, Sankey·매트릭스·코호트·캘린더
+def perf_state(prev, amt, status):
+    if amt is None:
+        return "미평가"
+    if status == "미활용" or amt <= 0:
+        return "종료"
+    if prev is None or prev <= 0:
+        return "증가"
+    if amt > prev * 1.05:
+        return "증가"
+    if amt < prev * 0.95:
+        return "감소"
+    return "유지"
+UTIL_ST = ["활용중", "부분활용", "미활용"]
+PERF_ST = ["증가", "유지", "감소", "종료"]
+util_projects = []
+sankey_links = Counter()
+matrix = Counter()
+cohort_curve = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0]))   # cy -> k -> [exp, real] 누적
+cal = defaultdict(lambda: {"done": 0, "wait": 0})
+for pr in proj_results:
+    prev = None
+    yrs_out = []
+    last_u = last_p = None
+    for yr, st, amt in pr["yrs"]:
+        ps = perf_state(prev, amt, st)
+        yrs_out.append([yr, st, amt, ps])
+        if amt is not None:
+            prev = amt
+        if st != "미평가":
+            last_u, last_p = st, ps
+    # Sankey: 완료 → 1년차 상태 → … (미평가는 직전 상태 유지로 간주)
+    chain = ["완료"]
+    for yr, st, amt, ps in yrs_out:
+        chain.append(f"{yr}년차 {st if st != '미평가' else '미평가'}")
+    for a, b in zip(chain, chain[1:]):
+        sankey_links[(a, b)] += 1
+    if last_u:
+        matrix[(last_u, last_p)] += 1
+    # 코호트 전환율 곡선: 완료연도별 k년차까지 누적 실현/기대
+    cum_e = cum_r = 0.0
+    for yr, st, amt, ps in yrs_out:
+        cum_e += pr["annualEok"] if yr <= 5 else 0
+        cum_r += (amt or 0)
+        cc = cohort_curve[pr["cy"]][yr]; cc[0] += cum_e; cc[1] += cum_r
+    # 2026 재산출 캘린더: 올해 도래 차수(완료월 기준) — 평가 실시 여부
+    due_yr = CUR_YEAR - pr["cy"]
+    if 1 <= due_yr <= 5 and pr.get("end"):
+        m = int(pr["end"][5:7]) if len(pr["end"]) >= 7 and pr["end"][5:7].isdigit() else 12
+        rec = next((y for y in yrs_out if y[0] == due_yr), None)
+        cal[m]["done" if rec and rec[1] != "미평가" else "wait"] += 1
+    util_projects.append({"code": pr["code"], "name": pr["name"], "lab": pr["lab"], "dept": pr["dept"], "cy": pr["cy"],
+                          "annual": pr["annualEok"], "cost": pr["cost"], "owner": pr.get("owner", ""),
+                          "years": yrs_out, "u": last_u or "미평가", "p": last_p or "미평가"})
+sankey_nodes = ["완료"] + [f"{y}년차 {s}" for y in range(1, 6) for s in UTIL_ST + ["미평가"]]
+used = {a for a, _ in sankey_links} | {b for _, b in sankey_links}
+util = {
+    "n": len(util_projects),
+    "sankey": {"nodes": [n for n in sankey_nodes if n in used], "links": [[a, b, v] for (a, b), v in sankey_links.items()]},
+    "matrix": [[u, p, matrix.get((u, p), 0)] for u in UTIL_ST for p in PERF_ST],
+    "cohortCurve": {str(cy): [[k, round(100 * v[1] / max(1e-9, v[0]))] for k, v in sorted(cohort_curve[cy].items())] for cy in sorted(cohort_curve) if cy >= CUR_YEAR - 6},
+    "calendar": [[m, cal[m]["done"], cal[m]["wait"]] for m in range(1, 13)],
+    "projects": util_projects,
+}
+
 appr_counts = Counter(r["status"] for r in regs)
 type_amounts = defaultdict(float)
 for r in regs:
@@ -1293,6 +1363,7 @@ perf = {
     "candidates": candidates,
     "cto": cto,
     "lab": lab,
+    "util": util,
     "regs": regs,
     "approval": {
         "wait": appr_counts.get("검토", 0) + appr_counts.get("보완", 0) + appr_counts.get("등록", 0),

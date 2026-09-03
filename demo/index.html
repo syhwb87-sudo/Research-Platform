@@ -1251,6 +1251,29 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
       <div style="overflow-x:auto"><table id="lgTable"><thead><tr><th>성과ID</th><th>과제</th><th>연구소</th><th>활용부서</th><th>유형</th><th class="num">성과총액</th><th class="num">역효과</th><th class="num">기여율</th><th class="num">직접비</th><th class="num">순재무성과</th><th>확정일</th><th></th></tr></thead><tbody></tbody></table></div>
     </div>
   </div>
+  <!-- ⑧ 장기 활용평가 — 연차 추적(설계서 11.6). 데이터: PF.util(etl.py, 활용평가 시뮬레이션 파생). 렌더: 스크립트 하단 UT 모듈 -->
+  <div class="ppanel" id="pp-util" hidden>
+    <div class="card" style="margin-bottom:14px;padding:10px 16px">
+      <h3 style="font-size:16px;margin:0">장기 활용평가 <span class="legend-note" style="font-weight:500">— 1~5년차 활용평가와 연차 재산출의 관제: 성과가 살아있는지, 기대 대비 실현되는지</span></h3>
+      <div class="sub" style="margin:2px 0 0">완료과제 활용평가 <b>시뮬레이션</b> 기준(DEMO). 성과상태(증가/유지/감소/종료)는 연차별 실현액 변화에서 파생: 전년 대비 +5% 초과 증가 · ±5% 이내 유지 · −5% 초과 감소 · 실현 0 또는 미활용 종료.</div>
+    </div>
+    <div class="row" style="grid-template-columns:repeat(5,1fr)" id="utKpis"></div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card"><h3>활용상태 Flow <span class="legend-note">— 완료 → 1~5년차 상태 분기 (과제 수)</span></h3><div class="chart" id="utSankey" style="height:340px"></div></div>
+      <div class="card"><h3>활용 × 성과상태 매트릭스 <span class="legend-note">— 최신 차수 · 셀 클릭 → 추적 시트 필터</span></h3><div class="chart" id="utMatrix" style="height:300px"></div>
+        <div class="legend-note">⚠ 하이라이트: 활용중인데 성과 감소·종료 — 기대와 실현이 어긋나는 과제</div></div>
+    </div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>전환율 코호트 <span class="legend-note">— 완료연도별 1~5년차 누적 실현 ÷ 누적 기대 (%)</span></h3><div class="chart short" id="utCohort"></div></div>
+      <div class="card"><h3>연차 재산출·평가 캘린더 <span class="legend-note">— 2026 월별 도래 차수 · 완료 / 대기</span></h3><div class="chart short" id="utCal"></div></div>
+    </div>
+    <div class="row" style="grid-template-columns:5fr 7fr;margin-bottom:0">
+      <div class="card"><h3>미활용·종료 사유 파레토 <span class="legend-note">— 시뮬레이션 사유</span></h3><div class="chart short" id="utPareto"></div></div>
+      <div class="card"><h3>과제별 연차 추적 시트 <span class="legend-note" id="utCount"></span></h3>
+        <div class="er-filters" id="utFil" role="group" aria-label="추적 시트 필터" style="margin-bottom:8px"></div>
+        <div class="scroll" style="max-height:300px"><div style="overflow-x:auto"><table id="utSheet"><thead><tr><th>과제</th><th>연구소</th><th class="num">기대/년</th><th>1년차</th><th>2년차</th><th>3년차</th><th>4년차</th><th>5년차</th><th>최신</th></tr></thead><tbody></tbody></table></div></div></div>
+    </div>
+  </div>
 </section>
 
 <!-- ─────────────── EXECUTIVE ─────────────── -->
@@ -2607,7 +2630,7 @@ const stPill = s => ({'확정':'<span class="pill g">확정</span>','승인':'<s
 
 /* 서브내비 */
 const PP_TABS = [['wb','① 자동산출 워크벤치'],['trace','② 산출 근거 추적'],['gross','③ 성과 총액'],
-  ['erosion','④ 역효과'],['contrib','⑤ 기여율'],['approval','⑥ 재무실 승인'],['ledger','⑦ 성과 원장']];
+  ['erosion','④ 역효과'],['contrib','⑤ 기여율'],['approval','⑥ 재무실 승인'],['ledger','⑦ 성과 원장'],['util','⑧ 장기 활용평가']];
 const ppNav = document.getElementById('ppNav');
 ppNav.innerHTML = PP_TABS.map(([k,t],i)=>
   `<button class="achip${i===0?' on':''}" data-k="${k}">${t}</button>`).join('');
@@ -4057,6 +4080,81 @@ const CT = (() => {
   return {init, refreshRegs, select(id){ const i = PF.regs.findIndex(r => r.id === id); if(i >= 0){ cur = i; render(); } }, refresh: render};
 })();
 
+/* ⑧ 장기 활용평가 — 연차 추적(설계서 11.6). PF.util(활용평가 시뮬레이션 파생: 활용상태·성과상태·코호트·캘린더) */
+const UT = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const U = () => PF.util, LT = () => D.longterm;
+  const UC = {'활용중':'#1e8e5a','부분활용':'#eda100','미활용':'#98a2b3','미평가':'#c9ced6','완료':INK3}, PC = {'증가':'#1e8e5a','유지':'#2a78d6','감소':'#eda100','종료':'#c53030','미평가':'#98a2b3'};
+  const US = ['활용중','부분활용','미활용'], PS = ['증가','유지','감소','종료'];
+  let ch = {}, fil = {u:'ALL', p:'ALL', q:''};
+  const nodeCol = n => UC[n.split(' ').pop()] || UC[n] || INK3;
+  function render(){
+    const P = U().projects, n = P.length, latest = P.filter(p => p.u !== '미평가');
+    const util = LT().utilRate;   // 장기 성과관리·확산 패널과 동일 산식(최신 차수 활용중 + 부분활용×0.5, 미평가 포함 분모)
+    const worse = P.filter(p => ['감소','종료'].includes(p.p)).length;
+    $('utKpis').innerHTML = kpiCard('추적대상 과제', `${nf(n)} <small>건</small>`, `완료 후 1년 이상 경과 · 정량효과 과제`)
+      + kpiCard('장기 활용률', `${util} <small>%</small>`, '활용중 + 부분활용×0.5 (최신 차수 · 장기 성과관리 패널과 동일)')
+      + kpiCard('전환율', `${LT().achievement} <small>%</small>`, '기대 대비 실현 (누적)')
+      + kpiCard('평가 이행률', `${LT().evalRate} <small>%</small>`, '도래 차수 대비 실시')
+      + kpiCard('성과상태 악화', `${nf(worse)} <small>건</small>`, `감소 ${P.filter(p=>p.p==='감소').length} · 종료 ${P.filter(p=>p.p==='종료').length}`);
+    /* Sankey */
+    const sk = U().sankey;
+    const sOpt = {tooltip:tip({formatter:p=>p.dataType==='edge'?`${p.data.source} → ${p.data.target}<br><b>${nf(p.data.value)}</b>건`:`<b>${p.name}</b>`}),
+      series:[{type:'sankey',left:10,right:90,top:10,bottom:10,nodeWidth:12,nodeGap:10,label:{fontSize:11,color:INK1},lineStyle:{color:'gradient',opacity:.3,curveness:.5},itemStyle:{borderWidth:0},
+        data:sk.nodes.map(nm=>({name:nm,itemStyle:{color:nodeCol(nm)}})),links:sk.links.map(([a,b,v])=>({source:a,target:b,value:v}))}]};
+    if(!ch.sk) ch.sk = mk('utSankey', sOpt); else ch.sk.setOption(sOpt, true);
+    /* 매트릭스 히트맵 */
+    const M = U().matrix, mx = Math.max(1, ...M.map(m=>m[2]));
+    const mOpt = {tooltip:tip({formatter:p=>`${US[p.value[1]]} × ${PS[p.value[0]]}<br><b>${nf(p.value[2])}</b>건`}), grid:{left:8,right:16,top:8,bottom:8,containLabel:true},
+      xAxis:axisX({type:'category',data:PS,position:'top',axisLabel:{fontSize:11,color:INK2}}), yAxis:axisY({type:'category',data:US.slice().reverse(),axisLabel:{fontSize:11}}),
+      visualMap:{show:false,min:0,max:mx,inRange:{color:['#f2f5fa','#2a78d6']}},
+      series:[{type:'heatmap',data:M.map(m=>{const ui=US.indexOf(m[0]),pi=PS.indexOf(m[1]);const warn=m[0]==='활용중'&&(m[1]==='감소'||m[1]==='종료');return {value:[pi,US.length-1-ui,m[2]],itemStyle:warn?{borderColor:'#c53030',borderWidth:3}:{}};}),
+        label:{show:true,fontSize:12,fontWeight:700,formatter:p=>{const m=M.find(x=>PS.indexOf(x[1])===p.value[0]&&US.length-1-US.indexOf(x[0])===p.value[1]);const warn=m&&m[0]==='활용중'&&(m[1]==='감소'||m[1]==='종료');return (warn&&p.value[2]?'⚠ ':'')+nf(p.value[2]);}},itemStyle:{borderColor:SURF,borderWidth:2}}]};
+    if(!ch.mx){ ch.mx = mk('utMatrix', mOpt); ch.mx.on('click', p => { const u = US[US.length-1-p.value[1]], s = PS[p.value[0]]; if(fil.u===u && fil.p===s){ fil.u='ALL'; fil.p='ALL'; } else { fil.u=u; fil.p=s; } renderSheet(); }); } else ch.mx.setOption(mOpt, true);
+    /* 코호트 곡선 */
+    const CC = U().cohortCurve, years = Object.keys(CC);
+    const cOpt = {tooltip:tip({trigger:'axis',formatter:p=>p[0].axisValue+'<br>'+p.map(x=>`${x.seriesName}년 완료: <b>${x.value==null?'—':x.value+'%'}</b>`).join('<br>')}), legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}},
+      grid:{left:8,right:16,top:12,bottom:28,containLabel:true}, xAxis:axisX({type:'category',data:['1년차','2년차','3년차','4년차','5년차']}), yAxis:axisY({type:'value',max:100,axisLabel:{formatter:'{value}%'}}),
+      series:years.map((y,i)=>({name:y,type:'line',smooth:true,symbolSize:6,lineStyle:{width:2},itemStyle:{color:['#2a78d6','#1baf7a','#eda100','#e87ba4','#eb6834','#008300','#5b6472'][i%7]},data:[1,2,3,4,5].map(k=>{const r=CC[y].find(x=>x[0]===k);return r?r[1]:null;})}))};
+    if(!ch.cc) ch.cc = mk('utCohort', cOpt); else ch.cc.setOption(cOpt, true);
+    /* 캘린더 */
+    const CAL = U().calendar;
+    const kOpt = {tooltip:tip({trigger:'axis',formatter:p=>p[0].axisValue+'<br>'+p.map(x=>`${x.seriesName}: <b>${x.value}</b>건`).join('<br>')}), legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}},
+      grid:{left:8,right:16,top:12,bottom:28,containLabel:true}, xAxis:axisX({type:'category',data:CAL.map(c=>c[0]+'월')}), yAxis:axisY({type:'value',minInterval:1}),
+      series:[{name:'평가 완료',type:'bar',stack:'c',barMaxWidth:24,itemStyle:{color:'#1e8e5a'},data:CAL.map(c=>c[1])},{name:'재산출 대기',type:'bar',stack:'c',barMaxWidth:24,itemStyle:{color:'#eda100',borderRadius:[4,4,0,0]},data:CAL.map(c=>c[2])}],
+      markLine:undefined};
+    if(!ch.cal) ch.cal = mk('utCal', kOpt); else ch.cal.setOption(kOpt, true);
+    /* 파레토 */
+    const PR = LT().unusedPareto, tot = PR.reduce((s,x)=>s+x[1],0)||1; let acc = 0;
+    const pOpt = {tooltip:tip({trigger:'axis'}), grid:{left:8,right:36,top:10,bottom:8,containLabel:true},
+      xAxis:axisX({type:'category',data:PR.map(x=>x[0]),axisLabel:{fontSize:10,interval:0,formatter:v=>v.length>7?v.slice(0,7)+'…':v}}),
+      yAxis:[axisY({type:'value'}), axisY({type:'value',max:100,axisLabel:{formatter:'{value}%'}})],
+      series:[{name:'건수',type:'bar',barMaxWidth:30,itemStyle:{color:'#98a2b3',borderRadius:[4,4,0,0]},data:PR.map(x=>x[1])},{name:'누적 %',type:'line',yAxisIndex:1,symbolSize:5,itemStyle:{color:INK2},data:PR.map(x=>Math.round((acc+=x[1])/tot*100))}]};
+    if(!ch.pr) ch.pr = mk('utPareto', pOpt); else ch.pr.setOption(pOpt, true);
+    renderSheet();
+  }
+  function renderSheet(){
+    const q = fil.q.trim().toLowerCase();
+    const rows = U().projects.filter(p => (fil.u==='ALL'||p.u===fil.u) && (fil.p==='ALL'||p.p===fil.p) && (!q || (p.code+' '+p.name+' '+p.lab+' '+p.dept).toLowerCase().includes(q)))
+      .sort((a,b)=>(['종료','감소'].includes(b.p)-['종료','감소'].includes(a.p)) || b.annual-a.annual);
+    $('utFil').innerHTML = [['u','ALL','활용 전체'],...US.map(u=>['u',u,u])].map(([k,v,t])=>`<button type="button" class="er-fbtn" data-k="${k}" data-v="${v}" aria-pressed="${fil[k]===v}">${t}</button>`).join('')
+      + ` <span style="width:1px;background:var(--border);margin:0 4px"></span> ` + [['p','ALL','성과 전체'],...PS.map(s=>['p',s,s])].map(([k,v,t])=>`<button type="button" class="er-fbtn" data-k="${k}" data-v="${v}" aria-pressed="${fil[k]===v}">${t}</button>`).join('')
+      + ` <input type="search" id="utQ" placeholder="과제·연구소·부서 검색" aria-label="추적 시트 검색" value="${esc(fil.q)}" style="font:inherit;font-size:12px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;margin-left:auto;min-width:180px">`;
+    $('utCount').textContent = `— ${nf(rows.length)}건 (전체 ${nf(U().projects.length)}건 중)`;
+    const cell = y => y ? `<span class="pill" style="background:${UC[y[1]]}22;color:${y[1]==='미평가'?INK3:UC[y[1]]};white-space:nowrap">${esc(y[1])}</span><div class="legend-note" style="white-space:nowrap">${y[2]!=null?nf(y[2])+'억':'—'} · <span style="color:${PC[y[3]]}">${esc(y[3])}</span></div>` : '<span class="legend-note">—</span>';
+    $('utSheet').querySelector('tbody').innerHTML = rows.slice(0,150).map(p => `<tr><td>${esc(p.name.slice(0,24))}<div class="legend-note">${esc(p.code)} · ${p.cy} 완료 · ${esc(p.dept)}</div></td><td>${esc(p.lab)}</td><td class="num">${nf(p.annual)}억</td>${[1,2,3,4,5].map(k=>`<td>${cell(p.years.find(y=>y[0]===k))}</td>`).join('')}<td><span class="pill" style="background:${UC[p.u]}22;color:${p.u==='미평가'?INK3:UC[p.u]}">${esc(p.u)}</span> <span class="pill" style="background:${PC[p.p]}22;color:${PC[p.p]}">${esc(p.p)}</span></td></tr>`).join('')
+      + (rows.length > 150 ? `<tr><td colspan="9" class="legend-note" style="padding:10px">상위 150건만 표시 — 검색으로 좁혀 주세요</td></tr>` : '') || '<tr><td colspan="9" class="legend-note" style="padding:12px">조건에 맞는 과제가 없습니다.</td></tr>';
+  }
+  function init(){
+    const root = $('pp-util');
+    root.addEventListener('click', e => { const b = e.target.closest('[data-k]'); if(b){ fil[b.dataset.k] = b.dataset.v; renderSheet(); } });
+    root.addEventListener('input', e => { if(e.target.id === 'utQ'){ fil.q = e.target.value; const v = e.target.value; renderSheet(); const q = $('utQ'); if(q){ q.focus(); q.setSelectionRange(v.length, v.length); } } });
+    render();
+  }
+  return {init, refresh: render};
+})();
+
 /* ⑦ 성과 원장 — 확정 순재무성과 원장(설계서 11.5). PF.regs 확정 건(옵션: 승인 포함)만 집계 */
 const LG = (() => {
   const $ = id => document.getElementById(id);
@@ -4127,6 +4225,7 @@ const LG = (() => {
 
 CT.init();   // ⑤ 기여율 — 저장된 결정을 PF.regs에 반영한 뒤 ①·② 재렌더
 LG.init();   // ⑦ 성과 원장 — 확정 건 집계
+UT.init();   // ⑧ 장기 활용평가 (시뮬레이션 파생 — 등록 원장과 무관)
 GR.init();   // ③ 성과 총액 — 산식 카탈로그·미리계산기
 WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연 등록 반영)
 CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변경 시 refreshRegs
