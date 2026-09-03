@@ -104,6 +104,7 @@ def top_org(dept):
 person_ym = defaultdict(lambda: defaultdict(float))            # name -> ym -> mw
 person_proj_mw = defaultdict(lambda: defaultdict(float))       # name -> 과제코드 -> mw
 proj_name_map = {}                                             # 과제코드 -> 과제명
+proj_mw_total = defaultdict(float)                             # 과제코드 -> 전체 투입 MW (기여율 안분 분모)
 
 for r in a2:
     act = classify(r["과제코드"])
@@ -130,6 +131,7 @@ for r in a2:
     p["total"] += total
     person_projects[name].add(r["과제코드"])
     person_proj_mw[name][r["과제코드"]] += total
+    proj_mw_total[r["과제코드"]] += total
     proj_name_map.setdefault(r["과제코드"], r["과제명"])
 
 # 기준일 이후(계획) 데이터는 차트 축에서 제외
@@ -617,6 +619,7 @@ detail = {"strategy": strategy_detail, "explore": explore_detail,
 
 # ──────────────────── My Dashboard (아이디어 27~34) ────────────────────
 a3_status = {r["과제코드"]: short(r.get("진행상태", ""), 10) for r in a3}
+a3_end = {r["과제코드"]: r.get("완료일", "") for r in a3}
 util_by_code = {}
 for pr_ in proj_results:
     util_by_code[pr_["code"]] = pr_
@@ -633,10 +636,13 @@ me_people = {}
 for name, p in person.items():
     projs = sorted(person_proj_mw[name].items(), key=lambda x: -x[1])
     impact = []
-    for code, _mw in projs:
+    for code, mw_ in projs:
         u = util_by_code.get(code)
         if u:
-            impact.append([short(u["name"], 26), u["cy"], u["status"], u["real"]])
+            # 기여율 안분: 과제 실현이익 × (내 MW / 과제 전체 MW). 실운영 시 ⑤ 기여율 확정값으로 대체.
+            share = mw_ / proj_mw_total[code] if proj_mw_total[code] else 0
+            impact.append([short(u["name"], 26), u["cy"], u["status"], u["real"],
+                           round(100 * share), round(u["real"] * share, 1), code])
         if len(impact) >= 6:
             break
     me_people[name] = {
@@ -647,7 +653,8 @@ for name, p in person.items():
                  round(p["acts"].get(4, 0), 1)],
         "ym": {ym: round(v, 1) for ym, v in person_ym[name].items() if v > 0 and ym <= LATEST_YM},
         "projects": [[c, short(proj_name_map.get(c, c), 30), round(m, 1),
-                      a3_status.get(c, "-")] for c, m in projs[:8]],
+                      a3_status.get(c, "-"), a3_end.get(c, ""),
+                      round(100 * m / proj_mw_total[c]) if proj_mw_total[c] else 0] for c, m in projs[:8]],
         "impact": impact,
         "knowledge": know_by_person.get(name, [])[:6],
         "pct": percentile(p["total"]),

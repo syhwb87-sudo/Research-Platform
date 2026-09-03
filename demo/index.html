@@ -155,38 +155,6 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #p-my .g-comp span{font-size:11px;color:var(--g-ink2);background:var(--g-soft);
   border:1px solid var(--g-line);border-radius:20px;padding:3px 9px}
 
-/* ── Rank ── */
-#p-my .g-rank{font-size:38px;font-weight:800;color:var(--g-ink);letter-spacing:-1.5px;line-height:1.1}
-#p-my .g-rank small{font-size:15px;font-weight:600;color:var(--g-ink3);margin-left:2px}
-#p-my .g-top{display:inline-block;margin-top:8px;font-size:12px;font-weight:700;color:#065F46;
-  background:#D1FAE5;border-radius:20px;padding:3px 11px}
-#p-my .g-delta{font-size:12px;font-weight:700;margin-top:12px}
-#p-my .g-delta.up{color:var(--g-success)}
-#p-my .g-delta.down{color:#DC2626}
-#p-my .g-delta.flat{color:var(--g-ink3)}
-#p-my .g-spark{width:100%;height:96px;margin-top:4px}
-#p-my .g-rank-org{font-size:12px;color:var(--g-ink2);margin-top:12px;
-  padding-top:12px;border-top:1px dashed var(--g-line)}
-#p-my .g-rank-org b{color:var(--g-ink)}
-
-/* ── Insight ── */
-#p-my .g-insight{background:linear-gradient(135deg,#1E3A8A 0%,#2563EB 55%,#3B82F6 100%);
-  border:0;color:#fff;box-shadow:0 14px 34px rgba(37,99,235,.28);
-  padding:20px 26px 22px}
-#p-my .g-insight .g-sub{margin-bottom:14px}
-#p-my .g-insight h4,#p-my .g-insight .g-ins-t{color:#fff}
-#p-my .g-insight .g-sub{color:#BFDBFE}
-/* 인사이트는 3~4개의 짧은 항목이다. 세로로 쌓으면 1400px 카드에서 폭의 31%만 쓰면서
-   높이만 누적돼 카드가 비어 보인다 → 가로 그리드로 폭을 쓰고 높이를 절반으로 줄인다.
-   auto-fit이라 항목 수(3·4개)와 화면 폭에 따라 열 수가 자동으로 맞춰진다. */
-#p-my .g-ins-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));
-  gap:16px 26px}
-#p-my .g-ins-item{display:flex;gap:12px;align-items:flex-start;padding:0}
-#p-my .g-ins-ic{width:28px;height:28px;border-radius:9px;flex:none;display:grid;place-items:center;
-  background:rgba(255,255,255,.18);font-size:14px}
-#p-my .g-ins-t{font-size:13.5px;font-weight:600;line-height:1.5}
-#p-my .g-ins-d{font-size:11.5px;color:#BFDBFE;margin-top:2px}
-
 /* ── Badges ── */
 #p-my .g-badges{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
 #p-my .g-badge{border:1px solid var(--g-line);border-radius:16px;padding:17px 13px;text-align:center;
@@ -246,7 +214,6 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 /* ── 공통 소품 ── */
 #p-my .g-chart{width:100%;height:290px}
 #p-my #myGrass{height:330px}          /* Growth Journey(348px 캡)와 행 높이 정렬 */
-#p-my .g-chart.sm{height:250px}
 #p-my .g-empty{font-size:12px;color:var(--g-ink3);padding:18px 0;text-align:center}
 #p-my .g-list{list-style:none;margin:0;padding:0}
 #p-my .g-list li{display:flex;gap:10px;align-items:center;padding:9px 0;
@@ -629,6 +596,43 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #p-home .hm-todo li{cursor:pointer;border-radius:6px} #p-home .hm-todo li:hover{background:#f7f9fc}
 #p-home .hm-todo .go{margin-left:auto;color:var(--brand);font-weight:600;white-space:nowrap;padding-left:8px}
 #p-home .hm-ps{display:flex;flex-direction:column} #p-home .hm-ps .n{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1} #p-home .hm-ps .l{font-size:11px;color:var(--text-3)}
+/* ── My Dashboard 재구성 (4행): 할 일·순위줄·역량 프로필·과제 표 ── */
+#p-my .g-rankline{font-size:12.5px;color:var(--g-ink2);margin-top:12px}
+#p-my .g-rankline b{color:var(--g-ink);font-size:15px}
+#p-my .g-rankline .sep{margin:0 6px;color:var(--g-ink3)}
+#p-my .g-comp span.bonus{color:#065F46;background:#D1FAE5;border-color:#A7F3D0}
+#p-my .g-comp span.off{color:var(--g-ink3);border-style:dashed}
+#p-my .g-hint{font-size:11.5px;color:var(--g-ink2);margin-top:12px;padding-top:12px;border-top:1px dashed var(--g-line);text-align:left;line-height:1.5}
+#p-my .g-hint b{color:var(--g-primary-d)}
+#p-my .g-src{font-size:10.5px;font-weight:700;color:var(--g-ink2);background:var(--g-soft);border:1px solid var(--g-line);border-radius:20px;padding:1px 8px}
+#p-my .g-todo{list-style:none;margin:0;padding:0}
+#p-my .g-todo li{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px dashed var(--g-line);font-size:12.5px;color:var(--g-ink);cursor:pointer;border-radius:8px}
+#p-my .g-todo li:last-child{border-bottom:0}
+#p-my .g-todo li:hover{background:var(--g-soft)}
+#p-my .g-todo li.none{cursor:default;color:var(--g-ink2)}
+#p-my .g-todo .dot{width:8px;height:8px;border-radius:50%;flex:none}
+#p-my .g-todo .go{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--g-primary);white-space:nowrap}
+#p-my .g-todo .sub{font-size:11px;color:var(--g-ink3);margin-top:1px}
+#p-my table.g-tb td.num,#p-my table.g-tb th.num{text-align:right;font-variant-numeric:tabular-nums}
+#p-my table.g-tb th{white-space:nowrap}
+#p-my table.g-tb a.code{color:var(--g-primary);font-weight:700;text-decoration:none;cursor:pointer}
+#p-my table.g-tb a.code:hover{text-decoration:underline}
+#p-my table.g-tb .dday{font-size:11px;font-weight:700;color:#DC2626;margin-left:4px}
+#p-my table.g-tb .dday.ok{color:var(--g-ink3);font-weight:500}
+#p-my .g-stat{background:var(--g-soft);border:1px solid var(--g-line);border-radius:12px;padding:8px 12px;min-width:96px}
+#p-my .g-stat .l{font-size:10.5px;color:var(--g-ink3)}
+#p-my .g-stat .v{font-size:17px;font-weight:800;color:var(--g-ink);margin-top:1px;font-variant-numeric:tabular-nums}
+#p-my .g-stat .v small{font-size:11px;font-weight:600;color:var(--g-ink3);margin-left:2px}
+#p-my .g-stat .s{font-size:10.5px;color:var(--g-ink3);margin-top:1px}
+#p-my .g-bench{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+#p-my .g-bench div{text-align:center;background:var(--g-soft);border:1px solid var(--g-line);border-radius:12px;padding:8px 6px}
+#p-my .g-bench .l{font-size:10.5px;color:var(--g-ink3)}
+#p-my .g-bench .v{font-size:16px;font-weight:800;margin-top:1px}
+#p-my .g-badges{grid-template-columns:repeat(4,1fr);gap:10px}
+#p-my .g-badge{padding:13px 10px}
+#p-my .g-badge .ic{font-size:23px}
+#p-my .g-badge .demo{display:inline-block;font-size:9px;font-weight:800;color:#92400E;background:#FEF3C7;border-radius:20px;padding:0 6px;margin-left:3px;vertical-align:1px}
+#p-my .g-quest{padding:11px 0}
 </style>
 </head>
 <body>
@@ -698,7 +702,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
   <div class="g-card" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px;padding:18px 26px">
     <div>
       <h4>Researcher&#39;s Guild <span class="g-tag">My Dashboard</span></h4>
-      <div class="g-sub" style="margin-bottom:0">내 연구활동의 성장 여정 — 실운영 시 로그인 계정 자동 연결 (Demo: 연구원 선택)</div>
+      <div class="g-sub" style="margin-bottom:0">내 연구활동의 성장 기록과 오늘 할 일 — 실운영 시 로그인 계정 자동 연결 (Demo: 연구원 선택)</div>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <span id="myNudge"></span>
@@ -706,7 +710,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     </div>
   </div>
 
-  <!-- ① Hero: 프로필·레벨 / 종합 점수 / 조직 내 위치 -->
+  <!-- ① 프로필·레벨 / Activity Score·순위 / 내 할 일 -->
   <div class="g-grid g-hero">
     <div class="g-card lift">
       <div class="g-prof">
@@ -728,7 +732,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 
     <div class="g-card lift" style="text-align:center">
       <div class="g-hd" style="justify-content:center"><h4>Research Activity Score</h4></div>
-      <div class="g-sub" style="text-align:center">6개 활동 축의 전사 백분위 가중 합산 · 등급은 전사 상대 분포 기준</div>
+      <div class="g-sub" style="text-align:center">4개 활동 축 전사 백분위 가중 합산 + 활동 범위 보너스 · 등급은 전사 상대 분포</div>
       <div class="g-gauge">
         <svg width="172" height="172" viewBox="0 0 172 172" aria-hidden="true">
           <defs><linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="1">
@@ -744,97 +748,71 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
         </div>
       </div>
       <span class="g-grade" id="myGrade">–</span>
+      <div class="g-rankline" id="myRankLine"></div>
       <div class="g-comp" id="myScoreComp"></div>
+      <div class="g-hint" id="myScoreHint"></div>
     </div>
 
     <div class="g-card lift">
-      <div class="g-hd"><h4>My Ranking</h4></div>
-      <div class="g-sub">종합 점수 기준 전사 순위</div>
-      <div class="g-rank">#<span id="myRank">–</span><small id="myRankTot"></small></div>
-      <span class="g-top" id="myTop"></span>
-      <div class="g-delta" id="myDelta"></div>
-      <div class="g-spark" id="mySpark"></div>
-      <div class="g-rank-org" id="myRankOrg"></div>
+      <div class="g-hd"><h4>내 할 일</h4><span class="g-tag" id="myTodoCnt"></span></div>
+      <div class="g-sub">내 과제·성과 등록 상태에서 자동 도출 — 누르면 해당 화면으로</div>
+      <ul class="g-todo" id="myTodo"></ul>
     </div>
   </div>
 
-  <!-- ② AI Insight -->
-  <div class="g-grid"><div class="g-card g-insight">
-    <div class="g-hd"><h4>✨ Growth Insight</h4></div>
-    <div class="g-sub">내 활동 데이터에서 자동 도출된 다음 성장 포인트</div>
-    <div class="g-ins-list" id="myInsight"></div>
-  </div></div>
-
-  <!-- ③ 역량 레이더 / 벤치마크 -->
-  <div class="g-grid g-2" style="grid-template-columns:1fr 1fr">
+  <!-- ② 내 과제 현황 / 성과 실현 요약 -->
+  <div class="g-grid g-2" style="grid-template-columns:1.45fr 1fr">
     <div class="g-card lift">
-      <div class="g-hd"><h4>Research Radar</h4></div>
-      <div class="g-sub" id="myRadarSub">6개 활동 축 — 나 vs 소속 연구소 평균 (전사 백분위 환산)</div>
-      <div class="g-chart" id="myRadar"></div>
+      <div class="g-hd"><h4>내 과제 현황</h4><span class="g-tag" id="myProjCnt"></span></div>
+      <div class="g-sub">투입 MW 상위 8건 · 비중 = 내 MW ÷ 과제 전체 MW (a2) · 성과 등록 상태는 성과 플랫폼 원장 기준 — 코드 클릭 시 이동</div>
+      <div class="scroll" style="max-height:300px"><table class="g-tb" id="myProj">
+        <thead><tr><th>과제코드</th><th>과제명</th><th class="num">내 MW</th><th class="num">비중</th><th>상태</th><th>완료일</th><th>성과 등록</th></tr></thead>
+        <tbody></tbody></table></div>
     </div>
     <div class="g-card lift">
-      <div class="g-hd"><h4>Benchmark</h4></div>
-      <div class="g-sub" id="myBenchSub"></div>
-      <div class="g-chart" id="myBench"></div>
+      <div class="g-hd"><h4>성과 실현 요약</h4><span class="badge">DEMO 시뮬레이션</span></div>
+      <div class="g-sub">참여 완료과제의 실현이익을 내 MW 비중으로 안분 — 실운영 시 ⑤ 기여율 확정값 적용</div>
+      <div id="myImpactStats" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px"></div>
+      <div class="scroll" style="max-height:214px"><table class="g-tb" id="myImpact">
+        <thead><tr><th>과제</th><th class="num">완료</th><th>활용</th><th class="num">과제 실현</th><th class="num">내 비중</th><th class="num">내 몫</th></tr></thead>
+        <tbody></tbody></table></div>
     </div>
   </div>
 
-  <!-- ④ 배지 / 퀘스트 -->
-  <div class="g-grid g-2" style="grid-template-columns:1.6fr 1fr">
+  <!-- ③ 활동 캘린더·투입 추이 / 역량 프로필 -->
+  <div class="g-grid g-2" style="grid-template-columns:1.25fr 1fr">
+    <div class="g-card lift">
+      <div class="g-hd"><h4>Activity Calendar</h4><span class="g-src">a2</span></div>
+      <div class="g-sub">월별 투입 강도 — 진한 칸 = 집중 투입</div>
+      <div id="myCalStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"></div>
+      <div class="g-chart" id="myGrass"></div>
+    </div>
+    <div class="g-card lift">
+      <div class="g-hd"><h4>역량 프로필</h4></div>
+      <div class="g-sub" id="myRadarSub">4개 활동 축 — 나 vs 소속 연구소 상위 25% 선 (전사 백분위)</div>
+      <div class="g-chart" id="myRadar" style="height:300px"></div>
+      <div class="g-bench" id="myBench"></div>
+    </div>
+  </div>
+
+  <!-- ④ 배지·퀘스트 / 성장 여정 / 지식자산 -->
+  <div class="g-grid g-2" style="grid-template-columns:1.5fr 1fr 1fr">
     <div class="g-card lift">
       <div class="g-hd"><h4>Achievements</h4><span class="g-tag" id="myBadgeCnt"></span></div>
-      <div class="g-sub">실제 활동 실적으로 달성 여부가 결정됩니다 — 미획득 배지는 남은 조건을 표시합니다</div>
+      <div class="g-sub">실제 실적으로 판정 — 미획득 배지는 남은 조건 표시 · DEMO 표기는 활용평가 시뮬레이션 기반</div>
       <div class="g-badges" id="myBadges"></div>
-    </div>
-    <div class="g-card lift">
-      <div class="g-hd"><h4>Growth Quest</h4><span class="g-tag" id="myQuestCnt"></span></div>
-      <div class="g-sub">완료 여부는 내 실제 데이터로 자동 판정됩니다</div>
+      <div class="g-hd" style="margin-top:20px"><h4>Growth Quest</h4><span class="g-tag" id="myQuestCnt"></span></div>
+      <div class="g-sub">내 현재 상태에서 파생되는 다음 행동 — 완료 여부는 실데이터로 자동 판정</div>
       <div id="myQuests"></div>
     </div>
-  </div>
-
-  <!-- ⑤ 성장 여정 / MW 캘린더 -->
-  <div class="g-grid g-2" style="grid-template-columns:1fr 1.25fr">
     <div class="g-card lift">
       <div class="g-hd"><h4>Growth Journey</h4></div>
-      <div class="g-sub">내 연구활동 기록에서 추출한 주요 이정표</div>
+      <div class="g-sub">기록에 날짜가 있는 이정표만 표시 (완료과제는 연도)</div>
       <ul class="g-tl" id="myTimeline"></ul>
     </div>
     <div class="g-card lift">
-      <div class="g-hd"><h4>Activity Calendar</h4></div>
-      <div class="g-sub">월별 투입 강도 — 진한 칸 = 집중 투입</div>
-      <div class="g-chart" id="myGrass"></div>
-    </div>
-  </div>
-
-  <!-- ⑥ 포트폴리오 / 과제 -->
-  <div class="g-grid g-2" style="grid-template-columns:1fr 1.25fr">
-    <div class="g-card lift">
-      <div class="g-hd"><h4>My Portfolio</h4></div>
-      <div class="g-sub">내 MW의 활동군 배분 (누적)</div>
-      <div class="g-chart sm" id="myDonut"></div>
-    </div>
-    <div class="g-card lift">
-      <div class="g-hd"><h4>내 과제</h4></div>
-      <div class="g-sub">참여 과제별 내 투입 MW · 상위 8건</div>
-      <div class="scroll" style="max-height:280px"><table class="g-tb" id="myProj">
-        <thead><tr><th>과제코드</th><th>과제명</th><th class="num">내 MW</th><th>상태</th></tr></thead>
-        <tbody></tbody></table></div>
-    </div>
-  </div>
-
-  <!-- ⑦ 임팩트 / 지식자산 -->
-  <div class="g-grid g-2" style="grid-template-columns:1.25fr 1fr">
-    <div class="g-card lift">
-      <div class="g-hd"><h4>My Impact Trace</h4><span class="badge">DEMO</span></div>
-      <div class="g-sub">내가 참여한 완료과제의 활용상태·실현이익 (정량효과 과제)</div>
-      <div class="scroll" style="max-height:280px"><table class="g-tb" id="myImpact">
-        <thead><tr><th>과제</th><th class="num">완료</th><th>활용상태</th><th class="num">실현이익</th></tr></thead>
-        <tbody></tbody></table></div>
-    </div>
-    <div class="g-card lift">
-      <div class="g-hd"><h4>지식자산 Profile</h4></div>
-      <div class="g-sub">내 논문·발표·학회 이력 (a5)</div>
+      <div class="g-hd"><h4>지식자산 Profile</h4><span class="g-src">a5</span></div>
+      <div class="g-sub">내 논문·발표·학회 이력</div>
       <ul class="g-list" id="myKnow"></ul>
     </div>
   </div>
@@ -2205,10 +2183,13 @@ runSim();
 
 /* ══════════════════ My Dashboard — Researcher's Guild ══════════════════
    설계 원칙
-   1) Dummy 데이터 없음 — 모든 수치는 D.me(실 CSV 파생)에서 계산한다.
+   1) Dummy 데이터 없음 — 모든 수치는 D.me(실 CSV 파생)와 성과 플랫폼 원장(D.perf)에서 계산한다.
    2) 레벨·점수·배지·퀘스트 기준은 아래 GUILD 규칙표 한 곳에만 정의한다(단일 진실).
-   3) 순위·평균·백분위는 전체 인원(503명)을 대상으로 런타임 계산한다.
-   4) 화면은 순수 계산(buildIndex) → 렌더 컴포넌트로 분리해 재사용성을 확보한다. */
+   3) 순위·백분위는 전체 인원을 대상으로 런타임 계산한다. 동률은 중간 순위(mid-rank).
+   4) 점수 모델 (a): 값이 대다수에게 없는 희소 축(현업 대응·탐색·혁신)은 백분위 축에서 빼고
+      '활동 범위 보너스'로 가산한다. 백분위 0 고정으로 점수를 왜곡하지 않기 위함.
+   5) 성과 실현은 활용평가 시뮬레이션(DEMO)이며 내 MW 비중으로 안분한 값만 쓴다(기여율 안분).
+   6) 화면은 순수 계산(buildIndex) → 렌더 컴포넌트로 분리한다. 초기 렌더는 MY.init()에서. */
 const ME = D.me;
 const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 const G_INK = '#0F172A', G_INK2 = '#475569', G_INK3 = '#94A3B8', G_LINE = '#E2E8F0';
@@ -2216,28 +2197,29 @@ const G_PRIMARY = '#2563EB', G_TEAM = '#60A5FA', G_GRAY = '#94A3B8', G_GOLD = '#
 
 /* ── 1) 규칙 정의 (Rule Table) ───────────────────────────────────────── */
 const GUILD = {
-  /* 활동 6축: 전사 백분위로 정규화 후 가중 합산 → Research Activity Score */
+  /* 점수 축 4개: 전사 백분위(동률 중간 순위) 가중 합산 */
   axes: [
-    { k:'strategy',  n:'전략 프로젝트', w:.25, unit:'MW', get:p=>p.acts[0] },
-    { k:'knowledge', n:'지식자산',      w:.20, unit:'건', get:p=>p.knowledge.length },
-    { k:'impact',    n:'성과 실현',     w:.20, unit:'억', get:p=>p.impact.reduce((s,x)=>s+x[3],0) },
-    { k:'collab',    n:'과제 참여',     w:.15, unit:'건', get:p=>p.projN ?? p.projects.length },
-    { k:'field',     n:'현업 대응',     w:.10, unit:'MW', get:p=>p.acts[1] },
-    { k:'explore',   n:'탐색·혁신',     w:.10, unit:'MW', get:p=>p.acts[2] },
+    { k:'strategy',  n:'전략 프로젝트', w:.35, unit:'MW', src:'a2',   get:p=>p.acts[0] },
+    { k:'collab',    n:'과제 참여',     w:.25, unit:'건', src:'a2',   get:p=>p.projN ?? p.projects.length },
+    { k:'knowledge', n:'지식자산',      w:.20, unit:'건', src:'a5',   get:p=>p.knowledge.length },
+    { k:'impact',    n:'성과 실현',     w:.20, unit:'억', src:'DEMO', get:p=>Math.round(p.impact.reduce((s,x)=>s+(x[5]||0),0)*10)/10 },
   ],
-  /* EXP: 실제 활동 실적 × 계수 (누적) */
+  /* 활동 범위 보너스: 참여 여부만 판정 (희소 축) */
+  bonus: [
+    { k:'field',   n:'현업 대응', pts:5, unit:'MW', get:p=>p.acts[1] },
+    { k:'explore', n:'탐색·혁신', pts:5, unit:'MW', get:p=>p.acts[2] },
+  ],
+  /* EXP: 실제 활동 실적 × 계수 (누적). 실현이익은 내 몫(안분) 기준 */
   exp: [
-    { n:'투입 Man Week', per:10,  unit:'MW', get:p=>p.acts[0]+p.acts[1]+p.acts[2] },
-    { n:'참여 과제',     per:300, unit:'건', get:p=>p.projN ?? p.projects.length },
-    { n:'지식자산',      per:500, unit:'건', get:p=>p.knowledge.length },
-    { n:'활용중 성과',   per:800, unit:'건', get:p=>p.impact.filter(x=>x[2]==='활용중').length },
-    { n:'부분활용 성과', per:400, unit:'건', get:p=>p.impact.filter(x=>x[2]==='부분활용').length },
-    { n:'실현이익',      per:50,  unit:'억', get:p=>p.impact.reduce((s,x)=>s+x[3],0) },
+    { n:'투입 Man Week',  per:10,  unit:'MW', get:p=>p.acts[0]+p.acts[1]+p.acts[2] },
+    { n:'참여 과제',      per:300, unit:'건', get:p=>p.projN ?? p.projects.length },
+    { n:'지식자산',       per:500, unit:'건', get:p=>p.knowledge.length },
+    { n:'활용중 성과',    per:800, unit:'건', get:p=>p.impact.filter(x=>x[2]==='활용중').length },
+    { n:'부분활용 성과',  per:400, unit:'건', get:p=>p.impact.filter(x=>x[2]==='부분활용').length },
+    { n:'내 몫 실현이익', per:50,  unit:'억', get:p=>p.impact.reduce((s,x)=>s+(x[5]||0),0) },
   ],
-  /* 등급은 절대 점수가 아니라 전사 상대 분포(상위 %)로 부여한다.
-     점수는 백분위 가중합이라 축이 희소할수록 압축되므로, 절대 임계값은
-     대다수를 최하 등급으로 몰아 동기부여를 해친다. */
-  gradeBands: [[2,'S+'],[7,'S'],[15,'A+'],[30,'A'],[60,'B'],[100,'C']],
+  /* 등급은 전사 상대 분포(상위 %)로 부여. 어떤 밴드도 20%를 넘지 않게 8단계 */
+  gradeBands: [[2,'S+'],[7,'S'],[15,'A+'],[30,'A'],[45,'B+'],[60,'B'],[80,'C+'],[100,'C']],
   tiers:  [[16,'Research Master'],[13,'Principal Researcher'],[10,'Specialist'],
            [7,'Practitioner'],[4,'Contributor'],[1,'Explorer']],
   lvExp: L => Math.round(250 * Math.pow(L, 1.6)),
@@ -2251,23 +2233,28 @@ const GX = (function buildIndex(){
   const rows = Object.keys(ME.people).map(name => {
     const p = ME.people[name], raw = {};
     GUILD.axes.forEach(a => raw[a.k] = a.get(p));
+    GUILD.bonus.forEach(b => raw[b.k] = b.get(p));
     const expParts = GUILD.exp.map(r => { const v = r.get(p);
       return { n:r.n, v, unit:r.unit, exp:Math.round(v * r.per) }; });
     return { name, p, raw, expParts, exp: expParts.reduce((s,x)=>s+x.exp, 0) };
   });
-  /* 축별 오름차순 값 배열 → 백분위 산출용 */
   const sorted = {};
   GUILD.axes.forEach(a => sorted[a.k] = rows.map(r=>r.raw[a.k]).sort((x,y)=>x-y));
+  /* 동률 중간 순위 백분위: 값이 없는 다수가 0이 아니라 동률 구간의 중앙에 놓인다 */
   const pctOf = (k, v) => {
     const a = sorted[k]; let lo = 0, hi = a.length;
     while(lo < hi){ const m = (lo+hi) >> 1; a[m] < v ? lo = m+1 : hi = m; }
-    return Math.round(100 * lo / a.length);
+    let lo2 = lo, hi2 = a.length;
+    while(lo2 < hi2){ const m = (lo2+hi2) >> 1; a[m] <= v ? lo2 = m+1 : hi2 = m; }
+    return Math.round(100 * (lo + lo2) / 2 / a.length);
   };
-  const scoreOf = axes => Math.round(GUILD.axes.reduce((s,a)=>s + a.w * axes[a.k], 0));
+  const bonusOf = raw => GUILD.bonus.reduce((s,b) => s + (raw[b.k] > 0 ? b.pts : 0), 0);
+  const scoreOf = (axes, raw) => Math.min(100, Math.round(GUILD.axes.reduce((s,a)=>s + a.w * axes[a.k], 0) + bonusOf(raw)));
   rows.forEach(r => {
     r.axes = {};
     GUILD.axes.forEach(a => r.axes[a.k] = pctOf(a.k, r.raw[a.k]));
-    r.score = scoreOf(r.axes);
+    r.bonus = bonusOf(r.raw);
+    r.score = scoreOf(r.axes, r.raw);
     r.level = GUILD.levelOf(r.exp);
   });
   const byScore = [...rows].sort((a,b) => b.score - a.score || b.exp - a.exp);
@@ -2277,26 +2264,29 @@ const GX = (function buildIndex(){
     r.grade = GUILD.gradeOf(100 * r.rank / rows.length);
   });
 
-  /* 조직별 평균·1위 */
+  /* 조직별 평균·상위 25% 선 */
   const orgRows = {};
   rows.forEach(r => (orgRows[r.p.o] = orgRows[r.p.o] || []).push(r));
   const orgAvg = {}, orgTop = {};
   Object.entries(orgRows).forEach(([o, rs]) => {
     rs.sort((a,b) => b.score - a.score).forEach((r,i) => r.orgRank = i + 1);
-    const A = {};
-    GUILD.axes.forEach(a => A[a.k] = Math.round(rs.reduce((s,r)=>s+r.axes[a.k],0) / rs.length));
-    orgAvg[o] = { axes:A, score: Math.round(rs.reduce((s,r)=>s+r.score,0)/rs.length), n: rs.length };
+    const A = {}, Q = {};
+    GUILD.axes.forEach(a => {
+      const vs = rs.map(r => r.axes[a.k]).sort((x,y)=>x-y);
+      A[a.k] = Math.round(vs.reduce((s,v)=>s+v,0) / vs.length);
+      Q[a.k] = vs[Math.min(vs.length-1, Math.floor(vs.length * 0.75))];
+    });
+    orgAvg[o] = { axes:A, q75:Q, score: Math.round(rs.reduce((s,r)=>s+r.score,0)/rs.length), n: rs.length };
     orgTop[o] = rs[0].score;
   });
 
-  /* 최근 6개월 월별 MW 순위 (실데이터 시계열) */
+  /* 최근 12개월 키 */
   const [ly, lm] = ME.latestYm.split('-').map(Number);
   const months = [];
-  for(let i = 5; i >= 0; i--){
+  for(let i = 11; i >= 0; i--){
     let mm = lm - i, yy = ly;
     while(mm <= 0){ mm += 12; yy--; }
-    const ym = `${yy}-${String(mm).padStart(2,'0')}`;
-    months.push({ ym, desc: rows.map(r => r.p.ym[ym] || 0).sort((a,b) => b - a) });
+    months.push(`${yy}-${String(mm).padStart(2,'0')}`);
   }
   const map = {};
   rows.forEach(r => map[r.name] = r);
@@ -2306,23 +2296,19 @@ const GX = (function buildIndex(){
            topScore: byScore[0].score };
 })();
 
-const monthRank = (p, mo) => {           // 해당 월 MW 기준 전사 순위 (1-based)
-  const v = p.ym[mo.ym] || 0, a = mo.desc;
-  let lo = 0, hi = a.length;
-  while(lo < hi){ const m = (lo+hi) >> 1; a[m] > v ? lo = m+1 : hi = m; }
-  return lo + 1;
-};
-
 /* ── 3) 표현 헬퍼 ────────────────────────────────────────────────────── */
+const $m = id => document.getElementById(id);
+const escM = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const gPill = s => s === '활용중'   ? '<span class="g-pill g">활용중</span>'
                  : s === '부분활용' ? '<span class="g-pill y">부분활용</span>'
-                 : `<span class="g-pill n">${s}</span>`;
+                 : `<span class="g-pill n">${escM(s)}</span>`;
 const statMini = (label, val, sub) =>
   `<div style="background:var(--g-soft);border:1px solid var(--g-line);border-radius:14px;padding:11px 12px">
      <div style="font-size:11px;color:var(--g-ink3)">${label}</div>
      <div style="font-size:17px;font-weight:800;color:var(--g-ink);margin-top:2px">${val}</div>
      <div style="font-size:10.5px;color:var(--g-ink3);margin-top:1px">${sub}</div>
    </div>`;
+const gStat = (l, v, s, unit) => `<div class="g-stat"><div class="l">${l}</div><div class="v">${v}${unit?`<small>${unit}</small>`:''}</div><div class="s">${s||''}</div></div>`;
 function countUp(el, to, dur, fmt){
   fmt = fmt || (v => nf(Math.round(v)));
   const t0 = performance.now();
@@ -2332,277 +2318,159 @@ function countUp(el, to, dur, fmt){
     if(k < 1) requestAnimationFrame(step);
   })(t0);
 }
+const r1 = v => Math.round(v * 10) / 10;
+const dayDiff = (iso, base) => Math.round((new Date(iso) - new Date(base)) / 864e5);
+const actOfCode = code => { const m = /^\d{4}([A-Z])/.exec(code || ''); const L = m ? m[1] : ''; return L === 'W' ? 3 : (L === 'N' || L === 'L') ? 4 : 1; };
+/* 성과 플랫폼 원장 연결: 내 참여 과제코드 ↔ 등록 건/후보 */
+const perfOf = () => (typeof PF !== 'undefined' ? PF : D.perf);
+const myRegsOf = r => { const codes = new Set(r.p.projects.map(x => x[0])); return perfOf().regs.filter(g => codes.has(g.code)); };
+const myCandsOf = r => { const codes = new Set(r.p.projects.map(x => x[0])), regs = new Set(perfOf().regs.map(g => g.code)); return perfOf().candidates.filter(c => codes.has(c.code) && !regs.has(c.code)); };
+const erosionDone = reg => { if(typeof ErosionService === 'undefined') return true; const s = ErosionService.assessmentSummary(reg.id); return !!(s && s.status === 'COMPLETED'); };
+const asOfMy = () => D.meta.asOf || (ME.latestYm + '-28');
 
 /* ── 4) 렌더 컴포넌트 ────────────────────────────────────────────────── */
-let myDonut = null, myGrass = null, myBench = null, myRadar = null, mySpark = null;
+let myGrass = null, myRadar = null;
 
 function renderHero(r){
   const p = r.p, cy = ME.latestYm.slice(0, 4);
-  const yearMw = Object.entries(p.ym).filter(([ym]) => ym.startsWith(cy))
-                       .reduce((s,[,v]) => s + v, 0);
-  document.getElementById('myAvatar').textContent = r.name.slice(0, 2);
-  document.getElementById('myName').textContent = r.name;
-  document.getElementById('myMeta').innerHTML =
-    `${p.o} · 누적 EXP <b>${nf(r.exp)}</b>`;
-  document.getElementById('myTitle').textContent = GUILD.tierOf(r.level) + ' · Lv.' + r.level;
+  const yearMw = Object.entries(p.ym).filter(([ym]) => ym.startsWith(cy)).reduce((s,[,v]) => s + v, 0);
+  $m('myAvatar').textContent = r.name.slice(0, 2);
+  $m('myName').textContent = r.name;
+  $m('myMeta').innerHTML = `${escM(p.o)} · 누적 EXP <b>${nf(r.exp)}</b>`;
+  $m('myTitle').textContent = GUILD.tierOf(r.level) + ' · Lv.' + r.level;
 
-  const cur = GUILD.lvExp(r.level), next = GUILD.lvExp(r.level + 1);
+  const cur = GUILD.lvExp(r.level), next = GUILD.lvExp(r.level + 1), need = next - r.exp;
   const pctInLv = Math.max(0, Math.min(100, 100 * (r.exp - cur) / (next - cur)));
-  countUp(document.getElementById('myLevel'), r.level, 700, v => String(Math.round(v)));
-  document.getElementById('myExpTxt').innerHTML =
-    `EXP ${nf(r.exp)} / ${nf(next)}`;
-  const bar = document.getElementById('myExpBar');
+  countUp($m('myLevel'), r.level, 700, v => String(Math.round(v)));
+  $m('myExpTxt').innerHTML = `EXP ${nf(r.exp)} / ${nf(next)}`;
+  const bar = $m('myExpBar');
   bar.style.width = '0%';
   requestAnimationFrame(() => requestAnimationFrame(() => bar.style.width = pctInLv.toFixed(1) + '%'));
-  document.getElementById('myNext').innerHTML =
-    `다음 레벨까지 <b>${nf(next - r.exp)} EXP</b> — ` +
-    `지식자산 1건(+500) 또는 신규 과제 1건(+300)으로 채울 수 있습니다`;
-  document.getElementById('myStats').innerHTML =
-    statMini('금년 투입 MW', nf(Math.round(yearMw*10)/10), cy + '년 누계') +
+  const kN = Math.ceil(need / 500), pN = Math.ceil(need / 300), mwN = Math.ceil(need / 10);
+  $m('myNext').innerHTML =
+    `다음 레벨까지 <b>${nf(need)} EXP</b> — 지식자산 ${kN}건 · 신규 과제 ${pN}건 · 투입 ${nf(mwN)} MW 중 하나로 도달` +
+    (GUILD.tierOf(r.level + 1) !== GUILD.tierOf(r.level) ? ` · 달성 시 「${GUILD.tierOf(r.level + 1)}」 승급` : '');
+  $m('myStats').innerHTML =
+    statMini('금년 투입 MW', nf(r1(yearMw)), cy + '년 누계') +
     statMini('참여 과제', (p.projN ?? p.projects.length) + '건', 'MW 투입 기준') +
     statMini('지식자산', p.knowledge.length + '건', '논문·발표·학회') +
-    statMini('누적 MW', nf(Math.round(r.raw.strategy + r.raw.field + r.raw.explore)),
-             '상위 ' + Math.max(1, 100 - p.pct) + '%');
+    statMini('내 몫 실현이익', nf(r1(r.raw.impact)) + '억', 'MW 비중 안분 · DEMO');
 }
 
 function renderScore(r){
   const C0 = 2 * Math.PI * 70;
-  const arc = document.getElementById('myGaugeArc');
+  const arc = $m('myGaugeArc');
   arc.style.strokeDashoffset = C0;
   requestAnimationFrame(() => requestAnimationFrame(() =>
     arc.style.strokeDashoffset = C0 * (1 - r.score / 100)));
-  countUp(document.getElementById('myScore'), r.score, 1200, v => String(Math.round(v)));
-  document.getElementById('myGrade').textContent = 'Grade ' + r.grade;
-  document.getElementById('myScoreComp').innerHTML = GUILD.axes
-    .map(a => `<span title="${a.n} 전사 백분위 ${r.axes[a.k]} · 가중치 ${Math.round(a.w*100)}%">${a.n} ${r.axes[a.k]}</span>`)
+  countUp($m('myScore'), r.score, 1200, v => String(Math.round(v)));
+  $m('myGrade').textContent = 'Grade ' + r.grade;
+  $m('myRankLine').innerHTML =
+    `전사 <b>#${nf(r.rank)}</b> / ${nf(GX.N)} (상위 ${r.topPct}%)<span class="sep">·</span>${escM(r.p.o)} <b>${r.orgRank}위</b> / ${GX.orgAvg[r.p.o].n}명`;
+  $m('myScoreComp').innerHTML = GUILD.axes
+    .map(a => `<span${r.raw[a.k] > 0 ? '' : ' class="off"'} title="${a.n} ${nf(r1(r.raw[a.k]))}${a.unit} · 전사 백분위 ${r.axes[a.k]}${r.raw[a.k] > 0 ? '' : ' (동률 중간 순위)'} · 가중치 ${Math.round(a.w*100)}%${a.src==='DEMO'?' · 활용평가 시뮬레이션':''}">${a.n} ${r.raw[a.k] > 0 ? r.axes[a.k] : '0' + a.unit}</span>`)
+    .concat(GUILD.bonus.map(b => r.raw[b.k] > 0
+      ? `<span class="bonus" title="${b.n} ${nf(Math.round(r.raw[b.k]))} MW 참여">${b.n} +${b.pts}</span>`
+      : `<span class="off" title="${b.n} 참여 시 +${b.pts}점">${b.n} 미참여</span>`))
     .join('');
-}
-
-function renderRank(r){
-  document.getElementById('myRank').textContent = nf(r.rank);
-  document.getElementById('myRankTot').textContent = ' / ' + nf(GX.N);
-  document.getElementById('myTop').textContent = `상위 ${r.topPct}%`;
-  const ranks = GX.months.map(mo => monthRank(r.p, mo));
-  const dv = ranks[ranks.length - 2] - ranks[ranks.length - 1];   // + = 순위 상승
-  const el = document.getElementById('myDelta');
-  el.className = 'g-delta ' + (dv > 0 ? 'up' : dv < 0 ? 'down' : 'flat');
-  el.innerHTML = (dv > 0 ? `▲ ${dv}계단 상승` : dv < 0 ? `▼ ${-dv}계단 하락` : '― 전월과 동일')
-    + ' <span style="font-weight:500;color:var(--g-ink3)">· 월 투입 MW 순위 기준</span>';
-  const opt = {
-    tooltip: tip({ trigger:'axis',
-      formatter: q => `${GX.months[q[0].dataIndex].ym}<br>전사 <b>${nf(q[0].value)}</b>위` }),
-    grid:{ left:4, right:4, top:8, bottom:20 },
-    xAxis:{ type:'category', data:GX.months.map(m=>m.ym.slice(5)+'월'),
-      axisLabel:{ fontSize:9, color:G_INK3 }, axisLine:{show:false}, axisTick:{show:false} },
-    yAxis:{ type:'value', show:false, inverse:true },
-    /* y축 반전(작은 순위=위)이라 영역채움은 위쪽으로 칠해져 오독을 유발 → 선만 사용 */
-    series:[{ type:'line', data:ranks, symbol:'circle', symbolSize:5, smooth:true,
-      lineStyle:{ width:2.2, color:G_PRIMARY }, itemStyle:{ color:G_PRIMARY } }],
-  };
-  mySpark = mySpark ? (mySpark.setOption(opt), mySpark) : mk('mySpark', opt);
-  document.getElementById('myRankOrg').innerHTML =
-    `${r.p.o} 내 <b>${r.orgRank}위</b> / ${GX.orgAvg[r.p.o].n}명`;
-}
-
-function renderInsight(r){
-  const items = [], A = r.axes;
-  /* 강점 문구는 백분위가 충분할 때만. 활동이 적은 연구원에게 '상위 100%'라고
-     표시하면 평가받는 느낌만 남으므로, 성장 시작점 관점으로 분기한다. */
-  const best = [...GUILD.axes].sort((a,b) => A[b.k] - A[a.k])[0];
-  const anyActivity = GUILD.axes.some(a => r.raw[a.k] > 0);
-  if(A[best.k] >= 50)
-    items.push({ ic:'💪', t:`「${best.n}」이 전사 상위 ${Math.max(1,100-A[best.k])}% 수준으로 가장 강한 축입니다.`,
-      d:`현재 ${nf(Math.round(r.raw[best.k]*10)/10)}${best.unit} · 활동 점수 기여도 ${Math.round(best.w*100)}%` });
-  else if(anyActivity)
-    items.push({ ic:'🌱', t:`「${best.n}」을 중심으로 활동을 쌓고 있습니다 — 기록이 누적될수록 점수가 함께 올라갑니다.`,
-      d:`현재 ${nf(Math.round(r.raw[best.k]*10)/10)}${best.unit} · 이 축의 점수 기여도가 ${Math.round(best.w*100)}%로 가장 큽니다` });
-  else
-    items.push({ ic:'🌱', t:'아직 집계된 활동이 없습니다 — Man Week 입력부터 시작해 보세요.',
-      d:'투입 기록이 쌓이면 레벨·배지·순위가 자동으로 반영됩니다' });
-
-  /* 성장 시뮬레이션: 지식자산 1건 추가 시 점수·순위 변화 (실제 분포로 재계산) */
-  const kAxis = GUILD.axes.find(a => a.k === 'knowledge');
-  const simAxes = Object.assign({}, A);
+  /* 성장 시뮬레이션: 지식자산 1건 추가 시 점수·순위 (실제 분포로 재계산) */
+  const simAxes = Object.assign({}, r.axes);
   simAxes.knowledge = GX.pctOf('knowledge', r.raw.knowledge + 1);
-  const simScore = GX.scoreOf(simAxes);
+  const simScore = GX.scoreOf(simAxes, r.raw);
   const simRank = GX.byScore.filter(x => x.score > simScore).length + 1;
-  if(simScore > r.score)
-    items.push({ ic:'🎯', t:`지식자산 1건을 추가하면 종합 점수가 ${r.score} → ${simScore}점, 전사 ${nf(r.rank)}위 → 약 ${nf(simRank)}위로 올라갑니다.`,
-      d:'논문·학회 발표 등록 시 자동 반영 (a5 연동)' });
-
-  const need = GUILD.lvExp(r.level + 1) - r.exp;
-  items.push({ ic:'🚀', t:`Level ${r.level + 1}까지 ${nf(need)} EXP 남았습니다.`,
-    d:`${GUILD.tierOf(r.level + 1) !== GUILD.tierOf(r.level)
-        ? `달성 시 「${GUILD.tierOf(r.level + 1)}」 티어로 승급합니다` : '누적 활동이 그대로 EXP로 환산됩니다'}` });
-
-  const m = GX.months, recent = m.slice(-3).map(x => r.p.ym[x.ym] || 0);
-  const prev = m.slice(0, 3).map(x => r.p.ym[x.ym] || 0);
-  const rs = recent.reduce((a,b)=>a+b,0), ps = prev.reduce((a,b)=>a+b,0);
-  if(rs > 0 || ps > 0){
-    const up = rs >= ps;
-    items.push({ ic: up ? '📈' : '📉',
-      t:`최근 3개월 투입이 직전 3개월 대비 ${up ? '증가' : '감소'}했습니다 (${nf(Math.round(ps*10)/10)} → ${nf(Math.round(rs*10)/10)} MW).`,
-      d: up ? '현재 속도를 유지하면 다음 레벨 도달이 앞당겨집니다'
-            : '투입이 줄었습니다 — 진행 과제의 MW 입력 여부를 확인해 주세요' });
-  }
-  document.getElementById('myInsight').innerHTML = items.map(i =>
-    `<div class="g-ins-item"><div class="g-ins-ic">${i.ic}</div>
-      <div><div class="g-ins-t">${i.t}</div><div class="g-ins-d">${i.d}</div></div></div>`).join('');
+  const best = [...GUILD.axes].sort((a,b) => r.axes[b.k] - r.axes[a.k])[0];
+  const hints = [];
+  if(r.axes[best.k] >= 60) hints.push(`가장 강한 축은 「${best.n}」(전사 상위 ${Math.max(1, 100 - r.axes[best.k])}%)입니다.`);
+  else if(GUILD.axes.some(a => r.raw[a.k] > 0)) hints.push(`「${best.n}」을 중심으로 활동이 쌓이고 있습니다.`);
+  else hints.push('아직 집계된 활동이 없습니다 — Man Week 입력부터 시작해 보세요.');
+  if(simScore > r.score) hints.push(`지식자산 1건 추가 시 <b>${r.score} → ${simScore}점</b>, 전사 ${nf(r.rank)}위 → 약 ${nf(simRank)}위.`);
+  const missing = GUILD.bonus.filter(b => !(r.raw[b.k] > 0));
+  if(missing.length) hints.push(`${missing.map(b=>b.n).join('·')} 과제 참여 시 활동 범위 보너스 +${missing.reduce((s,b)=>s+b.pts,0)}점.`);
+  $m('myScoreHint').innerHTML = hints.join(' ');
 }
 
-function renderRadar(r){
-  const org = GX.orgAvg[r.p.o];
-  document.getElementById('myRadarSub').textContent =
-    `6개 활동 축 — 나 vs ${r.p.o} 평균(${org.n}명) · 전사 백분위(0~100) 환산`;
-  const opt = {
-    tooltip: tip({}),
-    legend:{ bottom:0, itemWidth:12, itemHeight:8, textStyle:{ fontSize:11, color:G_INK2 } },
-    radar:{ center:['50%','46%'], radius:'64%', splitNumber:4,
-      indicator: GUILD.axes.map(a => ({ name:a.n, max:100 })),
-      axisName:{ color:G_INK2, fontSize:11 },
-      splitLine:{ lineStyle:{ color:G_LINE } },
-      splitArea:{ areaStyle:{ color:['#F8FAFC','#FFFFFF'] } },
-      axisLine:{ lineStyle:{ color:G_LINE } } },
-    series:[{ type:'radar', symbolSize:5, data:[
-      { name:'나', value: GUILD.axes.map(a => r.axes[a.k]),
-        itemStyle:{ color:G_PRIMARY }, lineStyle:{ width:2.5, color:G_PRIMARY },
-        areaStyle:{ color:'rgba(37,99,235,.22)' } },
-      { name:r.p.o + ' 평균', value: GUILD.axes.map(a => org.axes[a.k]),
-        itemStyle:{ color:G_GRAY }, lineStyle:{ width:2, type:'dashed', color:G_GRAY },
-        areaStyle:{ color:'rgba(148,163,184,.12)' } },
-    ]}],
+/* 내 할 일: 내 과제·성과 등록 상태에서 파생. [level, title, sub, go(), label] */
+function todoItems(r){
+  const p = r.p, items = [], asOf = asOfMy(), cy = ME.latestYm.slice(0,4);
+  const regs = myRegsOf(r), cands = myCandsOf(r);
+  if(!(p.curYm > 0)) items.push(['bad', `${ME.latestYm} Man Week 미입력`, '이번 달 투입 실적을 기록해 주세요', () => go('mw'), 'MW 분석']);
+  regs.filter(g => g.status === '보완').forEach(g => items.push(['bad', `재무실 보완 요청 — ${g.code}`, g.supplementReason || '재제출 필요', () => { go('pp'); WB.openReg(g); goPp('wb'); }, '① 워크벤치']));
+  regs.filter(g => ['등록','검토','보완'].includes(g.status) && !erosionDone(g)).forEach(g => items.push(['warn', `역효과 체크리스트 미작성 — ${g.code}`, '승인 전 점검 필요', () => { go('pp'); ErosionView.select(g.id); goPp('erosion'); }, '④ 역효과']));
+  cands.forEach(c => items.push(['warn', `성과 등록 미착수 — ${c.code}`, `${c.name} · ${c.effect || ''}`.trim(), () => { go('pp'); WB.openCandidate(c.code); goPp('wb'); }, '① 워크벤치']));
+  regs.filter(g => g.contribution && g.contribution.mode === 'UP' && g.contribution.approval && g.contribution.approval.status === '승인대기').forEach(g => items.push(['warn', `기여율 상향 승인 대기 — ${g.code}`, '승인 전까지 표준 기여율 적용', () => { go('pp'); CT.select(g.id); goPp('contrib'); }, '⑤ 기여율']));
+  regs.filter(g => ['등록','검토'].includes(g.status)).forEach(g => items.push(['info', `재무실 검토 중 — ${g.code}`, g.slaDay != null ? `SLA D-${g.slaDay}` : '검토 대기', () => { go('pp'); APV.select(g.id); goPp('approval'); }, '⑥ 승인']));
+  p.projects.filter(x => x[4] && String(x[3]).includes('진행')).forEach(x => {
+    const dd = dayDiff(x[4], asOf);
+    if(dd >= 0 && dd <= 90) items.push(['info', `완료 임박 — ${x[0]} (D-${dd})`, x[1], () => go('act', actOfCode(x[0])), '활동군 상세']);
+  });
+  if(!p.knowledge.some(k => (k[2]||'').startsWith(cy))) items.push(['info', `${cy}년 지식자산 미등록`, '논문·학회 발표 등록 시 점수·EXP 자동 반영 (a5)', null, '']);
+  return items;
+}
+function renderTodo(r){
+  const items = todoItems(r);
+  const act = items.filter(i => i[0] !== 'info').length;
+  $m('myTodoCnt').textContent = items.length ? `${items.length}건 · 조치 필요 ${act}건` : '없음';
+  $m('myTodo').innerHTML = items.length ? items.map((it,i) =>
+    `<li data-i="${i}" ${it[3]?'tabindex="0"':'class="none"'}><span class="dot" style="background:var(--${it[0]==='info'?'brand':it[0]})"></span>
+       <div><div>${escM(it[1])}</div><div class="sub">${escM(it[2])}</div></div>${it[3]?`<span class="go">${escM(it[4])} →</span>`:''}</li>`).join('')
+    : '<li class="none"><span class="dot" style="background:var(--good)"></span>막힌 항목이 없습니다.</li>';
+  $m('myTodo').onclick = e => { const li = e.target.closest('li[data-i]'); if(li && items[+li.dataset.i][3]) items[+li.dataset.i][3](); };
+  $m('myTodo').onkeydown = e => { const li = e.target.closest('li[data-i]'); if(li && (e.key==='Enter'||e.key===' ') && items[+li.dataset.i][3]){ e.preventDefault(); items[+li.dataset.i][3](); } };
+}
+
+function renderProjects(r){
+  const p = r.p, asOf = asOfMy(), regs = myRegsOf(r), cands = myCandsOf(r);
+  $m('myProjCnt').textContent = `참여 ${p.projN ?? p.projects.length}건`;
+  const rows = p.projects.map((x, i) => {
+    const reg = regs.find(g => g.code === x[0]), cand = cands.find(c => c.code === x[0]);
+    const end = x[4] ? (() => { const dd = dayDiff(x[4], asOf); const run = String(x[3]).includes('진행');
+      return `${x[4]}${run ? `<span class="dday${dd > 30 || dd < 0 ? ' ok' : ''}">${dd >= 0 ? 'D-' + dd : 'D+' + (-dd)}</span>` : ''}`; })() : '−';
+    const perf = reg ? `<a class="code" data-i="${i}" data-k="reg">${stPill(reg.status)}</a>`
+               : cand ? `<a class="code" data-i="${i}" data-k="cand"><span class="pill y">후보 · 미등록</span></a>`
+               : `<span class="g-pill n">${String(x[3]).includes('완료') ? '대상 아님' : '−'}</span>`;
+    return `<tr><td><a class="code" data-i="${i}" data-k="act">${escM(x[0] || '−')}</a></td><td>${escM(x[1])}</td>
+      <td class="num"><b>${nf(x[2])}</b></td><td class="num">${x[5] != null ? x[5] + '%' : '−'}</td>
+      <td>${x[3] === '-' ? '<span class="g-pill n">과제정보 없음</span>' : String(x[3]).includes('진행') ? `<span class="g-pill g">${escM(x[3])}</span>` : `<span class="g-pill y">${escM(x[3])}</span>`}</td>
+      <td style="white-space:nowrap">${end}</td><td>${perf}</td></tr>`;
+  });
+  const tb = document.querySelector('#myProj tbody');
+  tb.innerHTML = rows.join('') || '<tr><td colspan="7" class="g-empty">참여 과제 없음</td></tr>';
+  tb.onclick = e => {
+    const a = e.target.closest('a.code'); if(!a) return;
+    const x = p.projects[+a.dataset.i];
+    if(a.dataset.k === 'reg'){ const reg = regs.find(g => g.code === x[0]); go('pp'); LN.render(perfOf().regs.indexOf(reg)); goPp('trace'); }
+    else if(a.dataset.k === 'cand'){ go('pp'); WB.openCandidate(x[0]); goPp('wb'); }
+    else go('act', actOfCode(x[0]));
   };
-  myRadar = myRadar ? (myRadar.setOption(opt, { replaceMerge:['series','radar'] }), myRadar) : mk('myRadar', opt);
 }
 
-function renderBench(r){
-  const cy = ME.latestYm.slice(0,4), mNo = +ME.latestYm.slice(5,7);
-  const yearMw = Object.entries(r.p.ym).filter(([ym]) => ym.startsWith(cy)).reduce((s,[,v]) => s+v, 0);
-  const myYearAvg = Math.round(yearMw / mNo * 12 * 10) / 10;
-  const orgMw = ME.orgAvgYear[r.p.o] || ME.allAvgYear;
-  document.getElementById('myBenchSub').innerHTML =
-    `Activity Score 비교 · 참고: 내 연환산 투입 <b>${nf(myYearAvg)}</b> MW/년 ` +
-    `(${r.p.o} 평균 ${nf(orgMw)} · 전사 평균 ${nf(ME.allAvgYear)})`;
-  const rows = [
-    ['Top Performer', GX.topScore, G_GOLD],
-    ['전사 평균',      GX.allAvg,   G_GRAY],
-    [r.p.o + ' 평균',  GX.orgAvg[r.p.o].score, G_TEAM],
-    ['나',            r.score,     G_PRIMARY],
-  ];
-  const opt = {
-    tooltip: tip({ trigger:'axis', axisPointer:{ type:'shadow' },
-      formatter: q => `${q[0].name}<br><b>${q[0].value}</b> / 100` }),
-    grid:{ left:110, right:52, top:10, bottom:26 },
-    xAxis: axisY({ type:'value', max:100, name:'Score', nameTextStyle:{ color:G_INK3 } }),
-    yAxis: axisX({ type:'category', data: rows.map(x => x[0]), axisLabel:{ fontSize:11.5, color:G_INK2 } }),
-    series:[{ type:'bar', barMaxWidth:24, itemStyle:{ borderRadius:[0,6,6,0] },
-      label:{ show:true, position:'right', fontSize:11.5, fontWeight:700, color:G_INK2 },
-      data: rows.map(x => ({ value:x[1], itemStyle:{ color:x[2] } })) }],
-  };
-  myBench = myBench ? (myBench.setOption(opt, { replaceMerge:['series'] }), myBench) : mk('myBench', opt);
-}
-
-function renderBadges(r){
-  const p = r.p, raw = r.raw;
-  const inUse = p.impact.filter(x => x[2] === '활용중').length;
-  const ymKeys = Object.keys(p.ym).filter(k => k <= ME.latestYm).sort();
-  const last12 = GX.months.length ? ymKeys.slice(-12) : [];
-  const streak = last12.filter(k => p.ym[k] > 0).length;
-  const topPct = r.topPct;
-  const defs = [
-    { ic:'📚', t:'Knowledge Author', ok: raw.knowledge >= 1,
-      on:`논문·발표 ${raw.knowledge}건 등록`, off:'논문·발표 1건 등록 시 획득' },
-    { ic:'🏆', t:'Impact Maker', ok: inUse >= 1,
-      on:`활용중 성과 ${inUse}건 보유`, off:'완료과제가 현장에서 활용되면 획득' },
-    { ic:'💎', t:'Value Creator', ok: raw.impact >= 10,
-      on:`누적 실현이익 ${nf(Math.round(raw.impact*10)/10)}억`, off:`실현이익 ${nf(Math.round((10-raw.impact)*10)/10)}억 더 필요` },
-    { ic:'🤝', t:'Team Player', ok: raw.collab >= 5,
-      on:`${raw.collab}개 과제 참여`, off:`과제 ${5-raw.collab}건 더 참여 시 획득` },
-    { ic:'🚀', t:'Explorer', ok: raw.explore > 0,
-      on:`탐색·혁신 ${nf(Math.round(raw.explore))} MW`, off:'탐색·혁신 과제 참여 시 획득' },
-    { ic:'🔧', t:'Field Solver', ok: raw.field > 0,
-      on:`현업 대응 ${nf(Math.round(raw.field))} MW`, off:'현업·고객 문제해결 참여 시 획득' },
-    { ic:'🔥', t:'Steady Pace', ok: streak >= 10,
-      on:`최근 12개월 중 ${streak}개월 기록`, off:`꾸준한 기록 ${Math.max(0,10-streak)}개월 더 필요` },
-    { ic:'⭐', t:'Top Performer', ok: topPct <= 10,
-      on:`종합 상위 ${topPct}%`, off:`상위 10% 진입까지 ${topPct-10}%p` },
-  ];
-  const got = defs.filter(d => d.ok).length;
-  document.getElementById('myBadgeCnt').textContent = `${got} / ${defs.length} 획득`;
-  document.getElementById('myBadges').innerHTML = defs.map((d,i) =>
-    `<div class="g-badge ${d.ok ? 'on' : 'off'}" style="animation-delay:${i*45}ms"
-          title="${d.ok ? d.on : d.off}">
-       <span class="ic">${d.ic}</span>
-       <div class="t">${d.t}</div>
-       <div class="d">${d.ok ? d.on : d.off}</div>
-     </div>`).join('');
-}
-
-function renderQuests(r){
-  const p = r.p, cy = ME.latestYm.slice(0,4);
-  const kThisYear = p.knowledge.filter(k => (k[2] || '').startsWith(cy)).length;
-  const inUse = p.impact.filter(x => x[2] === '활용중').length;
-  const qs = [
-    { t:`${ME.latestYm} Man Week 입력`, d:'이번 달 투입 실적 기록', exp:50,  ok: p.curYm > 0 },
-    { t:'금년 지식자산 등록',            d:`${cy}년 논문·발표·학회 1건 이상`, exp:150, ok: kThisYear >= 1 },
-    { t:'과제 5건 이상 참여',            d:`현재 ${r.raw.collab}건 참여 중`,  exp:100, ok: r.raw.collab >= 5 },
-    { t:'활용중 성과 확보',              d:'완료과제의 현장 활용 달성',       exp:200, ok: inUse >= 1 },
-  ];
-  const done = qs.filter(q => q.ok).length;
-  const gain = qs.filter(q => q.ok).reduce((s,q) => s + q.exp, 0);
-  const total = qs.reduce((s,q) => s + q.exp, 0);
-  document.getElementById('myQuestCnt').textContent = `${done} / ${qs.length} 완료`;
-  document.getElementById('myQuests').innerHTML = qs.map(q =>
-    `<div class="g-quest ${q.ok ? 'done' : ''}">
-       <div class="g-check ${q.ok ? 'done' : ''}">${q.ok ? '✓' : ''}</div>
-       <div><div class="g-qt">${q.t}</div><div class="g-qd">${q.d}</div></div>
-       <span class="g-qx">+${q.exp} EXP</span>
-     </div>`).join('') +
-    `<div style="margin-top:14px;font-size:12px;color:var(--g-ink2)">
-       획득 <b style="color:var(--g-primary)">${nf(gain)}</b> / ${nf(total)} EXP
-     </div>`;
-}
-
-function renderTimeline(r){
-  const p = r.p, ev = [];
-  const ymKeys = Object.keys(p.ym).filter(k => p.ym[k] > 0 && k <= ME.latestYm).sort();
-  if(ymKeys.length)
-    ev.push({ d:ymKeys[0], t:'연구활동 기록 시작', s:`${ymKeys[0]} · 첫 Man Week 기록`, ic:'🌱' });
-  p.knowledge.slice().sort((a,b) => (a[2]||'').localeCompare(b[2]||'')).slice(0,2)
-    .forEach(k => ev.push({ d:k[2], t:`${k[0]} — ${k[1]}`, s:'지식자산 등록 (+500 EXP)', ic:'📚' }));
-  p.impact.slice().sort((a,b) => a[1] - b[1]).slice(0,2)
-    .forEach(x => ev.push({ d:`${x[1]}-12`, t:x[0], s:`완료과제 ${x[2]} · 실현이익 ${nf(x[3])}억`, ic:'🏆' }));
-  if(p.projects.length)
-    ev.push({ d:ymKeys[Math.floor(ymKeys.length/2)] || ymKeys[0],
-      t:`주력 과제 — ${p.projects[0][1]}`, s:`내 투입 ${nf(p.projects[0][2])} MW (최다)`, ic:'🎯' });
-  ev.sort((a,b) => (a.d||'').localeCompare(b.d||''));
-  ev.push({ d:ME.latestYm, t:`현재 — Level ${r.level} · ${GUILD.tierOf(r.level)}`,
-    s:`종합 점수 ${r.score}점 (Grade ${r.grade}) · 전사 ${nf(r.rank)}위`, ic:'📍', now:true });
-  document.getElementById('myTimeline').innerHTML = ev.map((e,i) =>
-    `<li class="${e.now ? 'now' : ''}" style="animation-delay:${i*70}ms">
-       <div class="tt">${e.ic} ${e.t}</div>
-       <div class="td">${e.s}</div>
-       <div class="tm">${e.d || ''}</div>
-     </li>`).join('');
-}
-
-function renderPortfolio(r){
+function renderImpact(r){
   const p = r.p;
-  const opt = {
-    tooltip: tip({ formatter: q => `${q.name} <b>${nf(q.value)}</b> MW (${q.percent}%)` }),
-    legend:{ bottom:0, itemWidth:10, itemHeight:10, textStyle:{ fontSize:11, color:G_INK2 } },
-    series:[{ type:'pie', radius:['52%','76%'], center:['50%','44%'],
-      itemStyle:{ borderColor:'#fff', borderWidth:3 }, label:{ show:false },
-      data:[{ name:ACT[1], value:p.acts[0], itemStyle:{ color:C[1] } },
-            { name:ACT[3], value:p.acts[1], itemStyle:{ color:C[3] } },
-            { name:ACT[4], value:p.acts[2], itemStyle:{ color:C[4] } }].filter(d => d.value > 0) }],
-  };
-  myDonut = myDonut ? (myDonut.setOption(opt, { replaceMerge:['series'] }), myDonut) : mk('myDonut', opt);
+  const mine = r1(p.impact.reduce((s,x)=>s+(x[5]||0),0)), total = r1(p.impact.reduce((s,x)=>s+(x[3]||0),0));
+  const inUse = p.impact.filter(x=>x[2]==='활용중').length;
+  $m('myImpactStats').innerHTML =
+    gStat('내 몫 실현이익', nf(mine), `과제 전체 ${nf(total)}억 중`, '억') +
+    gStat('추적 과제', p.impact.length, `활용중 ${inUse}건`, '건') +
+    gStat('평균 내 비중', p.impact.length ? Math.round(p.impact.reduce((s,x)=>s+(x[4]||0),0)/p.impact.length) : 0, 'MW 기준', '%');
+  document.querySelector('#myImpact tbody').innerHTML = p.impact.map(x =>
+    `<tr><td>${escM(x[0])}</td><td class="num">${x[1]}</td><td>${gPill(x[2])}</td>
+      <td class="num">${nf(x[3])}억</td><td class="num">${x[4] != null ? x[4] + '%' : '−'}</td><td class="num"><b>${nf(x[5] ?? 0)}</b>억</td></tr>`).join('')
+    || '<tr><td colspan="6" class="g-empty">추적 중인 완료과제 없음 (정량효과 과제 기준)</td></tr>';
 }
 
 function renderCalendar(r){
-  const p = r.p, data = [];
-  ME.years.forEach((y, yi) => MONTHS.forEach((m, mi) => {
+  const p = r.p, cy = ME.latestYm.slice(0,4), mNo = +ME.latestYm.slice(5,7);
+  const yearMw = Object.entries(p.ym).filter(([ym]) => ym.startsWith(cy)).reduce((s,[,v]) => s+v, 0);
+  const myYearAvg = r1(yearMw / mNo * 12), orgMw = ME.orgAvgYear[p.o] || ME.allAvgYear;
+  const m = GX.months, recent = m.slice(-3).reduce((s,ym)=>s+(p.ym[ym]||0),0), prev = m.slice(-6,-3).reduce((s,ym)=>s+(p.ym[ym]||0),0);
+  const active = m.filter(ym => p.ym[ym] > 0).length;
+  $m('myCalStats').innerHTML =
+    gStat(cy + '년 투입', nf(r1(yearMw)), `연환산 ${nf(myYearAvg)} MW`, 'MW') +
+    gStat('연구소 평균 대비', orgMw ? Math.round(100 * myYearAvg / orgMw) : '−', `${escM(p.o)} ${nf(orgMw)} · 전사 ${nf(ME.allAvgYear)} MW/년`, '%') +
+    gStat('최근 3개월', nf(r1(recent)), `직전 3개월 ${nf(r1(prev))} MW ${recent >= prev ? '▲' : '▼'}`, 'MW') +
+    gStat('최근 12개월 기록', active, '월 단위 입력', '개월');
+  const data = [];
+  ME.years.forEach((y, yi) => MONTHS.forEach((mm, mi) => {
     const v = p.ym[`${y}-${String(mi+1).padStart(2,'0')}`];
     if(v !== undefined) data.push([mi, yi, v]);
   }));
@@ -2621,49 +2489,153 @@ function renderCalendar(r){
   myGrass = myGrass ? (myGrass.setOption(opt, { replaceMerge:['series','visualMap'] }), myGrass) : mk('myGrass', opt);
 }
 
-function renderTables(r){
-  const p = r.p;
-  document.querySelector('#myProj tbody').innerHTML = p.projects.map(x =>
-    `<tr><td>${x[0] || '−'}</td><td>${x[1]}</td><td class="num"><b>${nf(x[2])}</b></td>
-      <td>${x[3] === '-' ? '<span class="g-pill n">과제정보 없음</span>'
-        : x[3].includes('진행') ? `<span class="g-pill g">${x[3]}</span>`
-        : `<span class="g-pill y">${x[3]}</span>`}</td></tr>`).join('')
-    || '<tr><td colspan="4" class="g-empty">참여 과제 없음</td></tr>';
-  document.querySelector('#myImpact tbody').innerHTML = p.impact.map(x =>
-    `<tr><td>${x[0]}</td><td class="num">${x[1]}</td><td>${gPill(x[2])}</td>
-      <td class="num"><b>${nf(x[3])}</b>억</td></tr>`).join('')
-    || '<tr><td colspan="4" class="g-empty">추적 중인 완료과제 없음 (정량효과 과제 기준)</td></tr>';
-  document.getElementById('myKnow').innerHTML = p.knowledge.map(k =>
+function renderRadar(r){
+  const org = GX.orgAvg[r.p.o];
+  $m('myRadarSub').textContent = `4개 활동 축 — 나 vs ${r.p.o} 상위 25% 선(${org.n}명) · 전사 백분위(0~100)`;
+  const opt = {
+    tooltip: tip({}),
+    legend:{ bottom:0, itemWidth:12, itemHeight:8, textStyle:{ fontSize:11, color:G_INK2 } },
+    radar:{ center:['50%','48%'], radius:'62%', splitNumber:4,
+      indicator: GUILD.axes.map(a => ({ name:a.n + (a.src==='DEMO' ? ' (DEMO)' : ''), max:100 })),
+      axisName:{ color:G_INK2, fontSize:11 },
+      splitLine:{ lineStyle:{ color:G_LINE } },
+      splitArea:{ areaStyle:{ color:['#F8FAFC','#FFFFFF'] } },
+      axisLine:{ lineStyle:{ color:G_LINE } } },
+    series:[{ type:'radar', symbolSize:5, data:[
+      { name:'나', value: GUILD.axes.map(a => r.axes[a.k]),
+        itemStyle:{ color:G_PRIMARY }, lineStyle:{ width:2.5, color:G_PRIMARY },
+        areaStyle:{ color:'rgba(37,99,235,.22)' } },
+      { name:r.p.o + ' 상위 25% 선', value: GUILD.axes.map(a => org.q75[a.k]),
+        itemStyle:{ color:G_GRAY }, lineStyle:{ width:2, type:'dashed', color:G_GRAY },
+        areaStyle:{ color:'rgba(148,163,184,.10)' } },
+    ]}],
+  };
+  myRadar = myRadar ? (myRadar.setOption(opt, { replaceMerge:['series','radar'] }), myRadar) : mk('myRadar', opt);
+  const rows = [['나', r.score, G_PRIMARY], [r.p.o + ' 평균', org.score, G_TEAM], ['전사 평균', GX.allAvg, G_GRAY], ['Top', GX.topScore, G_GOLD]];
+  $m('myBench').innerHTML = rows.map(x => `<div><div class="l">${escM(x[0])}</div><div class="v" style="color:${x[2]}">${x[1]}</div></div>`).join('');
+}
+
+function renderBadges(r){
+  const p = r.p, raw = r.raw;
+  const inUse = p.impact.filter(x => x[2] === '활용중').length;
+  const streak = GX.months.filter(ym => p.ym[ym] > 0).length;
+  const topPct = r.topPct;
+  const defs = [
+    { ic:'📚', t:'Knowledge Author', ok: raw.knowledge >= 1,
+      on:`논문·발표 ${raw.knowledge}건 등록`, off:'논문·발표 1건 등록 시 획득' },
+    { ic:'🏆', t:'Impact Maker', demo:true, ok: inUse >= 1,
+      on:`활용중 성과 ${inUse}건 보유`, off:'완료과제가 현장에서 활용되면 획득' },
+    { ic:'💎', t:'Value Creator', demo:true, ok: raw.impact >= 3,
+      on:`내 몫 실현이익 ${nf(r1(raw.impact))}억`, off:`내 몫 실현이익 ${nf(r1(3-raw.impact))}억 더 필요` },
+    { ic:'🤝', t:'Team Player', ok: raw.collab >= 5,
+      on:`${raw.collab}개 과제 참여`, off:`과제 ${5-raw.collab}건 더 참여 시 획득` },
+    { ic:'🚀', t:'Explorer', ok: raw.explore > 0,
+      on:`탐색·혁신 ${nf(Math.round(raw.explore))} MW`, off:'탐색·혁신 과제 참여 시 획득 (+5점)' },
+    { ic:'🔧', t:'Field Solver', ok: raw.field > 0,
+      on:`현업 대응 ${nf(Math.round(raw.field))} MW`, off:'현업·고객 문제해결 참여 시 획득 (+5점)' },
+    { ic:'🔥', t:'Steady Pace', ok: streak >= 10,
+      on:`최근 12개월 중 ${streak}개월 기록`, off:`꾸준한 기록 ${Math.max(0,10-streak)}개월 더 필요` },
+    { ic:'⭐', t:'Top Performer', ok: topPct <= 10,
+      on:`종합 상위 ${topPct}%`, off:`상위 10% 진입까지 ${topPct-10}%p` },
+  ];
+  const got = defs.filter(d => d.ok).length;
+  $m('myBadgeCnt').textContent = `${got} / ${defs.length} 획득`;
+  $m('myBadges').innerHTML = defs.map((d,i) =>
+    `<div class="g-badge ${d.ok ? 'on' : 'off'}" style="animation-delay:${i*45}ms" title="${escM(d.ok ? d.on : d.off)}">
+       <span class="ic">${d.ic}</span>
+       <div class="t">${d.t}${d.demo ? '<span class="demo">DEMO</span>' : ''}</div>
+       <div class="d">${escM(d.ok ? d.on : d.off)}</div>
+     </div>`).join('');
+}
+
+/* 동적 퀘스트: 내 상태에서 파생되는 후보 중 미완료 우선, 최대 5개 */
+function renderQuests(r){
+  const p = r.p, cy = ME.latestYm.slice(0,4), asOf = asOfMy();
+  const regs = myRegsOf(r), cands = myCandsOf(r), openRegs = regs.filter(g => ['등록','검토','보완'].includes(g.status));
+  const inUse = p.impact.filter(x => x[2] === '활용중').length;
+  const soon = p.projects.filter(x => x[4] && String(x[3]).includes('진행') && dayDiff(x[4], asOf) >= 0 && dayDiff(x[4], asOf) <= 90);
+  const pool = [
+    { t:`${ME.latestYm} Man Week 입력`, d:'이번 달 투입 실적 기록', exp:50, ok: p.curYm > 0 },
+    { t:'금년 지식자산 등록', d:`${cy}년 논문·발표·학회 1건 이상`, exp:150, ok: p.knowledge.some(k => (k[2]||'').startsWith(cy)) },
+    cands.length ? { t:'완료과제 성과 등록 착수', d:`후보 ${cands.length}건 — ${cands[0].code}`, exp:200, ok:false } : null,
+    openRegs.length ? { t:'역효과 체크리스트 작성', d:`검토 중 등록 ${openRegs.length}건`, exp:100, ok: openRegs.every(erosionDone) } : null,
+    regs.length ? { t:'성과 재무실 확정', d:`등록 ${regs.length}건 중 확정 ${regs.filter(g=>['확정','승인'].includes(g.status)).length}건`, exp:300, ok: regs.length > 0 && regs.every(g => ['확정','승인'].includes(g.status)) } : null,
+    soon.length ? { t:'완료 임박 과제 마무리', d:`90일 내 완료 ${soon.length}건 — ${soon[0][0]}`, exp:150, ok:false } : null,
+    { t:'과제 5건 이상 참여', d:`현재 ${r.raw.collab}건 참여 중`, exp:100, ok: r.raw.collab >= 5 },
+    { t:'활용중 성과 확보', d:'완료과제의 현장 활용 달성 (DEMO)', exp:200, ok: inUse >= 1 },
+  ].filter(Boolean);
+  const qs = pool.filter(q => !q.ok).concat(pool.filter(q => q.ok)).slice(0, 5);
+  const done = qs.filter(q => q.ok).length;
+  const gain = qs.filter(q => q.ok).reduce((s,q) => s + q.exp, 0), total = qs.reduce((s,q) => s + q.exp, 0);
+  $m('myQuestCnt').textContent = `${done} / ${qs.length} 완료`;
+  $m('myQuests').innerHTML = qs.map(q =>
+    `<div class="g-quest ${q.ok ? 'done' : ''}">
+       <div class="g-check ${q.ok ? 'done' : ''}">${q.ok ? '✓' : ''}</div>
+       <div><div class="g-qt">${escM(q.t)}</div><div class="g-qd">${escM(q.d)}</div></div>
+       <span class="g-qx">+${q.exp} EXP</span>
+     </div>`).join('') +
+    `<div style="margin-top:12px;font-size:12px;color:var(--g-ink2)">획득 <b style="color:var(--g-primary)">${nf(gain)}</b> / ${nf(total)} EXP</div>`;
+}
+
+function renderTimeline(r){
+  const p = r.p, ev = [];
+  const ymKeys = Object.keys(p.ym).filter(k => p.ym[k] > 0 && k <= ME.latestYm).sort();
+  if(ymKeys.length) ev.push({ d:ymKeys[0], t:'연구활동 기록 시작', s:`${ymKeys[0]} · 첫 Man Week 기록`, ic:'🌱' });
+  p.knowledge.filter(k => k[2]).slice().sort((a,b) => a[2].localeCompare(b[2])).slice(0,3)
+    .forEach(k => ev.push({ d:k[2], t:`${k[0]} — ${k[1]}`, s:'지식자산 등록 (+500 EXP)', ic:'📚' }));
+  p.impact.slice().sort((a,b) => a[1] - b[1]).slice(0,2)
+    .forEach(x => ev.push({ d:`${x[1]}`, t:x[0], s:`완료과제 ${x[2]} · 내 몫 실현이익 ${nf(x[5] ?? 0)}억 (DEMO)`, ic:'🏆' }));
+  myRegsOf(r).slice(0,2).forEach(g => ev.push({ d:g.period ? String(g.period).slice(0,7) : ME.latestYm, t:`성과 등록 — ${g.code}`, s:`${g.type || ''} · ${g.status} · 순재무성과 ${nf(g.netEok)}억`, ic:'🧾' }));
+  ev.sort((a,b) => (a.d||'').localeCompare(b.d||''));
+  ev.push({ d:ME.latestYm, t:`현재 — Level ${r.level} · ${GUILD.tierOf(r.level)}`,
+    s:`종합 점수 ${r.score}점 (Grade ${r.grade}) · 전사 ${nf(r.rank)}위`, ic:'📍', now:true });
+  $m('myTimeline').innerHTML = ev.map((e,i) =>
+    `<li class="${e.now ? 'now' : ''}" style="animation-delay:${i*70}ms">
+       <div class="tt">${e.ic} ${escM(e.t)}</div>
+       <div class="td">${escM(e.s)}</div>
+       <div class="tm">${escM(e.d || '')}${/^\d{4}$/.test(e.d||'') ? '년' : ''}</div>
+     </li>`).join('');
+}
+
+function renderKnow(r){
+  $m('myKnow').innerHTML = r.p.knowledge.map(k =>
     `<li><span class="dot2" style="background:${C[5]}"></span>
-      <span>[${k[0]}] ${k[1]}</span><span class="mt">${k[2]}</span></li>`).join('')
+      <span>[${escM(k[0])}] ${escM(k[1])}</span><span class="mt">${escM(k[2])}</span></li>`).join('')
     || '<li class="g-empty">등록된 지식자산 활동 없음 — 첫 논문·발표를 등록해 보세요</li>';
 }
 
 /* ── 5) 진입점 ───────────────────────────────────────────────────────── */
+let myCurrent = null;
 function renderMe(name){
-  const r = GX.map[name];
-  document.getElementById('myNudge').innerHTML = r.p.curYm > 0
+  const r = GX.map[name]; myCurrent = name;
+  $m('myNudge').innerHTML = r.p.curYm > 0
     ? `<span class="g-pill g">✓ ${ME.latestYm} MW 입력 완료</span>`
     : `<span class="g-pill y">⚠ ${ME.latestYm} MW 미입력</span>`;
-  renderHero(r); renderScore(r); renderRank(r); renderInsight(r);
-  renderRadar(r); renderBench(r); renderBadges(r); renderQuests(r);
-  renderTimeline(r); renderPortfolio(r); renderCalendar(r); renderTables(r);
+  renderHero(r); renderScore(r); renderTodo(r);
+  renderProjects(r); renderImpact(r);
+  renderCalendar(r); renderRadar(r);
+  renderBadges(r); renderQuests(r); renderTimeline(r); renderKnow(r);
 }
 
 const meNames = Object.keys(ME.people).sort((a,b) => a.localeCompare(b,'ko'));
-const mySel = document.getElementById('mySel');
-mySel.innerHTML = meNames.map(n => `<option>${n} · ${ME.people[n].o}</option>`).join('');
+const mySel = $m('mySel');
+mySel.innerHTML = meNames.map(n => `<option>${escM(n)} · ${escM(ME.people[n].o)}</option>`).join('');
 mySel.addEventListener('change', () => renderMe(mySel.value.split(' · ')[0]));
-/* 기본 인물: 성과·지식자산·최근 기록을 모두 갖춘 연구원 중 전사 상위 12% 부근
-   (1위를 띄우면 성장 여지·잠긴 배지가 보이지 않아 데모 서사가 약해진다) */
+/* 기본 인물: 성과·지식자산·최근 기록을 모두 갖추고 성과 플랫폼 원장에 연결된 과제가 있는
+   연구원 중 전사 상위 12% 부근 (1위를 띄우면 성장 여지·잠긴 배지가 보이지 않는다) */
 const myDefault = (function(){
   const target = GX.N * 0.12;
-  const pool = GX.byScore.filter(r => r.p.impact.length && r.p.knowledge.length && r.p.curYm > 0);
+  const regCodes = new Set(D.perf.regs.map(g => g.code)), candCodes = new Set(D.perf.candidates.map(c => c.code));
+  const linked = r => r.p.projects.some(x => regCodes.has(x[0]) || candCodes.has(x[0]));
+  const pool = GX.byScore.filter(r => r.p.impact.length && r.p.knowledge.length && r.p.curYm > 0 && linked(r));
   return (pool.sort((a,b) => Math.abs(a.rank-target) - Math.abs(b.rank-target))[0]
           || GX.byScore[0]).name;
 })();
 mySel.value = `${myDefault} · ${ME.people[myDefault].o}`;
-renderMe(myDefault);
+const MY = {
+  init(){ renderMe(myDefault); },
+  refreshRegs(){ if(myCurrent) { const r = GX.map[myCurrent]; renderTodo(r); renderProjects(r); renderQuests(r); renderTimeline(r); } },
+};
 
 /* ══════════ 성과 플랫폼 탭 (P-1 목업) ══════════ */
 const PF = D.perf;
@@ -2946,7 +2918,7 @@ const WB = (() => {
   }
   function refreshOthers(){
     if(typeof renderRegsTable === 'function') renderTable();
-    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST, typeof LG!=='undefined'&&LG, typeof RO!=='undefined'&&RO, typeof HM!=='undefined'&&HM].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
+    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST, typeof LG!=='undefined'&&LG, typeof RO!=='undefined'&&RO, typeof HM!=='undefined'&&HM, typeof MY!=='undefined'&&MY].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
   }
 
   /* ── 이벤트 */
@@ -2990,7 +2962,7 @@ const WB = (() => {
   }
   let grpSel = null;
   function openIdx(i){ curReg = PF.regs[i]; step = STEP_OF[curReg.status] || 1; render(); }
-  return {init, openReg(r){ const i = PF.regs.indexOf(r); if(i >= 0) openIdx(i); }, renderTable, refresh: render, get ready(){ return true; }};
+  return {init, openReg(r){ const i = PF.regs.indexOf(r); if(i >= 0) openIdx(i); }, openCandidate(code){ if(draft && draft.projectCode && draft.projectCode !== code && !confirm(`작성 중인 초안(${draft.projectCode})을 버리고 ${code}로 새로 시작할까요?`)) return; if(!draft || draft.projectCode !== code){ draft = newDraft(); draft.projectCode = code; const p = project(); if(p) draft.persist = p.persist; saveDraft(); } curReg = null; step = draft.step || 1; render(); }, renderTable, refresh: render, get ready(){ return true; }};
 })();
 function renderWb(reg){ if(typeof WB !== 'undefined') WB.openReg(reg); }        // 구 호환 (CT 등에서 호출)
 function renderRegsTable(){ if(typeof WB !== 'undefined') WB.renderTable(); }
@@ -4370,6 +4342,7 @@ WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연
 CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변경 시 refreshRegs
 CTO.init();   // Executive(연구원장) — 구조 관점
 INST.init();  // Executive(연구소장) — 조직 실행 관점
+MY.init();    // My Dashboard — 성과 플랫폼 원장(등록·후보) 연결 후 렌더
 HM.init();    // 홈 종합현황 — 모든 모듈 초기화 후 (등록 원장·역효과·승인 상태 참조)
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
