@@ -1041,7 +1041,7 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     <div class="row" style="grid-template-columns:7fr 5fr">
       <div class="card" id="wbStep" role="tabpanel" aria-live="polite"></div>
       <div>
-        <div class="card" style="margin-bottom:14px"><h3>진행 요약</h3><div class="sub">성과총액 → −역효과 → ×기여율 → −직접비 → 순재무성과</div><dl class="wb-kv" id="wbSummary"></dl><div class="chart short" id="ppWaterfall" style="margin-top:8px"></div></div>
+        <div class="card" style="margin-bottom:14px"><h3>진행 요약</h3><div class="sub">성과총액 → −역효과 → ×기여율 → −직접비 → 순재무성과</div><dl class="wb-kv" id="wbSummary"></dl><div class="chart short" id="ppWaterfall" style="margin-top:8px"></div><div class="wb-ref" id="wbWfNote" hidden style="margin-top:10px;line-height:1.6"></div></div>
         <div class="card"><h3>미완 항목</h3><div class="sub">검토 요청 또는 승인 전에 채워야 할 것</div><ul class="wb-gaps" id="wbGaps"></ul></div>
       </div>
     </div>
@@ -2584,7 +2584,16 @@ const WB = (() => {
   function renderSummary(m){
     $('wbSummary').innerHTML = [['과제', m.code ? `${esc(m.code)} · ${esc(m.name.slice(0,24))}` : '—'],['유형', m.type ? `<span class="pill" style="background:${gcOf(m.type)};color:#fff">${esc(m.type)}</span> ${esc(typeName(m.type))}` : '—'],
       ['대상 Key', m.rule ? `${m.rule.keys.length}개 · ${esc(m.rule.periodKey)}` : '—'],['ERP 매칭', m.matched ? `${nf(m.matched.records)}건${m.frozen?' · 동결':''}` : '—'],['성과총액', `<b>${nf(m.grossEok)}억</b>`],['역효과', `−${nf(m.erosionEok)}억`],['기여율', `× ${m.contrib}%`],['직접발생비', `−${nf(m.directEok)}억`],['순재무성과', `<b style="color:var(--brand)">${nf(m.netEok)}억</b>`],['상태', m.isDraft ? '작성중 (초안)' : stPill(m.status)]].map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('');
+    const noData = m.isDraft && !(m.matched && m.matched.records > 0), wf = $('ppWaterfall'), note = $('wbWfNote');
+    if(noData){   // 초안: 매칭 전에는 워터폴 대신 안내 문구
+      wf.hidden = true; note.hidden = false;
+      note.innerHTML = !m.type ? '<b>워터폴은 ERP 매칭 후 표시됩니다.</b><br>Step1에서 과제와 재무성과 유형을 고르면 산식이 정해집니다.'
+        : `<b>워터폴은 ERP 매칭 후 표시됩니다.</b><br>Step2에서 대상 식별 Key ${m.rule.keys.length}개와 기간을 입력하고 「ERP 매칭 미리보기」를 실행하면 성과총액 → −역효과 → ×기여율(표준 ${m.contrib}%) → −직접비 → 순재무성과 흐름이 그려집니다.`;
+      return;
+    }
+    const wasHidden = wf.hidden; wf.hidden = false; note.hidden = true;
     drawWaterfall('ppWaterfall', {grossEok:m.grossEok, erosionEok:m.erosionEok, contrib:m.contrib, directEok:m.directEok, netEok:m.netEok, type:m.type||'A-1'}, wfRef);
+    if(wasHidden && wfRef.c) wfRef.c.resize();
   }
   function renderGaps(m){
     $('wbGaps').innerHTML = m.gaps.length ? m.gaps.map(g=>`<li><span class="ic">!</span><span><b>${esc(g[0])}</b> ${esc(g[1])}</span><button type="button" data-go="${g[2]}">이동 →</button></li>`).join('') : `<li><span class="ic ok">✓</span><span>${m.isDraft?'검토 요청 준비 완료':'미완 항목 없음'}</span></li>`;
