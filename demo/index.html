@@ -2624,7 +2624,7 @@ const WB = (() => {
   }
   function refreshOthers(){
     if(typeof renderRegsTable === 'function') renderTable();
-    ['LN','CT','GR','ErosionView'].forEach(k => { const mod = ({LN:typeof LN!=='undefined'&&LN, CT:typeof CT!=='undefined'&&CT, GR:typeof GR!=='undefined'&&GR, ErosionView:typeof ErosionView!=='undefined'&&ErosionView})[k]; if(mod && mod.refreshRegs) mod.refreshRegs(); });
+    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
   }
 
   /* ── 이벤트 */
@@ -2650,7 +2650,7 @@ const WB = (() => {
       if(act === 'trace' && curReg){ LN.render(PF.regs.indexOf(curReg), 4); goPp('trace'); }
       if(act === 'erosion' && curReg){ ErosionView.select(curReg.id); goPp('erosion'); }
       if(act === 'contrib' && curReg){ CT.select(curReg.id); goPp('contrib'); }
-      if(act === 'approval'){ goPp('approval'); }
+      if(act === 'approval'){ if(curReg && ['검토','보완','등록'].includes(curReg.status)) APV.select(curReg.id); goPp('approval'); }
     });
     root.addEventListener('keydown', e => { const tr = e.target.closest('tr.r'); if(tr && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openIdx(+tr.dataset.i); } });
     root.addEventListener('click', e => { const tr = e.target.closest('#ppRegs tr.r'); if(tr) openIdx(+tr.dataset.i); });
@@ -2941,59 +2941,63 @@ const LN = (() => {
 })();
 function renderLineage(idx){ LN.render(idx); }   // ④ 승인 큐 → 추적 바로가기 호환
 
-/* ④ 재무실 승인 */
-const AP = PF.approval;
-document.getElementById('ppApprKpis').innerHTML =
-  kpiCard('승인대기', AP.wait+' <small>건</small>','검토·보완·등록')+
-  kpiCard('승인완료', AP.done+' <small>건</small>','승인+확정')+
-  kpiCard('반려', AP.rejected+' <small>건</small>','사유 필수')+
-  kpiCard('평균 승인기간', AP.avgDays+' <small>일</small>','SLA 10일')+
-  kpiCard('승인·확정 금액', nf(AP.amountDone)+' <small>억원</small>','순재무성과 기준');
-const queue = PF.regs.filter(r=>['검토','보완','등록'].includes(r.status))
-  .sort((a,b)=>a.slaDay-b.slaDay);
-const vRef = {c:null};
-function renderVerify(r){
-  document.getElementById('ppVerify').innerHTML = `
-    <h3>검증 패널 — ${r.id} ${stPill(r.status)}</h3>
-    <div class="sub">${r.name} · ${r.type} ${typeName(r.type)} · 산식 ${r.rule}(${r.ruleVer}) · 매칭 ${nf(r.match)}건</div>
-    <div class="chart short" id="ppVerifyWf"></div>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button style="font:inherit;font-weight:600;color:#fff;background:var(--good);border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업 — 실운영에서 승인 워크플로가 동작합니다')">승인</button>
-      <button style="font:inherit;font-weight:600;color:var(--warn);background:#fdf1d7;border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업')">보완요청</button>
-      <button style="font:inherit;font-weight:600;color:var(--bad);background:#fdecec;border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업')">반려</button>
-      <a href="#" onclick="goPp('trace');document.getElementById('ppLinSel').value=${PF.regs.indexOf(r)};renderLineage(${PF.regs.indexOf(r)});return false"
-        style="margin-left:auto;font-size:12px;align-self:center">Lineage 열기 →</a>
-    </div>`;
-  vRef.c = null;
-  drawWaterfall('ppVerifyWf', r, vRef);
-}
-document.querySelector('#ppQueue tbody').innerHTML = queue.map((r,i)=>
-  `<tr data-i="${i}" style="cursor:pointer">
-   <td>${r.slaDay<=3?'<span class="pill r">D-'+r.slaDay+'</span>':'<span class="pill y">D-'+r.slaDay+'</span>'}</td>
-   <td>${r.id}</td><td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${r.type}</span></td>
-   <td class="num">${nf(r.netEok)}억</td><td>${stPill(r.status)}</td></tr>`).join('');
-document.querySelector('#ppQueue tbody').addEventListener('click', e=>{
-  const tr = e.target.closest('tr'); if(tr) renderVerify(queue[+tr.dataset.i]);
-});
-renderVerify(queue[0]);
-mk('ppFunnel', {
-  tooltip:tip({formatter:p=>`${p.name}<br><b>${p.value}</b>건`}),
-  grid:{left:60,right:40,top:8,bottom:20},
-  xAxis:axisY({type:'value'}),
-  yAxis:axisX({type:'category',data:AP.funnel.map(f=>f[0]).reverse()}),
-  series:[{type:'bar',barMaxWidth:22,color:'#6ea3dd',itemStyle:{borderRadius:[0,4,4,0]},
-    label:{show:true,position:'right',fontSize:11,color:INK2},
-    data:AP.funnel.map(f=>f[1]).reverse()}]
-});
-mk('ppByType', {
-  tooltip:tip({formatter:p=>`${p.name} ${typeName(p.name)}<br><b>${nf(p.value)}</b>억원`}),
-  grid:{left:70,right:50,top:8,bottom:20},
-  xAxis:axisY({type:'value',name:'억원',nameTextStyle:{color:INK3}}),
-  yAxis:axisX({type:'category',data:AP.byType.map(x=>x[0]).reverse()}),
-  series:[{type:'bar',barMaxWidth:18,itemStyle:{borderRadius:[0,4,4,0]},
-    label:{show:true,position:'right',fontSize:10,color:INK2,formatter:p=>nf(p.value)},
-    data:AP.byType.map(x=>({value:x[1],itemStyle:{color:gcOf(x[0])}})).reverse()}]
-});
+/* ⑥ 재무실 승인 — PF.regs를 직접 집계하므로 ① 워크벤치의 신규 등록·삭제가 바로 반영된다 (refreshRegs) */
+const APV = (() => {
+  const AP0 = PF.approval;                       // 시드 값 중 등록 데이터에서 유도할 수 없는 항목(반려·평균 승인기간)만 사용
+  const vRef = {c:null}; let queue = [], fRef = {c:null}, tRef = {c:null}, curId = null;
+  const stats = () => {
+    const R = PF.regs, cnt = st => R.filter(r => st.includes(r.status)).length;
+    return {wait: cnt(['검토','보완','등록']), done: cnt(['승인','확정']), rejected: AP0.rejected, avgDays: AP0.avgDays,
+      amountDone: Math.round(R.filter(r => ['승인','확정'].includes(r.status)).reduce((s,r)=>s+r.netEok,0)*10)/10,
+      funnel: [['등록', R.length], ['검토', cnt(['검토','보완','승인','확정'])], ['보완', cnt(['보완'])], ['승인', cnt(['승인','확정'])], ['확정', cnt(['확정'])]],
+      byType: Object.entries(R.filter(r => ['승인','확정'].includes(r.status)).reduce((m,r)=>{ m[r.type]=(m[r.type]||0)+r.netEok; return m; },{})).map(([t,v])=>[t,Math.round(v*10)/10]).sort((a,b)=>b[1]-a[1])};
+  };
+  function renderVerify(r){
+    if(!r){ document.getElementById('ppVerify').innerHTML = '<h3>검증 패널</h3><div class="legend-note" style="padding:12px 0">승인 대기 건이 없습니다.</div>'; return; }
+    curId = r.id;
+    document.getElementById('ppVerify').innerHTML = `
+      <h3>검증 패널 — ${r.id} ${stPill(r.status)}${r.userCreated?' <span class="badge">시연 등록</span>':''}</h3>
+      <div class="sub">${r.name} · ${r.type} ${typeName(r.type)} · 산식 ${r.rule}(${r.ruleVer}) · 매칭 ${nf(r.match)}건 · 기여율 ${r.contrib}%${r.contribution&&r.contribution.mode==='UP'?' (상향 '+((r.contribution.approval||{}).status||'미요청')+')':''}</div>
+      <div class="chart short" id="ppVerifyWf"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button style="font:inherit;font-weight:600;color:#fff;background:var(--good);border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업 — 실운영에서 승인 워크플로가 동작합니다')">승인</button>
+        <button style="font:inherit;font-weight:600;color:var(--warn);background:#fdf1d7;border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업')">보완요청</button>
+        <button style="font:inherit;font-weight:600;color:var(--bad);background:#fdecec;border:0;border-radius:6px;padding:8px 18px;cursor:pointer" onclick="alert('P-1 목업')">반려</button>
+        <a href="#" onclick="goPp('trace');renderLineage(${PF.regs.indexOf(r)});return false" style="margin-left:auto;font-size:12px;align-self:center">② 산출 근거 추적 →</a>
+        <a href="#" onclick="ErosionView.select('${r.id}');goPp('erosion');return false" style="font-size:12px;align-self:center">④ 역효과 →</a>
+        <a href="#" onclick="CT.select('${r.id}');goPp('contrib');return false" style="font-size:12px;align-self:center">⑤ 기여율 →</a>
+      </div>`;
+    vRef.c = null;
+    drawWaterfall('ppVerifyWf', r, vRef);
+  }
+  function render(){
+    const S = stats();
+    document.getElementById('ppApprKpis').innerHTML =
+      kpiCard('승인대기', S.wait+' <small>건</small>','검토·보완·등록')+
+      kpiCard('승인완료', S.done+' <small>건</small>','승인+확정')+
+      kpiCard('반려', S.rejected+' <small>건</small>','사유 필수')+
+      kpiCard('평균 승인기간', S.avgDays+' <small>일</small>','SLA 10일')+
+      kpiCard('승인·확정 금액', nf(S.amountDone)+' <small>억원</small>','순재무성과 기준');
+    queue = PF.regs.filter(r=>['검토','보완','등록'].includes(r.status)).sort((a,b)=>a.slaDay-b.slaDay);
+    document.querySelector('#ppQueue tbody').innerHTML = queue.map((r,i)=>
+      `<tr data-i="${i}" style="cursor:pointer"${r.id===curId?' class="cur"':''}>
+       <td>${r.slaDay<=3?'<span class="pill r">D-'+r.slaDay+'</span>':'<span class="pill y">D-'+r.slaDay+'</span>'}</td>
+       <td>${r.id}${r.userCreated?' <span class="badge">시연</span>':''}</td><td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${r.type}</span></td>
+       <td class="num">${nf(r.netEok)}억</td><td>${stPill(r.status)}</td></tr>`).join('') || '<tr><td colspan="5" class="legend-note" style="padding:12px">승인 대기 건이 없습니다.</td></tr>';
+    const cur = queue.find(r => r.id === curId) || queue[0]; renderVerify(cur);
+    const fOpt = {tooltip:tip({formatter:p=>`${p.name}<br><b>${p.value}</b>건`}), grid:{left:60,right:40,top:8,bottom:20},
+      xAxis:axisY({type:'value'}), yAxis:axisX({type:'category',data:S.funnel.map(f=>f[0]).reverse()}),
+      series:[{type:'bar',barMaxWidth:22,color:'#6ea3dd',itemStyle:{borderRadius:[0,4,4,0]},label:{show:true,position:'right',fontSize:11,color:INK2},data:S.funnel.map(f=>f[1]).reverse()}]};
+    const tOpt = {tooltip:tip({formatter:p=>`${p.name} ${typeName(p.name)}<br><b>${nf(p.value)}</b>억원`}), grid:{left:70,right:50,top:8,bottom:20},
+      xAxis:axisY({type:'value',name:'억원',nameTextStyle:{color:INK3}}), yAxis:axisX({type:'category',data:S.byType.map(x=>x[0]).reverse()}),
+      series:[{type:'bar',barMaxWidth:18,itemStyle:{borderRadius:[0,4,4,0]},label:{show:true,position:'right',fontSize:10,color:INK2,formatter:p=>nf(p.value)},data:S.byType.map(x=>({value:x[1],itemStyle:{color:gcOf(x[0])}})).reverse()}]};
+    if(!fRef.c) fRef.c = mk('ppFunnel', fOpt); else fRef.c.setOption(fOpt, true);
+    if(!tRef.c) tRef.c = mk('ppByType', tOpt); else tRef.c.setOption(tOpt, true);
+  }
+  document.querySelector('#ppQueue tbody').addEventListener('click', e=>{ const tr = e.target.closest('tr'); if(tr && tr.dataset.i != null) { renderVerify(queue[+tr.dataset.i]); render(); } });
+  render();
+  return {render, refreshRegs: render, select(id){ curId = id; render(); }};
+})();
 
 /* ══════════ ⑤ 역효과(Erosion) 점검 ══════════
    계층: EROSION_DATA(설정 데이터) → ErosionRepo(저장소) → ErosionContext(대상 성과) → ErosionService(규칙)
@@ -3761,6 +3765,7 @@ const CT = (() => {
     render();
     if(typeof WB !== 'undefined') WB.refresh();
     if(typeof LN !== 'undefined') LN.refresh();
+    if(typeof APV !== 'undefined') APV.render();
   }
   const root = $('pp-contrib');
   root.addEventListener('change', e => {
