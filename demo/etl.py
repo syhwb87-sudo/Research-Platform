@@ -288,6 +288,8 @@ for r in a1:
         "annual": annual, "persist": persist, "roi": money(r["투자효율"]),
         "useDept": r["활용부서"].split()[0] if r["활용부서"] else "미지정", "axis": axis,
         "qual": annual <= 0,
+        "effect": re.split(r"[,\s]", r.get("정량효과유형", "").strip() or "기타")[0] or "기타",
+        "start": r.get("착수일", ""), "rdept": r.get("연구부서", ""),
     })
 
 util_year_status = defaultdict(Counter)          # 차수 -> 상태 -> n
@@ -309,6 +311,7 @@ for p in completed:
     exp_total = p["annual"] * min(n_years, p["persist"])
     real_total = 0.0
     last_status = None
+    traj = []
     for yr in range(1, n_years + 1):
         evals_due += 1
         if rng.random() < 0.12:            # 평가 미실시 시뮬레이션
@@ -320,6 +323,7 @@ for p in completed:
         if last_status == "미활용" and rng.random() < 0.7:
             status = "미활용"               # 미활용은 관성이 강함
         last_status = status
+        traj.append(status)
         util_year_status[yr][status] += 1
         if p["qual"]:
             continue
@@ -344,7 +348,8 @@ for p in completed:
             "code": p["code"], "name": p["name"][:30], "cy": p["cy"], "dept": p["useDept"],
             "exp": eok(exp_total), "real": eok(real_total),
             "achv": round(100 * real_total / exp_total),
-            "cost": eok(p["cost"]), "status": last_status or "미평가",
+            "cost": eok(p["cost"]), "status": last_status or "미평가", "traj": traj, "act": classify(p["code"]),
+            "effect": p.get("effect", "기타"),
         })
 
 tracked = [p for p in completed if CUR_YEAR - p["cy"] >= 1]
@@ -896,6 +901,11 @@ RULE_BY_TYPE = {r["type"]: r for r in RULES}
 EFFECT_TO_TYPE = {k: v[0] for k, v in EFFECT_MAP.items() if v}
 EFFECT_TO_TYPE["실수율/품질향상"] = "B-6"   # 설계서 3.1 기본 추천 (목록 순서와 무관)
 
+def tech_major(t):
+    t = (t or "").strip()
+    m = re.match(r"^\((.+?)\)", t)
+    return m.group(1) if m else ("기타" if t in ("", "-") else t)
+TECH_OF = {r["과제코드"]: tech_major(r.get("기술분류")) for r in a3 if r.get("과제코드")}
 STATUSES = ["확정", "확정", "확정", "확정", "확정", "승인", "승인", "검토", "검토", "검토", "보완", "등록"]
 KEY_BY_GROUP = {
     "A": "제품군·강종·고객사·품질등급·판매기간",
@@ -949,6 +959,7 @@ for p, eff in picked:
         "key": KEY_BY_GROUP[ptype[0]],
         "erosionName": ero_pair[0] if ero_pair else "해당 역효과 없음",
         "dept": p["useDept"], "slaDay": prng.randint(1, 9), "costEok": eok(p["cost"]),
+        "tech": TECH_OF.get(p["code"], "기타"), "act": classify(p["code"]),
         "utilY1": prng.choice(["활용중", "활용중", "부분활용"]),
     })
 
@@ -1189,10 +1200,48 @@ for p in sorted(completed, key=lambda x: -x["annual"]):
     r1 = a1_by_code.get(p["code"]) or {}
     eff = re.split(r"[,\s]", (r1.get("정량효과유형") or "기타").strip())[0] or "기타"
     candidates.append({"code": p["code"], "name": short(p["name"], 40), "dept": p["useDept"], "effect": eff,
-                       "annualEok": eok(p["annual"]), "costEok": eok(p["cost"]), "persist": max(1, round(p["persist"])) if p["persist"] else 3,
+                       "annualEok": eok(p["annual"]), "costEok": eok(p["cost"]), "tech": TECH_OF.get(p["code"], "기타"), "act": classify(p["code"]), "persist": max(1, round(p["persist"])) if p["persist"] else 3,
                        "a1Contrib": round(money(r1.get("연구기여도", "")) or 70)})
     if len(candidates) >= 40:
         break
+
+# ── CTO Dashboard 데이터: 기술분류 × 성과유형, 기술분류별 전환율, 활동군별 실현 추이, 탐색→전략 후속화, Watch List
+_tech_cell = defaultdict(lambda: {"exp": 0.0, "n": 0})
+_tech_conv = defaultdict(lambda: {"n": 0, "exp": 0.0, "real": 0.0})
+_act_year = defaultdict(lambda: defaultdict(float))
+for pr in proj_results:
+    tmaj = TECH_OF.get(pr["code"], "기타")
+    ptype = EFFECT_TO_TYPE.get(pr["effect"])
+    if ptype:
+        c = _tech_cell[(tmaj, ptype)]; c["exp"] += pr["exp"]; c["n"] += 1
+    tc = _tech_conv[tmaj]; tc["n"] += 1; tc["exp"] += pr["exp"]; tc["real"] += pr["real"]
+    _act_year[pr["cy"]][pr["act"]] += pr["real"]
+tech_rows = [t for t, v in sorted(_tech_conv.items(), key=lambda x: -x[1]["exp"]) if v["n"] >= 3][:9]
+# 탐색(N/L) 완료과제 → 이후 동일 연구부서·기술분류에서 착수한 전략 과제 존재 여부 (근사 후속화율)
+_strat_starts = defaultdict(list)
+for r in a3:
+    if classify(r["과제코드"]) == 1 and r.get("착수일"):
+        _strat_starts[(dept_short(r.get("연구부서")), TECH_OF.get(r["과제코드"], "기타"))].append(r["착수일"])
+explore_done = [p for p in completed if classify(p["code"]) == 4]
+followed = 0
+for p in explore_done:
+    key = (dept_short(p.get("rdept")), TECH_OF.get(p["code"], "기타"))
+    done_at = f"{p['cy']}-12-31"
+    if any(st > done_at for st in _strat_starts.get(key, [])):
+        followed += 1
+_watch_unused = sorted([pr for pr in proj_results if pr["status"] == "미활용"], key=lambda x: -x["cost"])[:6]
+_watch_drop = sorted([pr for pr in proj_results if len(pr["traj"]) >= 2 and pr["traj"][-1] != "활용중" and pr["traj"][-2] == "활용중"], key=lambda x: -x["exp"])[:6]
+cto = {
+    "techRows": tech_rows,
+    "matrix": [[t, pt, round(v["exp"], 1), v["n"]] for (t, pt), v in _tech_cell.items() if t in tech_rows],
+    "techConv": [[t, _tech_conv[t]["n"], round(_tech_conv[t]["exp"], 1), round(_tech_conv[t]["real"], 1),
+                  round(100 * _tech_conv[t]["real"] / max(1e-9, _tech_conv[t]["exp"]))] for t in tech_rows],
+    "actYears": sorted(y for y in _act_year if y >= CUR_YEAR - 6),
+    "actSeries": {str(a): [round(_act_year[y].get(a, 0.0), 1) for y in sorted(y for y in _act_year if y >= CUR_YEAR - 6)] for a in (1, 3, 4)},
+    "followUp": {"explore": len(explore_done), "followed": followed, "rate": round(100 * followed / max(1, len(explore_done)))},
+    "watchUnused": [[pr["code"], pr["name"], pr["dept"], pr["cost"], pr["exp"], "·".join(pr["traj"])] for pr in _watch_unused],
+    "watchDrop": [[pr["code"], pr["name"], pr["dept"], pr["cost"], pr["exp"], "·".join(pr["traj"])] for pr in _watch_drop],
+}
 
 appr_counts = Counter(r["status"] for r in regs)
 type_amounts = defaultdict(float)
@@ -1206,6 +1255,7 @@ perf = {
     "keyDict": KEY_DICT,
     "contribTable": CONTRIB_TABLE,
     "candidates": candidates,
+    "cto": cto,
     "regs": regs,
     "approval": {
         "wait": appr_counts.get("검토", 0) + appr_counts.get("보완", 0) + appr_counts.get("등록", 0),

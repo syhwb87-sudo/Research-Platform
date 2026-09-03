@@ -601,6 +601,15 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #p-exec .ex-pipe b{display:block;font-size:18px;color:var(--text-1);font-variant-numeric:tabular-nums}
 #p-exec .ex-pipe .on{border-color:var(--good);background:#e6f4ec} #p-exec .ex-pipe .on b{color:var(--good)}
 @media print{header,footer,#p-exec .ex-print{display:none !important} main{padding:0} .page{display:none} #p-exec{display:block !important}}
+/* Executive 서브탭(CEO/CTO) */
+#p-exec .ex-nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+#p-exec .cto-fil{display:flex;gap:6px;margin:4px 0 8px}
+#p-exec .cto-fil button{border:1px solid var(--border);background:var(--surface);font:inherit;font-size:12px;font-weight:600;color:var(--text-2);border-radius:20px;padding:4px 11px;cursor:pointer}
+#p-exec .cto-fil button[aria-pressed="true"]{background:var(--brand);border-color:transparent;color:#fff}
+#p-exec .cto-fil button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+#p-exec .cto-card{border-top:3px solid var(--border)} #p-exec .cto-card .stat{font-size:22px}
+#p-exec .cto-src{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:2px;background:#eef1f5;color:var(--text-2);border:1px solid var(--border)}
+#p-exec .cto-src.fin{background:#e6f4ec;color:#1a6b3a;border-color:#bfe3cc}
 </style>
 </head>
 <body>
@@ -1223,6 +1232,8 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 
 <!-- ─────────────── EXECUTIVE ─────────────── -->
 <section class="page" id="p-exec">
+  <div class="ex-nav" id="exNav"></div>
+  <div class="ex-panel" id="ex-ceo">
   <div class="card" style="margin-bottom:14px;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
     <div><h3 style="font-size:16px;margin:0">CEO Dashboard <span class="legend-note" style="font-weight:500">— R&D가 회사 손익에 얼마를 기여했고, 그 숫자는 재무실이 확정한 것인가</span></h3>
       <div class="sub" style="margin:2px 0 0">모든 금액은 <b>재무실 확정 순재무성과</b> 기준입니다. 검토·승인 단계의 미확정 금액은 이 화면에 올리지 않습니다.</div></div>
@@ -1239,6 +1250,31 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     <div><div class="brief" id="exBrief" style="margin-bottom:14px"></div>
       <div class="card"><h3>검증 파이프라인 <span class="legend-note">— 건수 (금액은 확정분만)</span></h3><div id="exPipe"></div>
         <div class="legend-note" style="margin-top:8px">상세는 <a href="#" onclick="go('pp');goPp('approval');return false">⑥ 재무실 승인</a> · <a href="#" onclick="go('pp');goPp('trace');return false">② 산출 근거 추적</a></div></div></div>
+  </div>
+  </div>
+  <div class="ex-panel" id="ex-cto" hidden>
+    <div class="card" style="margin-bottom:14px;padding:10px 16px">
+      <h3 style="font-size:16px;margin:0">CTO Dashboard <span class="legend-note" style="font-weight:500">— 성과의 양이 아니라 구조: 어떤 기술·활동군이 성과를 만들고, 파이프라인은 건강한가</span></h3>
+      <div class="sub" style="margin:2px 0 0">확정 순재무성과(재무실)와 파이프라인 단계별 금액을 함께 보며, 기술분류·활동군 지표는 완료평가(a1)·활용평가 시뮬레이션 기준입니다 — 각 카드에 기준을 표기합니다.</div>
+    </div>
+    <div class="row" style="grid-template-columns:repeat(5,1fr)" id="ctoKpis"></div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card"><h3>기술분류 × 재무성과 유형 <span class="legend-note">— 완료평가 기대이익(억), a1 정량효과 → 재무성과 유형 기본 매핑</span></h3><div class="chart" id="ctoMatrix" style="height:340px"></div></div>
+      <div class="card"><h3>성과 파이프라인 <span class="legend-note">— 단계별 금액(억)</span></h3><div class="chart short" id="ctoFunnel"></div>
+        <div class="legend-note">등록·산출은 성과총액, 승인·확정은 순재무성과. 확정 전 금액은 검토 중 값입니다.</div></div>
+    </div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>활동군별 실현이익 추이 <span class="legend-note">— 완료연도별 스택(억), 활용평가 시뮬레이션</span></h3><div class="chart short" id="ctoAct"></div></div>
+      <div class="card"><h3>기술분류별 전환율 <span class="legend-note">— 실현 ÷ 기대 (a1·시뮬레이션)</span></h3>
+        <div class="scroll" style="max-height:230px"><table id="ctoTech"><thead><tr><th>기술분류</th><th class="num">완료</th><th class="num">기대(억)</th><th class="num">실현(억)</th><th class="num">전환율</th><th class="num">확정 순성과</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+    <div class="row" style="grid-template-columns:7fr 5fr;margin-bottom:0">
+      <div class="card"><h3>Watch List <span class="legend-note">— 미활용 매몰비용 상위 · 활용중 → 부분활용/미활용 전환(성과 감소)</span></h3>
+        <div class="cto-fil" id="ctoWatchFil"></div>
+        <div class="scroll" style="max-height:260px"><table id="ctoWatch"><thead><tr><th>과제</th><th>활용부서</th><th class="num">연구비(억)</th><th class="num">기대(억)</th><th>활용 궤적</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card"><h3>전환율 낮은 코호트 경보 <span class="legend-note">— 완료연도별 실현 ÷ 기대</span></h3><ul class="alist" id="ctoCohort"></ul>
+        <div class="legend-note" style="margin-top:8px">경보 기준: 전환율 40% 미만 · 상세는 <a href="#" onclick="go('act',2);return false">활동군 상세 › 장기 성과관리·확산</a></div></div>
+    </div>
   </div>
 </section>
 </main>
@@ -1285,6 +1321,7 @@ function syncHash(){
   if(applyingRoute) return;
   let h = '#page=' + currentPage;
   if(currentPage === 'act') h += '&activity=' + ACT_SLUG[currentAct];
+  if(currentPage === 'exec' && execView === 'cto') h += '&view=cto';
   setHash(h);
 }
 function go(p, act){
@@ -1303,6 +1340,7 @@ function applyRoute(){
   if(!document.getElementById('p-' + page)) page = 'home';
   applyingRoute = true;
   go(page, act);
+  if(page === 'exec') goExec(q.get('view') === 'cto' ? 'cto' : 'ceo');
   applyingRoute = false;
   syncHash();
 }
@@ -1658,6 +1696,85 @@ const CEO = (() => {
   }
   return {init: render, refreshRegs: render};
 })();
+
+/* ── Executive › CTO Dashboard — 구조 관점. 확정 순성과(PF.regs)와 파이프라인은 재무실 기준, 기술·활동군 지표는 PF.cto(a1·활용평가 시뮬레이션) */
+const CTO = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const r1 = v => Math.round(v * 10) / 10, sum = (l,f) => r1(l.reduce((s,x)=>s+f(x),0));
+  const ACTN = {1:'전략 프로젝트', 3:'현업·고객 문제해결', 4:'탐색·혁신'};
+  const T = () => PF.cto, LT = () => D.longterm;   // PF는 성과 플랫폼 블록에서 정의 — 렌더 시점에 조회
+  let mat = null, fun = null, act = null, watchMode = 'unused';
+  const src = (t, fin) => `<span class="cto-src${fin?' fin':''}">${t}</span>`;
+  function render(){
+    const R = PF.regs, fixed = R.filter(r => r.status === '확정'), appr = R.filter(r => ['승인','확정'].includes(r.status));
+    const byAct = {}; fixed.forEach(r => { byAct[r.act] = (byAct[r.act]||0) + r.netEok; }); const fixedNet = sum(fixed, r=>r.netEok);
+    const actShare = [1,3,4].map(a => `${ACTN[a].split(' ')[0].replace('·','·')} ${fixedNet ? Math.round((byAct[a]||0)/fixedNet*100) : 0}%`).join(' · ');
+    const convs = T().techConv.map(t => t[4]).sort((a,b)=>a-b), medConv = convs.length ? convs[Math.floor(convs.length/2)] : 0;
+    const pipe = {등록: sum(R, r=>r.grossEok), 산출: sum(R.filter(r=>r.lineage.snapshot.id), r=>r.grossEok), 승인: sum(appr, r=>r.netEok), 확정: fixedNet};
+    const card = (t, v, s, fin) => `<div class="card cto-card" style="border-top-color:${fin?'var(--good)':'var(--border)'}"><div class="sub" style="margin:0 0 2px">${t}${src(fin?'재무실 확정':'a1·시뮬레이션', fin)}</div><div class="stat">${v}</div><div class="legend-note">${s}</div></div>`;
+    $('ctoKpis').innerHTML = card('활동군별 확정 순성과 구성', `${nf(fixedNet)}<small>억원</small>`, actShare, true)
+      + card('탐색 → 전략 후속화율', `${T().followUp.rate}<small>%</small>`, `탐색 완료 ${T().followUp.explore}건 중 ${T().followUp.followed}건 — 동일 연구부서·기술분류의 후속 전략 과제 착수 (근사)`)
+      + card('기술분류별 전환율 중앙값', `${medConv}<small>%</small>`, `${T().techConv.length}개 대분류 · 실현 ÷ 기대`)
+      + card('미활용 매몰비용', `${nf(LT().unusedSunk)}<small>억원</small>`, `미활용 완료과제 ${nf(LT().unusedN)}건 연구비`)
+      + card('성과 파이프라인', `${nf(pipe.등록)}<small>억 → ${nf(pipe.확정)}억</small>`, `등록 총액 → 산출 ${nf(pipe.산출)} → 승인 ${nf(pipe.승인)} → 확정 ${nf(pipe.확정)} (억)`, true);
+    /* 기술 × 유형 히트맵 */
+    const cols = PF.types.map(t=>t[0]).filter(c => T().matrix.some(m => m[1] === c)), rows = T().techRows;
+    const data = T().matrix.map(m => [cols.indexOf(m[1]), rows.indexOf(m[0]), m[2], m[3]]).filter(x => x[0] >= 0 && x[1] >= 0);
+    const mx = Math.max(1, ...data.map(x=>x[2]));
+    const mOpt = {tooltip:tip({formatter:p=>`${rows[p.value[1]]} × ${cols[p.value[0]]} ${typeName(cols[p.value[0]])}<br>기대이익 <b>${nf(p.value[2])}억</b> · ${p.value[3]}건`}),
+      grid:{left:8,right:16,top:8,bottom:8,containLabel:true}, xAxis:axisX({type:'category',data:cols,position:'top',axisLabel:{fontSize:10,color:INK2}}),
+      yAxis:axisY({type:'category',data:rows.slice().reverse(),axisLabel:{fontSize:11}}), visualMap:{show:false,min:0,max:mx,inRange:{color:['#eef3fb','#2a78d6']}},
+      series:[{type:'heatmap',data:data.map(x=>[x[0], rows.length-1-x[1], x[2], x[3]]),label:{show:true,fontSize:10,formatter:p=>p.value[2]>=1?nf(Math.round(p.value[2])):''},itemStyle:{borderColor:SURF,borderWidth:2},emphasis:{itemStyle:{shadowBlur:6,shadowColor:'rgba(0,0,0,.2)'}}}]};
+    if(!mat) mat = mk('ctoMatrix', mOpt); else mat.setOption(mOpt, true);
+    /* 파이프라인 깔때기(금액) */
+    const fOpt = {tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b>억원`}), grid:{left:8,right:60,top:8,bottom:8,containLabel:true},
+      xAxis:axisY({type:'value'}), yAxis:axisX({type:'category',data:['확정','승인','산출','등록']}),
+      series:[{type:'bar',barMaxWidth:26,itemStyle:{borderRadius:[0,4,4,0]},label:{show:true,position:'right',fontSize:11,color:INK2,formatter:p=>nf(p.value)+'억'},
+        data:[{value:pipe.확정,itemStyle:{color:'#1e8e5a'}},{value:pipe.승인,itemStyle:{color:'#4dbf95'}},{value:pipe.산출,itemStyle:{color:'#6ea3dd'}},{value:pipe.등록,itemStyle:{color:'#a9bdef'}}]}]};
+    if(!fun) fun = mk('ctoFunnel', fOpt); else fun.setOption(fOpt, true);
+    /* 활동군별 실현 추이 */
+    const aOpt = {tooltip:tip({trigger:'axis',formatter:p=>p[0].axisValue+'년 완료<br>'+p.map(x=>`${x.seriesName}: <b>${nf(x.value)}</b>억`).join('<br>')}),
+      legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}}, grid:{left:8,right:16,top:10,bottom:28,containLabel:true},
+      xAxis:axisX({type:'category',data:T().actYears.map(String)}), yAxis:axisY({type:'value',name:'억원',nameTextStyle:{fontSize:10,color:INK3}}),
+      series:[1,3,4].map(a => ({name:ACTN[a],type:'bar',stack:'a',barMaxWidth:30,itemStyle:{color:C[a]},data:T().actSeries[String(a)]}))};
+    if(!act) act = mk('ctoAct', aOpt); else act.setOption(aOpt, true);
+    /* 기술분류별 전환율 표 */
+    const fixedByTech = {}; fixed.forEach(r => { fixedByTech[r.tech] = (fixedByTech[r.tech]||0) + r.netEok; });
+    $('ctoTech').querySelector('tbody').innerHTML = T().techConv.map(t => `<tr><td><b>${esc(t[0])}</b></td><td class="num">${t[1]}</td><td class="num">${nf(t[2])}</td><td class="num">${nf(t[3])}</td><td class="num"><b style="color:${t[4]<40?'var(--bad)':t[4]<60?'var(--warn)':'var(--good)'}">${t[4]}%</b></td><td class="num">${fixedByTech[t[0]]?nf(r1(fixedByTech[t[0]]))+'억':'—'}</td></tr>`).join('');
+    renderWatch(); renderCohort();
+  }
+  function renderWatch(){
+    $('ctoWatchFil').innerHTML = [['unused','미활용 매몰비용'],['drop','성과 감소 전환']].map(([k,t])=>`<button type="button" data-w="${k}" aria-pressed="${watchMode===k}">${t}</button>`).join('');
+    const rows = watchMode === 'unused' ? T().watchUnused : T().watchDrop;
+    $('ctoWatch').querySelector('tbody').innerHTML = rows.map(w => `<tr><td>${esc(w[1])}<div class="legend-note">${esc(w[0])}</div></td><td>${esc(w[2])}</td><td class="num">${nf(w[3])}</td><td class="num">${nf(w[4])}</td><td class="legend-note">${esc(w[5]).replace(/미활용/g,'<span style="color:var(--bad)">미활용</span>').replace(/부분활용/g,'<span style="color:var(--warn)">부분활용</span>')}</td></tr>`).join('')
+      || '<tr><td colspan="5" class="legend-note" style="padding:12px">해당 과제가 없습니다.</td></tr>';
+  }
+  function renderCohort(){
+    const items = LT().cohortYears.map((y,i) => [y, LT().cohortExp[i], LT().cohortReal[i], LT().cohortExp[i] ? Math.round(LT().cohortReal[i]/LT().cohortExp[i]*100) : 0]).filter(x => x[1] > 0);
+    const low = items.filter(x => x[3] < 40);
+    $('ctoCohort').innerHTML = (low.length ? low : items.slice(-3)).map(x => `<li><span class="dot" style="background:${x[3]<40?'var(--bad)':x[3]<60?'var(--warn)':'var(--good)'}"></span>${x[0]}년 완료 코호트 — 전환율 <b>${x[3]}%</b> <span class="meta">기대 ${nf(x[1])}억 · 실현 ${nf(x[2])}억</span></li>`).join('')
+      + (low.length ? '' : '<li><span class="dot" style="background:var(--good)"></span>전환율 40% 미만 코호트 없음 — 최근 3개 코호트 표시</li>');
+  }
+  function init(){
+    $('ctoWatchFil').addEventListener('click', e => { const b = e.target.closest('[data-w]'); if(b){ watchMode = b.dataset.w; renderWatch(); } });
+    render();
+  }
+  return {init, refreshRegs: render};
+})();
+
+/* ── Executive 서브탭(CEO/CTO) — #page=exec&view=cto */
+let execView = 'ceo';
+const exNav = document.getElementById('exNav');
+exNav.innerHTML = [['ceo','CEO Dashboard · 전사 가치'],['cto','CTO Dashboard · 기술경영']].map(([k,t])=>`<button type="button" class="achip${k==='ceo'?' on':''}" data-v="${k}">${t}</button>`).join('');
+function goExec(v){
+  execView = v === 'cto' ? 'cto' : 'ceo';
+  exNav.querySelectorAll('.achip').forEach(b=>{ const on = b.dataset.v===execView; b.classList.toggle('on', on); b.style.background = on ? 'var(--brand)' : ''; });
+  document.querySelectorAll('.ex-panel').forEach(el=>el.hidden = el.id!=='ex-'+execView);
+  charts.forEach(c=>c.resize());
+  syncHash();
+}
+exNav.addEventListener('click', e=>{ const b = e.target.closest('.achip'); if(b) goExec(b.dataset.v); });
 
 /* ══════════ 활동군 상세 탭 ══════════ */
 const DT = D.detail;
@@ -2635,7 +2752,7 @@ const WB = (() => {
     const id = `PF-2026-${String(n).padStart(3,'0')}`, t = today(), snapId = `SNAP-${t.replace(/-/g,'')}-${String(n).padStart(3,'0')}`;
     const std = stdOf(r.type), gross = m.grossEok, ero = m.erosionEok, direct = m.directEok, net = m.netEok;
     return {id, code:p.code, name:p.name, effect:p.effect, type:r.type, status:'검토', contrib:std, persist:m.persist, grossEok:gross, erosionEok:ero, directEok:direct, netEok:net,
-      rule:r.id, ruleVer:r.ver, match:m.matched.records, period:`${m.base} / ${m.ver}`, key:r.keys.join('·'), costEok:p.costEok||0, erosionName: ero ? '재무실 조정 차감' : '해당 역효과 없음 (④ 점검 전)', dept:p.dept, slaDay:10, utilY1:'예정', userCreated:true,
+      rule:r.id, ruleVer:r.ver, match:m.matched.records, period:`${m.base} / ${m.ver}`, key:r.keys.join('·'), costEok:p.costEok||0, tech:p.tech||'기타', act:p.act||1, erosionName: ero ? '재무실 조정 차감' : '해당 역효과 없음 (④ 점검 전)', dept:p.dept, slaDay:10, utilY1:'예정', userCreated:true,
       contribution:{mode:'STANDARD', applied:std, standard:std, effective:std, reason:'', evidence:'', a1Ref:p.a1Contrib},
       lineage:{snapshot:{id:snapId, frozenAt:`${t} ${new Date().toTimeString().slice(0,5)}`, source:r.source, records:m.matched.records, currentRecords:m.matched.records, period:`${m.base} / ${m.ver}`, samples:m.matched.samples},
         keyValues: r.keys.map(k => [k, m.keys[k], (PF.keyDict[k]||[])[0]||'']).concat([[r.periodKey, `${m.base} / ${m.ver}`, (PF.keyDict[r.periodKey]||[])[0]||'']]),
@@ -2647,7 +2764,7 @@ const WB = (() => {
   }
   function refreshOthers(){
     if(typeof renderRegsTable === 'function') renderTable();
-    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
+    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
   }
 
   /* ── 이벤트 */
@@ -3839,6 +3956,7 @@ CT.init();   // ⑤ 기여율 — 저장된 결정을 PF.regs에 반영한 뒤 �
 GR.init();   // ③ 성과 총액 — 산식 카탈로그·미리계산기
 WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연 등록 반영)
 CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변경 시 refreshRegs
+CTO.init();   // Executive(CTO) — 구조 관점
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
 applyingRoute = false;
