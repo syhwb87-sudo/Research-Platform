@@ -1349,6 +1349,41 @@ util = {
     "projects": util_projects,
 }
 
+# ── 연구 ROI Dashboard 데이터(설계서 11.7): 과제별 투입(연구비+MW) 대비 누적 실현(시뮬레이션), 코호트 BEP, 기술분류·활동군 ROI, 분포
+proj_mw = defaultdict(float)
+for _name, _codes in person_proj_mw.items():
+    for _code, _mw in _codes.items():
+        proj_mw[_code] += _mw
+roi_projects = []
+for pr in proj_results:
+    real = sum((y[2] or 0) for y in pr["yrs"])
+    cost = pr["cost"]
+    roi_projects.append({"code": pr["code"], "name": pr["name"], "lab": pr["lab"], "dept": pr["dept"], "act": pr["act"],
+                         "tech": TECH_OF.get(pr["code"], "기타"), "cy": pr["cy"], "cost": cost, "mw": round(proj_mw.get(pr["code"], 0.0), 1),
+                         "annual": pr["annualEok"], "exp": pr["exp"], "real": round(real, 1),
+                         "roi": round(real / cost, 2) if cost > 0 else None, "years": [[y[0], y[2]] for y in pr["yrs"] if y[2] is not None]})
+_cb = defaultdict(lambda: defaultdict(lambda: [0.0, 0.0]))   # cy -> k -> [누적 실현, 투입]
+for rp in roi_projects:
+    acc = 0.0
+    for k in range(1, 6):
+        acc += next((a for y, a in rp["years"] if y == k), 0.0)
+        if k <= CUR_YEAR - rp["cy"]:
+            c = _cb[rp["cy"]][k]; c[0] += acc; c[1] += rp["cost"]
+_tech = defaultdict(lambda: [0.0, 0.0, 0])
+_actr = defaultdict(lambda: [0.0, 0.0, 0])
+for rp in roi_projects:
+    t = _tech[rp["tech"]]; t[0] += rp["cost"]; t[1] += rp["real"]; t[2] += 1
+    a = _actr[rp["act"]]; a[0] += rp["cost"]; a[1] += rp["real"]; a[2] += 1
+bins = [(0, 0.5, "0~0.5"), (0.5, 1, "0.5~1"), (1, 2, "1~2"), (2, 3, "2~3"), (3, 5, "3~5"), (5, 10, "5~10"), (10, 1e9, "10+")]
+hist = [[lab_, sum(1 for rp in roi_projects if rp["roi"] is not None and lo <= rp["roi"] < hi)] for lo, hi, lab_ in bins]
+roi = {
+    "projects": roi_projects,
+    "cohortBep": {str(cy): [[k, round(100 * v[0] / max(1e-9, v[1]))] for k, v in sorted(_cb[cy].items())] for cy in sorted(_cb) if cy >= CUR_YEAR - 6},
+    "techRoi": sorted([[t, round(v[0], 1), round(v[1], 1), round(v[1] / max(1e-9, v[0]), 2), v[2]] for t, v in _tech.items() if v[2] >= 3], key=lambda x: -x[3]),
+    "actRoi": {str(a): [round(v[0], 1), round(v[1], 1), round(v[1] / max(1e-9, v[0]), 2), v[2]] for a, v in _actr.items()},
+    "hist": hist,
+}
+
 appr_counts = Counter(r["status"] for r in regs)
 type_amounts = defaultdict(float)
 for r in regs:
@@ -1364,6 +1399,7 @@ perf = {
     "cto": cto,
     "lab": lab,
     "util": util,
+    "roi": roi,
     "regs": regs,
     "approval": {
         "wait": appr_counts.get("검토", 0) + appr_counts.get("보완", 0) + appr_counts.get("등록", 0),

@@ -1274,6 +1274,29 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
         <div class="scroll" style="max-height:300px"><div style="overflow-x:auto"><table id="utSheet"><thead><tr><th>과제</th><th>연구소</th><th class="num">기대/년</th><th>1년차</th><th>2년차</th><th>3년차</th><th>4년차</th><th>5년차</th><th>최신</th></tr></thead><tbody></tbody></table></div></div></div>
     </div>
   </div>
+  <!-- ⑨ 연구 ROI — 투자수익 분석(설계서 11.7). 데이터: PF.roi(etl.py, a1 연구비·a2 MW·활용평가 시뮬레이션). 렌더: 스크립트 하단 RO 모듈 -->
+  <div class="ppanel" id="pp-roi" hidden>
+    <div class="card" style="margin-bottom:14px;padding:10px 16px">
+      <h3 style="font-size:16px;margin:0">연구 ROI <span class="legend-note" style="font-weight:500">— 연구 투입(연구비+MW) 대비 실현 순성과의 수익성: 포트폴리오 재배분의 근거</span></h3>
+      <div class="sub" style="margin:2px 0 0">투입은 a1 집행 연구비와 a2 투입 MW, 실현은 완료과제 활용평가 <b>시뮬레이션</b> 누계(DEMO)입니다. 재무실 확정 건은 산점도에 ◆로 별도 표시합니다. 점을 누르면 과제 ROI 카드가 열립니다.</div>
+    </div>
+    <div class="row" style="grid-template-columns:repeat(5,1fr)" id="roiKpis"></div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card"><h3>ROI 산점도 <span class="legend-note">— X 투입 연구비(억) · Y 누적 실현(억) · 대각선 = BEP · 색 = 활동군</span></h3>
+        <div class="er-filters" id="roiFil" role="group" aria-label="산점도 필터" style="margin-bottom:6px"></div><div class="chart" id="roiScatter" style="height:340px"></div></div>
+      <div class="card" id="roiCard" aria-live="polite"></div>
+    </div>
+    <div class="row" style="grid-template-columns:6fr 6fr">
+      <div class="card"><h3>코호트별 BEP 곡선 <span class="legend-note">— 완료연도별 누적 실현 ÷ 투입 (%), 100% = BEP</span></h3><div class="chart short" id="roiCohort"></div></div>
+      <div class="card"><h3>기술분류별 ROI <span class="legend-note">— 누적 실현 ÷ 연구비 (배) · 공백/저성과 분야 식별</span></h3><div class="chart short" id="roiTech"></div></div>
+    </div>
+    <div class="row" style="grid-template-columns:5fr 7fr;margin-bottom:0">
+      <div class="card"><h3>ROI 분포 <span class="legend-note">— 과제 수 · 1배 미만 = 미회수</span></h3><div class="chart short" id="roiHist"></div></div>
+      <div class="card"><h3>Top / Bottom 리더보드 <span class="legend-note">— 연구비 1억 이상</span></h3>
+        <div class="er-filters" id="roiLbFil" role="group" aria-label="리더보드" style="margin-bottom:6px"></div>
+        <div class="scroll" style="max-height:230px"><table id="roiLb"><thead><tr><th>#</th><th>과제</th><th>활동군</th><th class="num">연구비</th><th class="num">MW</th><th class="num">누적 실현</th><th class="num">ROI</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+  </div>
 </section>
 
 <!-- ─────────────── EXECUTIVE ─────────────── -->
@@ -2630,7 +2653,7 @@ const stPill = s => ({'확정':'<span class="pill g">확정</span>','승인':'<s
 
 /* 서브내비 */
 const PP_TABS = [['wb','① 자동산출 워크벤치'],['trace','② 산출 근거 추적'],['gross','③ 성과 총액'],
-  ['erosion','④ 역효과'],['contrib','⑤ 기여율'],['approval','⑥ 재무실 승인'],['ledger','⑦ 성과 원장'],['util','⑧ 장기 활용평가']];
+  ['erosion','④ 역효과'],['contrib','⑤ 기여율'],['approval','⑥ 재무실 승인'],['ledger','⑦ 성과 원장'],['util','⑧ 장기 활용평가'],['roi','⑨ 연구 ROI']];
 const ppNav = document.getElementById('ppNav');
 ppNav.innerHTML = PP_TABS.map(([k,t],i)=>
   `<button class="achip${i===0?' on':''}" data-k="${k}">${t}</button>`).join('');
@@ -2891,7 +2914,7 @@ const WB = (() => {
   }
   function refreshOthers(){
     if(typeof renderRegsTable === 'function') renderTable();
-    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST, typeof LG!=='undefined'&&LG].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
+    [typeof LN!=='undefined'&&LN, typeof CT!=='undefined'&&CT, typeof GR!=='undefined'&&GR, typeof ErosionView!=='undefined'&&ErosionView, typeof APV!=='undefined'&&APV, typeof CEO!=='undefined'&&CEO, typeof CTO!=='undefined'&&CTO, typeof INST!=='undefined'&&INST, typeof LG!=='undefined'&&LG, typeof RO!=='undefined'&&RO].forEach(mod => { if(mod && mod.refreshRegs) mod.refreshRegs(); });
   }
 
   /* ── 이벤트 */
@@ -4080,6 +4103,89 @@ const CT = (() => {
   return {init, refreshRegs, select(id){ const i = PF.regs.findIndex(r => r.id === id); if(i >= 0){ cur = i; render(); } }, refresh: render};
 })();
 
+/* ⑨ 연구 ROI — 투자수익 분석(설계서 11.7). PF.roi(과제별 투입·누적 실현·코호트 BEP·기술분류 ROI·분포) + PF.regs 확정 건 오버레이 */
+const RO = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const R = () => PF.roi, ACTN = {1:'전략 프로젝트', 3:'현업·고객 문제해결', 4:'탐색·혁신'};
+  const r1 = v => Math.round(v * 10) / 10, r2 = v => Math.round(v * 100) / 100;
+  let ch = {}, act = 'ALL', lb = 'top', cur = null;
+  const P = () => R().projects.filter(p => act === 'ALL' || String(p.act) === act);
+  function render(){
+    const all = R().projects, cost = r1(all.reduce((s,p)=>s+p.cost,0)), real = r1(all.reduce((s,p)=>s+p.real,0));
+    const rois = all.filter(p=>p.roi!=null).map(p=>p.roi).sort((a,b)=>a-b), med = rois.length ? rois[Math.floor(rois.length/2)] : 0;
+    const bepCoh = Object.entries(R().cohortBep).filter(([,v]) => v.length && v[v.length-1][1] >= 100).length, cohN = Object.keys(R().cohortBep).length;
+    const sorted = all.slice().sort((a,b)=>b.real-a.real), top10 = sorted.slice(0, Math.max(1, Math.round(all.length*0.1))), share = real ? Math.round(top10.reduce((s,p)=>s+p.real,0)/real*100) : 0;
+    $('roiKpis').innerHTML = kpiCard('전사 ROI', `${cost?r2(real/cost):'—'} <small>배</small>`, `누적 실현 ${nf(real)}억 ÷ 누적 연구비 ${nf(cost)}억`)
+      + kpiCard('BEP 도달 코호트', `${bepCoh} <small>/ ${cohN}</small>`, '완료연도별 누적 실현 ≥ 투입')
+      + kpiCard('ROI 중앙값', `${med} <small>배</small>`, `과제 ${nf(all.length)}건`)
+      + kpiCard('상위 10% 성과 점유율', `${share} <small>%</small>`, `상위 ${top10.length}건이 누적 실현의 ${share}%`)
+      + kpiCard('BEP 도달 과제', `${nf(all.filter(p=>p.cost>0&&p.real>=p.cost).length)} <small>건</small>`, `미회수 ${nf(all.filter(p=>p.cost>0&&p.real<p.cost).length)}건`);
+    $('roiFil').innerHTML = [['ALL','전체 활동군'],['1','전략 프로젝트'],['3','현업·고객 문제해결'],['4','탐색·혁신']].map(([k,t])=>`<button type="button" class="er-fbtn" data-act="${k}" aria-pressed="${act===k}">${t}</button>`).join('');
+    renderScatter(); renderCard(cur);
+    /* 코호트 BEP */
+    const CB = R().cohortBep, years = Object.keys(CB);
+    const cOpt = {tooltip:tip({trigger:'axis',formatter:p=>p[0].axisValue+'<br>'+p.map(x=>`${x.seriesName}년 완료: <b>${x.value==null?'—':x.value+'%'}</b>`).join('<br>')}), legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}},
+      grid:{left:8,right:16,top:12,bottom:28,containLabel:true}, xAxis:axisX({type:'category',data:['1년차','2년차','3년차','4년차','5년차']}), yAxis:axisY({type:'value',axisLabel:{formatter:'{value}%'}}),
+      series:years.map((y,i)=>({name:y,type:'line',smooth:true,symbolSize:6,lineStyle:{width:2},itemStyle:{color:['#2a78d6','#1baf7a','#eda100','#e87ba4','#eb6834','#008300','#5b6472'][i%7]},data:[1,2,3,4,5].map(k=>{const r=CB[y].find(x=>x[0]===k);return r?r[1]:null;}),
+        markLine:i===0?{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#c53030'},label:{formatter:'BEP 100%',fontSize:10,color:'#c53030',position:'insideEndTop'},data:[{yAxis:100}]}:undefined}))};
+    if(!ch.co) ch.co = mk('roiCohort', cOpt); else ch.co.setOption(cOpt, true);
+    /* 기술분류 ROI */
+    const T = R().techRoi;
+    const tOpt = {tooltip:tip({formatter:p=>`${p.name}<br>ROI <b>${p.value}배</b> · 연구비 ${nf(T[p.dataIndex][1])}억 · 실현 ${nf(T[p.dataIndex][2])}억 · ${T[p.dataIndex][4]}건`}), grid:{left:8,right:40,top:8,bottom:8,containLabel:true},
+      xAxis:axisY({type:'value',name:'배',nameTextStyle:{fontSize:10,color:INK3}}), yAxis:axisX({type:'category',data:T.map(t=>t[0]).reverse(),axisLabel:{fontSize:11}}),
+      series:[{type:'bar',barMaxWidth:20,itemStyle:{borderRadius:[0,4,4,0]},label:{show:true,position:'right',fontSize:10,color:INK2,formatter:p=>p.value+'배'},data:T.slice().reverse().map(t=>({value:t[3],itemStyle:{color:t[3]<1?'#c53030':t[3]<2?'#eda100':'#1e8e5a'}})),
+        markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:INK3},label:{formatter:'BEP',fontSize:10,color:INK3},data:[{xAxis:1}]}}]};
+    if(!ch.te) ch.te = mk('roiTech', tOpt); else ch.te.setOption(tOpt, true);
+    /* 분포 */
+    const H = R().hist;
+    const hOpt = {tooltip:tip({formatter:p=>`ROI ${p.name}배<br><b>${nf(p.value)}</b>건`}), grid:{left:8,right:16,top:10,bottom:8,containLabel:true},
+      xAxis:axisX({type:'category',data:H.map(h=>h[0])}), yAxis:axisY({type:'value'}),
+      series:[{type:'bar',barMaxWidth:36,itemStyle:{borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:INK2},data:H.map((h,i)=>({value:h[1],itemStyle:{color:i<2?'#c53030':i<3?'#eda100':'#1e8e5a'}}))}]};
+    if(!ch.hi) ch.hi = mk('roiHist', hOpt); else ch.hi.setOption(hOpt, true);
+    renderLb();
+  }
+  function renderScatter(){
+    const regByCode = {}; PF.regs.filter(r=>r.status==='확정').forEach(r => { regByCode[r.code] = r; });
+    const pts = P().filter(p => p.cost > 0), mx = Math.max(1, ...pts.map(p=>Math.max(p.cost,p.real)));
+    const byAct = {1:[],3:[],4:[]}; pts.forEach(p => (byAct[p.act]||byAct[1]).push({value:[p.cost, p.real], code:p.code}));
+    const sOpt = {tooltip:tip({formatter:p=>{const q=R().projects.find(x=>x.code===p.data.code);return q?`<b>${esc(q.name)}</b><br>연구비 ${nf(q.cost)}억 · MW ${nf(q.mw)} · 누적 실현 ${nf(q.real)}억<br>ROI <b>${q.roi??'—'}배</b> · ${ACTN[q.act]}${p.seriesName==='재무실 확정'?'<br>◆ 확정 순재무성과 '+nf(p.data.net)+'억':''}`:p.name;}}),
+      legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}}, grid:{left:8,right:16,top:12,bottom:28,containLabel:true},
+      xAxis:axisX({type:'value',name:'투입 연구비(억)',nameTextStyle:{fontSize:10,color:INK3},max:Math.ceil(mx)}), yAxis:axisY({type:'value',name:'누적 실현(억)',nameTextStyle:{fontSize:10,color:INK3},max:Math.ceil(mx)}),
+      series:[1,3,4].filter(a=>byAct[a].length).map(a=>({name:ACTN[a],type:'scatter',symbolSize:7,itemStyle:{color:C[a],opacity:.75},data:byAct[a],
+          markLine:a===[1,3,4].filter(x=>byAct[x].length)[0]?{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#c53030'},label:{formatter:'BEP',fontSize:10,color:'#c53030'},data:[[{coord:[0,0]},{coord:[Math.ceil(mx),Math.ceil(mx)]}]]}:undefined}))
+        .concat([{name:'재무실 확정',type:'scatter',symbol:'diamond',symbolSize:12,itemStyle:{color:'#0a4da2',borderColor:'#fff',borderWidth:1},data:Object.values(regByCode).filter(r=>act==='ALL'||String(r.act)===act).map(r=>({value:[r.costEok||0, r.netEok], code:r.code, net:r.netEok}))}])};
+    if(!ch.sc){ ch.sc = mk('roiScatter', sOpt); ch.sc.on('click', p => { if(p.data && p.data.code){ cur = p.data.code; renderCard(cur); } }); } else ch.sc.setOption(sOpt, true);
+  }
+  function renderCard(code){
+    const q = R().projects.find(x => x.code === code) || P().slice().sort((a,b)=>b.real-a.real)[0]; if(!q){ $('roiCard').innerHTML = '<h3>과제 ROI 카드</h3><div class="legend-note">과제가 없습니다.</div>'; return; }
+    cur = q.code; const reg = PF.regs.find(r => r.code === q.code), conv = q.exp ? Math.round(q.real/q.exp*100) : 0;
+    $('roiCard').innerHTML = `<h3>과제 ROI 카드 <span class="legend-note">— 산점도에서 선택</span></h3>
+      <div style="font-size:13.5px;font-weight:700;margin:4px 0 2px">${esc(q.name)}</div><div class="legend-note">${esc(q.code)} · ${q.cy} 완료 · ${esc(q.lab)} · 활용 ${esc(q.dept)} · <span class="pill" style="background:${C[q.act]}22;color:${C[q.act]}">${ACTN[q.act]}</span> · ${esc(q.tech)}</div>
+      <div class="stat" style="margin-top:8px;color:${q.roi==null?INK3:q.roi<1?'var(--bad)':'var(--good)'}">${q.roi??'—'}<small>배 ROI</small> <span class="legend-note" style="font-size:12px">${q.cost>0&&q.real>=q.cost?'✓ BEP 도달':'미회수 '+nf(r1(Math.max(0,q.cost-q.real)))+'억'}</span></div>
+      <h4 style="margin:10px 0 4px;font-size:12.5px">투입 내역</h4><dl class="wb-kv" style="display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12.5px;margin:0"><dt class="legend-note">연구비(집행)</dt><dd><b>${nf(q.cost)}억</b></dd><dt class="legend-note">투입 MW</dt><dd>${nf(q.mw)} MW</dd><dt class="legend-note">기대(누적)</dt><dd>${nf(q.exp)}억 · 연 ${nf(q.annual)}억</dd></dl>
+      <h4 style="margin:10px 0 4px;font-size:12.5px">연차 순성과 <span class="legend-note">(활용평가 시뮬레이션)</span></h4>
+      <table><thead><tr><th>연차</th><th class="num">실현(억)</th><th class="num">누적</th></tr></thead><tbody>${(()=>{let a=0;return q.years.map(([y,v])=>{a+=v;return `<tr><td>${y}년차</td><td class="num">${nf(v)}</td><td class="num"><b>${nf(r1(a))}</b></td></tr>`;}).join('')||'<tr><td colspan="3" class="legend-note">평가 실적 없음</td></tr>';})()}</tbody></table>
+      <div style="margin-top:8px;font-size:12.5px">전환율 <b>${conv}%</b> <span class="legend-note">(누적 실현 ÷ 누적 기대)</span></div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${reg ? `<span class="pill g">재무실 ${esc(reg.status)} · 순재무성과 ${nf(reg.netEok)}억</span><button type="button" class="ln-act" data-trace="${PF.regs.indexOf(reg)}">② 산출 근거 추적 →</button>` : '<span class="legend-note">성과 플랫폼 등록 전 — ① 워크벤치에서 등록하면 확정 순재무성과와 연결됩니다</span>'}</div>`;
+  }
+  function renderLb(){
+    $('roiLbFil').innerHTML = [['top','Top 10'],['bottom','Bottom 10']].map(([k,t])=>`<button type="button" class="er-fbtn" data-lb="${k}" aria-pressed="${lb===k}">${t}</button>`).join('');
+    const rows = P().filter(p => p.cost >= 1 && p.roi != null).sort((a,b) => lb==='top' ? b.roi-a.roi : a.roi-b.roi).slice(0,10);
+    $('roiLb').querySelector('tbody').innerHTML = rows.map((p,i)=>`<tr data-code="${esc(p.code)}" style="cursor:pointer"><td>${i+1}</td><td>${esc(p.name.slice(0,24))}<div class="legend-note">${esc(p.code)} · ${esc(p.lab)}</div></td><td><span class="pill" style="background:${C[p.act]}22;color:${C[p.act]}">${ACTN[p.act].split(' ')[0]}</span></td><td class="num">${nf(p.cost)}</td><td class="num">${nf(p.mw)}</td><td class="num">${nf(p.real)}</td><td class="num"><b style="color:${p.roi<1?'var(--bad)':'var(--good)'}">${p.roi}배</b></td></tr>`).join('') || '<tr><td colspan="7" class="legend-note" style="padding:12px">해당 과제가 없습니다.</td></tr>';
+  }
+  function init(){
+    const root = $('pp-roi');
+    root.addEventListener('click', e => { const b = e.target.closest('button'); const tr = e.target.closest('tr[data-code]');
+      if(b && b.dataset.act){ act = b.dataset.act; render(); return; }
+      if(b && b.dataset.lb){ lb = b.dataset.lb; renderLb(); return; }
+      if(b && b.dataset.trace != null){ LN.render(+b.dataset.trace, 9); goPp('trace'); return; }
+      if(tr){ cur = tr.dataset.code; renderCard(cur); } });
+    render();
+  }
+  return {init, refresh: render, refreshRegs: () => { renderScatter(); renderCard(cur); }};
+})();
+
 /* ⑧ 장기 활용평가 — 연차 추적(설계서 11.6). PF.util(활용평가 시뮬레이션 파생: 활용상태·성과상태·코호트·캘린더) */
 const UT = (() => {
   const $ = id => document.getElementById(id);
@@ -4226,6 +4332,7 @@ const LG = (() => {
 CT.init();   // ⑤ 기여율 — 저장된 결정을 PF.regs에 반영한 뒤 ①·② 재렌더
 LG.init();   // ⑦ 성과 원장 — 확정 건 집계
 UT.init();   // ⑧ 장기 활용평가 (시뮬레이션 파생 — 등록 원장과 무관)
+RO.init();   // ⑨ 연구 ROI (확정 건 오버레이는 등록 원장 참조)
 GR.init();   // ③ 성과 총액 — 산식 카탈로그·미리계산기
 WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연 등록 반영)
 CEO.init();   // Executive(CEO) — 재무실 확정 기준, 등록 원장 변경 시 refreshRegs
