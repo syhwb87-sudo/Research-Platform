@@ -687,6 +687,36 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #p-sim .sim-cmp button{font:inherit;font-size:11.5px;padding:2px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;margin-right:4px}
 #p-sim .sim-cmp button:hover{border-color:var(--brand);color:var(--brand)}
 #p-sim .sim-empty{font-size:12.5px;color:var(--text-3);padding:24px 8px;text-align:center;line-height:1.7}
+/* ── 활동군 상세 › 전략 프로젝트 재구성 ── */
+#ap-1 .st-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:-4px 0 12px;font-size:12.5px}
+#ap-1 .st-toggle{margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--text-2);cursor:pointer}
+#ap-1 .st-kpi{cursor:pointer} #ap-1 .st-kpi:hover{border-color:var(--brand)}
+#ap-1 .st-kpi .stat small.x{font-size:11px;color:var(--text-3);font-weight:500;margin-left:6px}
+#ap-1 .st-filters{float:right;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#ap-1 .st-filters select,#ap-1 .st-filters input{font:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface)}
+#ap-1 .st-filters input{width:170px}
+#ap-1 table.st-tb{width:100%;border-collapse:collapse;font-size:12.5px}
+#ap-1 table.st-tb th{font-size:11.5px;font-weight:700;color:var(--text-3);text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--surface);cursor:pointer;user-select:none}
+#ap-1 table.st-tb th:hover{color:var(--brand)} #ap-1 table.st-tb th.sorted::after{content:' ▾';color:var(--brand)} #ap-1 table.st-tb th.sorted.asc::after{content:' ▴'}
+#ap-1 table.st-tb td{padding:7px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle} #ap-1 table.st-tb td:last-child{white-space:nowrap}
+#ap-1 table.st-tb .num{text-align:right;font-variant-numeric:tabular-nums}
+#ap-1 table.st-tb a.lnk{color:var(--brand);font-weight:600;cursor:pointer;text-decoration:none} #ap-1 table.st-tb a.lnk:hover{text-decoration:underline}
+#ap-1 table.st-tb .dday{font-size:11px;font-weight:700;margin-left:4px;color:var(--bad)} #ap-1 table.st-tb .dday.ok{color:var(--text-3);font-weight:500} #ap-1 table.st-tb .dday.over{color:#fff;background:var(--bad);border-radius:8px;padding:0 5px}
+#ap-1 table.st-tb .stg{display:inline-flex;gap:2px;vertical-align:middle} #ap-1 table.st-tb .stg i{width:9px;height:9px;border-radius:2px;background:#e4e7ec} #ap-1 table.st-tb .stg i.on{background:var(--act1)}
+#ap-1 .st-modal{position:fixed;inset:0;background:rgba(16,24,40,.45);z-index:50;display:flex;align-items:center;justify-content:center;padding:24px}
+#ap-1 .st-modal[hidden]{display:none}
+#ap-1 .st-card{background:var(--surface);border-radius:14px;width:min(980px,100%);max-height:calc(100vh - 48px);overflow:auto;padding:22px 26px;position:relative;box-shadow:0 20px 60px rgba(16,24,40,.3)}
+#ap-1 .st-close{position:absolute;top:12px;right:14px;font:inherit;font-size:14px;border:0;background:transparent;cursor:pointer;color:var(--text-2)}
+#ap-1 .st-card h3{margin:0 0 4px;font-size:16px} #ap-1 .st-card .meta{font-size:12.5px;color:var(--text-2);margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap}
+#ap-1 .st-card .meta a{color:var(--brand);cursor:pointer;font-weight:600}
+#ap-1 .st-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+#ap-1 .st-stats>div{background:#f7f8fa;border:1px solid var(--border);border-radius:10px;padding:8px 10px}
+#ap-1 .st-stats .l{font-size:10.5px;color:var(--text-3)} #ap-1 .st-stats .v{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums} #ap-1 .st-stats .s{font-size:10.5px;color:var(--text-3)}
+#ap-1 .st-two{display:grid;grid-template-columns:5fr 7fr;gap:14px}
+#ap-1 .st-parts{list-style:none;margin:0;padding:0;font-size:12.5px} #ap-1 .st-parts li{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed var(--border)}
+#ap-1 .st-parts li a{color:var(--brand);font-weight:600;cursor:pointer;min-width:60px} #ap-1 .st-parts .track{flex:1;height:7px;border-radius:99px;background:#eef2f7;overflow:hidden} #ap-1 .st-parts .track i{display:block;height:100%;background:var(--act1)}
+#ap-1 .st-parts .v{min-width:56px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+#ap-1 .st-prog{height:8px;border-radius:99px;background:#eef2f7;overflow:hidden;margin-top:4px} #ap-1 .st-prog i{display:block;height:100%;background:var(--act1)} #ap-1 .st-prog i.over{background:var(--bad)}
 </style>
 </head>
 <body>
@@ -878,24 +908,60 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
     <div id="actNav" style="display:flex;gap:8px;flex-wrap:wrap"></div>
   </div>
 
-  <!-- 전략 프로젝트 -->
+  <!-- 전략 프로젝트 — 진행중 전체(a3)를 클라이언트에서 집계 · 초대형 과제 제외 토글 · 과제 카드 드릴다운 -->
   <div class="apanel" id="ap-1">
-    <div class="row" style="grid-template-columns:repeat(4,1fr)" id="stKpis"></div>
-    <div class="row" style="grid-template-columns:6fr 6fr">
-      <div class="card"><h3>기술분류별 연구비 (진행중)</h3>
-        <div class="sub">억원 · a3 기술분류 상위 14</div>
-        <div class="chart" id="stTech"></div></div>
-      <div class="card"><h3>과제유형 × 연구부서</h3>
-        <div class="sub">진행중 과제 기준</div>
-        <div style="display:flex;gap:8px">
-          <div class="chart" id="stType" style="width:44%"></div>
-          <div class="chart" id="stDept" style="width:56%"></div>
-        </div></div>
+    <div class="st-bar">
+      <span class="legend-note" id="stScope"></span>
+      <label class="st-toggle"><input type="checkbox" id="stMega"> 초대형 과제(연구비 <span id="stMegaEok"></span>억 이상) 제외 <span class="legend-note" id="stMegaNote"></span></label>
     </div>
-    <div class="card"><h3>진행중 전략 프로젝트 (연구비 상위 60)</h3>
-      <div class="scroll"><table id="stTable">
-        <thead><tr><th>과제코드</th><th>과제명</th><th>연구부서</th><th>책임자</th>
-        <th class="num">연구비</th><th class="num">완료예정</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="row" style="grid-template-columns:repeat(6,1fr)" id="stKpis"></div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card">
+        <h3>포트폴리오 버블 <span class="legend-note">— X 연구비 · Y 기대이익(로그) · 크기 실적 MW · 색 연구소 · 클릭 → 과제 카드</span></h3>
+        <div class="sub" id="stBubbleSub"></div>
+        <div class="chart tall" id="stBubble"></div>
+      </div>
+      <div class="card">
+        <h3>진행 현황</h3>
+        <div class="sub">위: 다단계 과제의 현단계 분포 · 아래: 완료 예정 시점(기한 경과 + 향후 12개월)</div>
+        <div class="chart" id="stStage" style="height:150px"></div>
+        <div class="chart" id="stEnd" style="height:170px"></div>
+      </div>
+    </div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card">
+        <h3>기술분류 × 연구소 <span class="legend-note">— 연구비 상위 12 + 기타</span></h3>
+        <div class="sub" id="stTechSub">억원 · 스택 = 연구소</div>
+        <div class="chart tall" id="stTechOrg"></div>
+      </div>
+      <div class="card">
+        <h3>과제 구성</h3>
+        <div class="sub">과제유형 · 연구성격 · 성과유형 구성비 (건수) · 조각 클릭 → 표 필터</div>
+        <div class="chart tall" id="stMix"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>진행중 전략 프로젝트 <span class="legend-note" id="stCount"></span>
+        <span class="st-filters">
+          <select id="stfOrg"><option value="">전체 연구소</option></select>
+          <select id="stfType"><option value="">전체 과제유형</option></select>
+          <select id="stfNature"><option value="">전체 연구성격</option></select>
+          <select id="stfEffect"><option value="">전체 성과유형</option></select>
+          <select id="stfState"><option value="">전체 상태</option><option value="soon">완료 임박(90일)</option><option value="overdue">기한 경과</option><option value="new">금년 착수</option><option value="multi">다단계</option></select>
+          <input class="search" id="stfQ" placeholder="과제명/코드/책임자 검색">
+          <button type="button" class="er-fbtn" id="stfReset">초기화</button>
+        </span></h3>
+      <div class="sub">코드 클릭 → 과제 카드 · 책임자 → My Dashboard · 연구소 → MW 분석 · 헤더 클릭 정렬</div>
+      <div class="scroll" style="max-height:520px"><table id="stTable" class="st-tb">
+        <thead><tr><th data-k="code">과제코드</th><th data-k="name">과제명</th><th data-k="dept">연구부서</th><th data-k="leader">책임자</th><th data-k="type">유형</th>
+        <th class="num" data-k="budget">연구비</th><th class="num" data-k="expected">기대이익</th><th class="num" data-k="mw">실적 MW</th><th data-k="end">완료예정</th><th data-k="stages">단계</th></tr></thead>
+        <tbody></tbody></table></div>
+    </div>
+    <!-- 과제 카드 (드릴다운) -->
+    <div class="st-modal" id="stModal" hidden><div class="st-card" role="dialog" aria-modal="true" aria-labelledby="stCardTitle">
+      <button type="button" class="st-close" id="stCardClose" aria-label="닫기">✕</button>
+      <div id="stCardBody"></div>
+    </div></div>
   </div>
 
   <!-- 장기 성과관리·확산 — 심화 대시보드를 패널 내부에 직접 렌더링 (Single Entry Point) -->
@@ -2128,42 +2194,201 @@ actNav.addEventListener('click', e=>{
 });
 goAct(1);
 
-/* 4.1 전략 */
+/* 4.1 전략 — 진행중 전체(DT.strategy.projects)를 클라이언트에서 집계. 초대형 과제 제외 토글, 필터·정렬, 과제 카드 드릴다운 */
 const ST = DT.strategy;
-document.getElementById('stKpis').innerHTML =
-  kpiCard('진행 과제수', nf(ST.kpi.running)+' <small>건</small>','a3 · W/N 코드 제외')+
-  kpiCard('진행 연구비', nf(ST.kpi.budget)+' <small>억원</small>','확정 연구비 합계')+
-  kpiCard('집행률', ST.kpi.execRate+'<small>%</small>','집행예산 ÷ 연구비')+
-  kpiCard('투입 MW', nf(ST.kpi.mw)+' <small>MW</small>','2023~2026 누적');
-mk('stTech', {
-  tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b>억원`}),
-  series:[{type:'treemap',roam:false,nodeClick:false,breadcrumb:{show:false},
-    itemStyle:{gapWidth:2,borderColor:SURF},
-    label:{fontSize:11,formatter:p=>`${p.name}\n${nf(p.value)}억`},
-    color:['#2a78d6','#4a89dd','#6a9ae3','#8aabe9','#a9bdef','#1baf7a','#4dbf95',
-           '#eda100','#f0b23a','#e87ba4','#eb6834','#98a2b3','#748094','#5b6472'],
-    data:ST.techTreemap}]
-});
-mk('stType', {
-  tooltip:tip({formatter:p=>`${p.name} <b>${nf(p.value)}건</b> (${p.percent}%)`}),
-  legend:{bottom:0,itemWidth:10,itemHeight:10,textStyle:{fontSize:10,color:INK2}},
-  series:[{type:'pie',radius:['45%','70%'],center:['50%','42%'],
-    itemStyle:{borderColor:SURF,borderWidth:2},label:{show:false},
-    color:['#2a78d6','#6a9ae3','#a9bdef','#1baf7a','#eda100','#e87ba4','#98a2b3'],
-    data:ST.typeDist.map(([n,v])=>({name:n,value:v}))}]
-});
-mk('stDept', {
-  tooltip:tip({formatter:p=>`${p.name}<br><b>${nf(p.value)}</b>건`}),
-  grid:{left:110,right:30,top:8,bottom:20},
-  xAxis:axisY({type:'value'}),
-  yAxis:axisX({type:'category',data:ST.deptBar.map(x=>x[0]).reverse(),axisLabel:{fontSize:10}}),
-  series:[{type:'bar',barMaxWidth:14,color:C[1],itemStyle:{borderRadius:[0,4,4,0]},
-    label:{show:true,position:'right',fontSize:10,color:INK2},
-    data:ST.deptBar.map(x=>x[1]).reverse()}]
-});
-document.querySelector('#stTable tbody').innerHTML = ST.projects.map(p=>
-  `<tr><td>${p.code}</td><td>${p.name}</td><td>${p.dept}</td><td>${p.leader}</td>
-   <td class="num">${nf(p.budget)}억</td><td class="num">${p.end}</td></tr>`).join('');
+const STV = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const ASOF = ST.asOf, MEGA = ST.megaEok, CY = ASOF.slice(0, 4);
+  const ORG_COL = {'공정DX연구소':'#2a78d6','솔루션연구소':'#1baf7a','제품연구소':'#eda100','미래철강연구소':'#e87ba4','기타(파견/TF 등)':'#98a2b3','기술연구원':'#6a5acd'};
+  const orgColor = o => ORG_COL[o] || '#748094';
+  const dayDiff = iso => Math.round((new Date(iso) - new Date(ASOF)) / 864e5);
+  const P = ST.projects.map(p => ({ ...p, dd: p.end ? dayDiff(p.end) : null, isNew: (p.start || '').startsWith(CY), multi: p.stages[0] > 1, mega: p.budget >= MEGA }));
+  const ORGS = [...new Set(P.map(p => p.lab))].sort((a, b) => P.filter(p => p.lab === b).length - P.filter(p => p.lab === a).length);   // 연구소 단위(top_org)
+  let exMega = false, f = { org:'', type:'', nature:'', effect:'', state:'', q:'' }, sortK = 'budget', sortAsc = false;
+  let bubble = null, stage = null, endC = null, techC = null, mixC = null, cardMw = null;
+  const base = () => exMega ? P.filter(p => !p.mega) : P;
+  const sum = (a, k) => a.reduce((s, p) => s + (p[k] || 0), 0);
+  const r1 = v => Math.round(v * 10) / 10;
+
+  function renderKpis(){
+    const A = base(), megaN = P.filter(p => p.mega).length, quant = A.filter(p => p.effect === '정량효과');
+    const execBase = A.filter(p => p.exec > 0), execRate = execBase.length ? Math.round(100 * sum(execBase, 'exec') / Math.max(1, sum(execBase, 'budget'))) : 0;
+    const elapsed = execBase.filter(p => p.elapsed != null), elapsedAvg = elapsed.length ? Math.round(elapsed.reduce((s, p) => s + p.elapsed, 0) / elapsed.length) : 0;
+    const soon = A.filter(p => p.dd != null && p.dd >= 0 && p.dd <= 90).length, over = A.filter(p => p.dd != null && p.dd < 0).length;
+    $('stScope').textContent = `진행중 ${nf(P.length)}건 (a3 · W/N 코드 제외) · 기준일 ${ASOF}` + (exMega ? ` · 초대형 ${megaN}건 제외 중` : '');
+    $('stMegaNote').textContent = `— ${megaN}건 · ${nf(Math.round(sum(P.filter(p => p.mega), 'budget')))}억`;
+    const cards = [
+      ['진행 과제', `${nf(A.length)} <small>건</small>`, `금년 착수 ${nf(A.filter(p => p.isNew).length)}건`, () => setFilter({ state:'new' })],
+      ['진행 연구비', `${nf(Math.round(sum(A, 'budget')))} <small>억원</small>`, exMega ? `초대형 제외 · 전체 ${nf(Math.round(sum(P, 'budget')))}억` : `초대형 ${megaN}건 ${nf(Math.round(sum(P.filter(p => p.mega), 'budget')))}억 포함`, () => setFilter({})],
+      ['집행률', `${execRate}<small>%</small><small class="x">경과 ${elapsedAvg}%</small>`, `집행예산 등록 ${execBase.length}건 기준 · 기간 경과율 대비 ${execRate >= elapsedAvg ? '순조' : '지연'}`, null],
+      ['기대이익', `${nf(Math.round(sum(quant, 'expected')))} <small>억원</small>`, `정량효과 ${quant.length}건 · 정성 ${A.filter(p => p.effect === '정성효과').length}건`, () => setFilter({ effect:'정량효과' })],
+      ['실적 투입 MW', `${nf(ST.mwTotal)} <small>MW</small>`, `${ST.mwFrom} ~ ${ASOF.slice(0, 7)} 실적 · 계획 제외`, null],
+      [`완료 임박 · 경과`, `${soon} <small>건</small><small class="x">경과 ${over}건</small>`, `90일 내 완료 예정 · 완료일 지난 진행중`, () => setFilter({ state: over ? 'overdue' : 'soon' })],
+    ];
+    $('stKpis').innerHTML = cards.map(([t, v, s, fn], i) => `<div class="card${fn ? ' st-kpi' : ''}" ${fn ? `data-i="${i}" role="button" tabindex="0"` : ''}><div class="sub" style="margin:0 0 2px">${t}</div><div class="stat">${v}</div><div class="legend-note">${s}</div></div>`).join('');
+    $('stKpis').onclick = e => { const c = e.target.closest('.st-kpi'); if(c) cards[+c.dataset.i][3](); };
+  }
+
+  function renderBubble(){
+    const A = base(), LO = 0.1;
+    const quant = A.filter(p => p.expected > 0), qual = A.filter(p => !(p.expected > 0));
+    $('stBubbleSub').textContent = `정량효과(기대이익 산정) ${quant.length}건 · 기대이익 미산정 ${qual.length}건은 하단 띠 · 연구비 하한 ${LO}억으로 표시`;
+    const mkS = (name, arr, gray) => ({ name, type:'scatter', data: arr.map(p => ({ value:[Math.max(LO, p.budget), Math.max(LO, p.expected), p.mw, p.code], itemStyle:{ color: gray ? '#c3c9d3' : orgColor(p.lab), opacity: gray ? .55 : .8 } })), symbolSize: v => 6 + Math.sqrt(v[2]) * 2.2 });
+    const series = ORGS.map(o => mkS(o, quant.filter(p => p.lab === o), false)).filter(s => s.data.length).concat([mkS('기대이익 미산정', qual, true)]);
+    const opt = {
+      tooltip: tip({ formatter: q => { const p = P.find(x => x.code === q.value[3]); return `<b>${esc(p.code)}</b> ${esc(p.name)}<br>${esc(p.dept)} · ${esc(p.leader)}<br>연구비 <b>${nf(p.budget)}</b>억 · 기대이익 <b>${p.expected > 0 ? nf(p.expected) + '억' : '미산정'}</b> · 실적 MW <b>${nf(p.mw)}</b>`; } }),
+      legend:{ bottom:0, left:'center', itemWidth:10, itemHeight:10, textStyle:{ fontSize:10.5, color:INK2 } },
+      grid:{ left:56, right:20, top:28, bottom:58 },
+      xAxis: axisY({ type:'log', name:'연구비(억)', nameLocation:'middle', nameGap:22, min:LO, axisLabel:{ formatter: v => nf(v) } }),
+      yAxis: axisY({ type:'log', name:'기대이익(억)', min:LO, axisLabel:{ formatter: v => nf(v) } }),
+      series,
+    };
+    if(!bubble){ bubble = mk('stBubble', opt); bubble.on('click', q => { if(q.value && q.value[3]) openCard(q.value[3]); }); } else bubble.setOption(opt, { replaceMerge:['series'] });
+  }
+
+  function renderProgress(){
+    const A = base(), multi = A.filter(p => p.multi);
+    const tot = [2, 3, 4, 5], byT = tot.map(t => multi.filter(p => p.stages[0] === t));
+    const stOpt = {
+      tooltip: tip({ trigger:'axis', axisPointer:{ type:'shadow' }, formatter: ps => `총 ${ps[0].axisValue}단계 과제<br>` + ps.filter(p => p.value).map(p => `${p.marker}${p.seriesName} <b>${p.value}</b>건`).join('<br>') }),
+      grid:{ left:64, right:40, top:6, bottom:4 }, legend:{ show:false },
+      xAxis: axisY({ type:'value', minInterval:1 }), yAxis: axisX({ type:'category', data: tot.map(t => `${t}단계`), axisLabel:{ fontSize:10.5 } }),
+      series: [1, 2, 3, 4, 5].map(c => ({ name:`현 ${c}단계`, type:'bar', stack:'s', barMaxWidth:14, data: byT.map(g => g.filter(p => p.stages[1] === c).length || null), itemStyle:{ color: ['#a9bdef', '#6a9ae3', '#2a78d6', '#174a86', '#0d2d57'][c - 1] }, label:{ show:true, fontSize:9.5, color:'#fff', formatter: q => q.value ? `${c}` : '' } })),
+    };
+    stage = stage ? (stage.setOption(stOpt, { replaceMerge:['series'] }), stage) : mk('stStage', stOpt);
+    $('stStage').title = `다단계 과제 ${multi.length}건 (단일 단계 ${A.length - multi.length}건 제외) · 막대 안 숫자 = 현단계`;
+    const months = []; let y = +ASOF.slice(0, 4), m = +ASOF.slice(5, 7);
+    for(let i = 0; i < 12; i++){ m++; if(m > 12){ m = 1; y++; } months.push(`${y}-${String(m).padStart(2, '0')}`); }
+    const over = A.filter(p => p.dd != null && p.dd < 0).length, thisM = A.filter(p => p.end && p.end.slice(0, 7) === ASOF.slice(0, 7) && p.dd >= 0).length;
+    const cnt = months.map(ym => A.filter(p => p.end && p.end.slice(0, 7) === ym).length), later = A.filter(p => p.end && p.end.slice(0, 7) > months[11]).length;
+    const endOpt = {
+      tooltip: tip({ trigger:'axis', axisPointer:{ type:'shadow' }, formatter: ps => `${ps[0].axisValue}<br><b>${ps[0].value}</b>건` }),
+      grid:{ left:36, right:10, top:8, bottom:26 },
+      xAxis: axisX({ type:'category', data: ['경과', '이달'].concat(months.map(v => v.slice(2).replace('-', '.')), ['이후']), axisLabel:{ fontSize:9.5, interval:0, rotate:0 } }),
+      yAxis: axisY({ type:'value', minInterval:1 }),
+      series:[{ type:'bar', barMaxWidth:16, data: [over, thisM].concat(cnt, [later]).map((v, i) => ({ value:v, itemStyle:{ color: i === 0 ? '#c53030' : i === 1 ? '#e0791e' : i === 14 ? '#98a2b3' : C[1] } })), itemStyle:{ borderRadius:[3, 3, 0, 0] }, label:{ show:true, position:'top', fontSize:9.5, color:INK2, formatter: q => q.value || '' } }],
+    };
+    endC = endC ? (endC.setOption(endOpt, { replaceMerge:['series'] }), endC) : mk('stEnd', endOpt);
+  }
+
+  function renderTechOrg(){
+    const A = base(), byTech = {};
+    A.forEach(p => { const t = byTech[p.tech] = byTech[p.tech] || { total:0, org:{}, n:0 }; t.total += p.budget; t.n++; t.org[p.lab] = (t.org[p.lab] || 0) + p.budget; });
+    const sorted = Object.entries(byTech).sort((a, b) => b[1].total - a[1].total), top = sorted.slice(0, 12), rest = sorted.slice(12);
+    const other = { total:0, org:{}, n:0 }; rest.forEach(([, t]) => { other.total += t.total; other.n += t.n; Object.entries(t.org).forEach(([o, v]) => other.org[o] = (other.org[o] || 0) + v); });
+    const rows = top.map(([k, t]) => [k, t]).concat(rest.length ? [[`기타 ${rest.length}종`, other]] : []).reverse();
+    $('stTechSub').textContent = `억원 · 스택 = 연구소 · 기술분류 ${sorted.length}종 중 상위 12${exMega ? ' · 초대형 제외' : ''}`;
+    const opt = {
+      tooltip: tip({ trigger:'axis', axisPointer:{ type:'shadow' }, formatter: ps => `${ps[0].axisValue} (${rows[ps[0].dataIndex][1].n}건)<br>` + ps.filter(p => p.value).map(p => `${p.marker}${p.seriesName} <b>${nf(Math.round(p.value))}</b>억`).join('<br>') }),
+      legend:{ top:0, right:0, itemWidth:10, itemHeight:8, textStyle:{ fontSize:10.5, color:INK2 } },
+      grid:{ left:170, right:40, top:44, bottom:22 },
+      xAxis: axisY({ type:'value', name:'억원', nameTextStyle:{ color:INK3 } }),
+      yAxis: axisX({ type:'category', data: rows.map(r => r[0].length > 20 ? r[0].slice(0, 19) + '…' : r[0]), axisLabel:{ fontSize:10 } }),
+      series: ORGS.map(o => ({ name:o, type:'bar', stack:'t', barMaxWidth:14, data: rows.map(r => r[1].org[o] ? r1(r[1].org[o]) : null), itemStyle:{ color: orgColor(o) } })),
+    };
+    techC = techC ? (techC.setOption(opt, { replaceMerge:['series'] }), techC) : mk('stTechOrg', opt);
+  }
+
+  function renderMix(){
+    const A = base(), dims = [['type', '과제유형'], ['nature', '연구성격'], ['effect', '성과유형']];
+    const cats = {}; dims.forEach(([k]) => { const c = {}; A.forEach(p => c[p[k]] = (c[p[k]] || 0) + 1); cats[k] = Object.entries(c).sort((a, b) => b[1] - a[1]); });
+    const palette = ['#2a78d6', '#6a9ae3', '#a9bdef', '#1baf7a', '#eda100', '#e87ba4', '#98a2b3', '#5b6472'];
+    const series = []; dims.forEach(([k, label], di) => cats[k].forEach(([name, v], i) => series.push({ name:`${label}:${name}`, type:'bar', stack:'m', barMaxWidth:26, data: dims.map((_, j) => j === di ? v : null), itemStyle:{ color: palette[i % palette.length] }, label:{ show: v / A.length > .07, fontSize:10, color:'#fff', formatter: `${name.length > 8 ? name.slice(0, 7) + '…' : name}\n${Math.round(100 * v / A.length)}%` } })));
+    const opt = {
+      tooltip: tip({ formatter: q => { const [dim, name] = q.seriesName.split(':'); return `${dim} · <b>${esc(name)}</b><br>${q.value}건 (${Math.round(100 * q.value / A.length)}%) · 클릭 시 표 필터`; } }),
+      grid:{ left:64, right:16, top:10, bottom:10 },
+      xAxis: axisY({ type:'value', max:A.length, show:false }), yAxis: axisX({ type:'category', data: dims.map(d => d[1]), inverse:true }),
+      series,
+    };
+    if(!mixC){ mixC = mk('stMix', opt); mixC.on('click', q => { const [dim, name] = q.seriesName.split(':'); const k = { '과제유형':'type', '연구성격':'nature', '성과유형':'effect' }[dim]; setFilter({ [k]: name }); }); } else mixC.setOption(opt, { replaceMerge:['series'] });
+  }
+
+  function rows(){
+    const A = base();
+    return A.filter(p => (!f.org || p.lab === f.org) && (!f.type || p.type === f.type) && (!f.nature || p.nature === f.nature) && (!f.effect || p.effect === f.effect)
+      && (!f.state || (f.state === 'soon' ? (p.dd != null && p.dd >= 0 && p.dd <= 90) : f.state === 'overdue' ? (p.dd != null && p.dd < 0) : f.state === 'new' ? p.isNew : p.multi))
+      && (!f.q || p.full.includes(f.q) || p.code.includes(f.q) || p.leader.includes(f.q)))
+      .sort((a, b) => { let x = a[sortK], y = b[sortK]; if(sortK === 'stages'){ x = a.stages[1] / Math.max(1, a.stages[0]); y = b.stages[1] / Math.max(1, b.stages[0]); } const r = typeof x === 'string' ? x.localeCompare(y, 'ko') : (x - y); return sortAsc ? r : -r; });
+  }
+  function renderTable(){
+    const R = rows();
+    $('stCount').textContent = `— ${nf(R.length)}건 / ${nf(base().length)}건`;
+    document.querySelectorAll('#stTable th[data-k]').forEach(th => { th.classList.toggle('sorted', th.dataset.k === sortK); th.classList.toggle('asc', th.dataset.k === sortK && sortAsc); });
+    document.querySelector('#stTable tbody').innerHTML = R.slice(0, 200).map(p => `<tr>
+      <td><a class="lnk" data-code="${esc(p.code)}">${esc(p.code)}</a></td><td title="${esc(p.full)}">${esc(p.name)}</td>
+      <td><a class="lnk" data-org="${esc(p.lab)}" title="${esc(p.deptFull)} → MW 분석(${esc(p.lab)})">${esc(p.dept)}</a></td><td><a class="lnk" data-person="${esc(p.leader)}">${esc(p.leader)}</a></td>
+      <td><span class="pill n" style="background:#eef1f5;color:var(--text-2)">${esc(p.type)}</span></td>
+      <td class="num">${nf(p.budget)}억${p.mega ? ' <span class="pill y">초대형</span>' : ''}</td><td class="num">${p.expected > 0 ? nf(p.expected) + '억' : '<span style="color:var(--text-3)">−</span>'}</td><td class="num">${nf(p.mw)}</td>
+      <td style="white-space:nowrap">${esc(p.end)}${p.dd == null ? '' : p.dd < 0 ? `<span class="dday over">D+${-p.dd}</span>` : `<span class="dday${p.dd > 90 ? ' ok' : ''}">D-${p.dd}</span>`}</td>
+      <td>${p.multi ? `<span class="stg" title="현 ${p.stages[1]} / 총 ${p.stages[0]}단계">${Array.from({ length:p.stages[0] }, (_, i) => `<i class="${i < p.stages[1] ? 'on' : ''}"></i>`).join('')}</span> ${p.stages[1]}/${p.stages[0]}` : '<span style="color:var(--text-3)">단일</span>'}</td></tr>`).join('')
+      + (R.length > 200 ? `<tr><td colspan="10" style="text-align:center;color:var(--text-3)">상위 200건까지 표시 — 필터·검색으로 좁혀 주세요</td></tr>` : '')
+      || '<tr><td colspan="10" style="text-align:center;color:var(--text-3);padding:16px">조건에 맞는 과제가 없습니다</td></tr>';
+  }
+  function setFilter(patch){
+    f = { org:'', type:'', nature:'', effect:'', state:'', q:'', ...patch };
+    ['org', 'type', 'nature', 'effect', 'state'].forEach(k => { const el = $('stf' + k[0].toUpperCase() + k.slice(1)); if(el) el.value = f[k]; });
+    $('stfQ').value = f.q; renderTable();
+    $('stTable').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  /* ── 과제 카드 (드릴다운) ── */
+  function openCard(code){
+    const p = P.find(x => x.code === code); if(!p) return;
+    const perf = (typeof PF !== 'undefined' ? PF : D.perf), reg = perf.regs.find(r => r.code === code), cand = perf.candidates.find(c => c.code === code);
+    const execRate = p.budget ? Math.round(100 * p.exec / p.budget) : 0;
+    $('stCardBody').innerHTML = `
+      <h3 id="stCardTitle">${esc(p.code)} · ${esc(p.full)}</h3>
+      <div class="meta"><span><a data-org="${esc(p.lab)}">${esc(p.deptFull || p.dept)}</a> → MW 분석(${esc(p.lab)})</span><span>책임자 <a data-person="${esc(p.leader)}">${esc(p.leader)}</a> → My Dashboard</span><span>${esc(p.type)} · ${esc(p.nature)} · ${esc(p.effect)}</span><span>활용부서 ${esc(p.useDept)}</span><span>기술분류 ${esc(p.tech)}</span></div>
+      <div class="st-stats">
+        <div><div class="l">연구비</div><div class="v">${nf(p.budget)}<small>억</small></div><div class="s">${p.mega ? '초대형' : ''}</div></div>
+        <div><div class="l">집행</div><div class="v">${p.exec > 0 ? nf(p.exec) + '<small>억</small>' : '−'}</div><div class="s">${p.exec > 0 ? `집행률 ${execRate}%` : '집행예산 미등록'}</div></div>
+        <div><div class="l">기대이익</div><div class="v">${p.expected > 0 ? nf(p.expected) + '<small>억</small>' : '−'}</div><div class="s">${p.effect}</div></div>
+        <div><div class="l">실적 투입 MW</div><div class="v">${nf(p.mw)}</div><div class="s">참여 ${p.people}명 (a2)</div></div>
+        <div><div class="l">기간</div><div class="v">${p.elapsed != null ? p.elapsed + '<small>%</small>' : '−'}</div><div class="s">${esc(p.start)} ~ ${esc(p.end)}${p.dd != null ? (p.dd < 0 ? ` · D+${-p.dd} 경과` : ` · D-${p.dd}`) : ''}</div><div class="st-prog"><i class="${p.dd != null && p.dd < 0 ? 'over' : ''}" style="width:${p.elapsed ?? 0}%"></i></div></div>
+        <div><div class="l">단계 · 성과 등록</div><div class="v">${p.multi ? `${p.stages[1]}<small>/${p.stages[0]}</small>` : '단일'}</div><div class="s">${reg ? `등록 ${reg.id} · ${reg.status}` : cand ? '성과 등록 후보' : p.effect === '정량효과' ? '완료 후 성과 등록 대상' : '정량 산출 대상 아님'}</div></div>
+      </div>
+      <div class="st-two">
+        <div><div class="sub" style="margin:0 0 6px">참여 인력 · 실적 MW 상위 ${p.parts.length}명 (이름 클릭 → My Dashboard)</div>
+          <ul class="st-parts">${p.parts.map(([n, m]) => `<li><a data-person="${esc(n)}">${esc(n)}</a><div class="track"><i style="width:${Math.min(100, 100 * m / Math.max(1, p.parts[0][1])).toFixed(1)}%"></i></div><span class="v">${nf(m)} MW</span></li>`).join('') || '<li style="color:var(--text-3)">a2 투입 기록 없음</li>'}</ul></div>
+        <div><div class="sub" style="margin:0 0 6px">월별 실적 투입 MW · 최근 12개월</div><div class="chart" id="stCardMw" style="height:200px"></div></div>
+      </div>
+      ${reg ? `<div style="margin-top:12px"><button type="button" class="er-fbtn" id="stCardTrace">② 산출 근거 추적에서 보기</button></div>` : ''}`;
+    $('stModal').hidden = false;
+    const opt = { tooltip: tip({ trigger:'axis' }), grid:{ left:36, right:8, top:8, bottom:24 }, xAxis: axisX({ type:'category', data: ST.cardMonths.map(v => v.slice(2).replace('-', '.')), axisLabel:{ fontSize:9.5 } }), yAxis: axisY({ type:'value' }), series:[{ type:'bar', data:p.monthly, barMaxWidth:18, itemStyle:{ color:C[1], borderRadius:[3, 3, 0, 0] } }] };
+    if(cardMw){ cardMw.dispose(); const i = charts.indexOf(cardMw); if(i >= 0) charts.splice(i, 1); }
+    cardMw = mk('stCardMw', opt);
+    const tr = $('stCardTrace'); if(tr) tr.onclick = () => { closeCard(); go('pp'); LN.render(perf.regs.indexOf(reg)); goPp('trace'); };
+    $('stCardClose').focus();
+  }
+  function closeCard(){ $('stModal').hidden = true; }
+  const nav = e => {
+    const a = e.target.closest('a[data-org],a[data-person],a[data-code]'); if(!a) return; e.preventDefault();
+    if(a.dataset.code) return openCard(a.dataset.code);
+    closeCard();
+    if(a.dataset.person && typeof MY !== 'undefined'){ MY.select(a.dataset.person); go('my'); }
+    if(a.dataset.org){ go('mw'); if(typeof MWV !== 'undefined' && MWV.org !== a.dataset.org) MWV.setOrg(a.dataset.org); }
+  };
+
+  function renderAll(){ renderKpis(); renderBubble(); renderProgress(); renderTechOrg(); renderMix(); renderTable(); }
+  function init(){
+    $('stMegaEok').textContent = MEGA;
+    const fill = (id, vals) => $(id).insertAdjacentHTML('beforeend', vals.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join(''));
+    fill('stfOrg', ORGS); fill('stfType', [...new Set(P.map(p => p.type))]); fill('stfNature', [...new Set(P.map(p => p.nature))]); fill('stfEffect', [...new Set(P.map(p => p.effect))]);
+    renderAll();
+    $('stMega').addEventListener('change', e => { exMega = e.target.checked; renderAll(); });
+    ['stfOrg', 'stfType', 'stfNature', 'stfEffect', 'stfState'].forEach(id => $(id).addEventListener('change', () => { f[id.slice(3).toLowerCase()] = $(id).value; renderTable(); }));
+    $('stfQ').addEventListener('input', e => { f.q = e.target.value.trim(); renderTable(); });
+    $('stfReset').addEventListener('click', () => setFilter({}));
+    document.querySelector('#stTable thead').addEventListener('click', e => { const th = e.target.closest('th[data-k]'); if(!th) return; if(sortK === th.dataset.k) sortAsc = !sortAsc; else { sortK = th.dataset.k; sortAsc = ['code', 'name', 'dept', 'leader', 'type', 'end'].includes(th.dataset.k); } renderTable(); });
+    document.querySelector('#stTable tbody').addEventListener('click', nav);
+    $('stCardBody').addEventListener('click', nav);
+    $('stCardClose').addEventListener('click', closeCard);
+    $('stModal').addEventListener('click', e => { if(e.target === $('stModal')) closeCard(); });
+    document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('stModal').hidden) closeCard(); });
+  }
+  return { init, openCard, setFilter, get exMega(){ return exMega; } };
+})();
 
 /* 4.2 장기성과 — KPI·차트는 ap-2 패널에 인라인 렌더링 (위 '장기성과' 블록에서 처리) */
 
@@ -4611,6 +4836,7 @@ INST.init();  // Executive(연구소장) — 조직 실행 관점
 MY.init();    // My Dashboard — 성과 플랫폼 원장(등록·후보) 연결 후 렌더
 MWV.init();   // MW 분석 — 계획 분리·조직 필터·연구원 표 (행 클릭 → MY.select)
 SIMV.init();  // 투입 시뮬레이터 — 활동 인원·계획값·개인 배정 (MY.select, MWV.setOrg 연동)
+STV.init();   // 활동군 상세 › 전략 프로젝트 — 진행중 전체 집계·과제 카드 (MY.select, MWV.setOrg, LN.render 연동)
 HM.init();    // 홈 종합현황 — 모든 모듈 초기화 후 (등록 원장·역효과·승인 상태 참조)
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */

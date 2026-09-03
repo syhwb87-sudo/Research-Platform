@@ -97,6 +97,7 @@ proj_people = defaultdict(set)                             # 과제코드 -> 연
 proj_org = defaultdict(lambda: defaultdict(float))         # 과제코드 -> org -> 실적 mw
 proj_person_mw = defaultdict(lambda: defaultdict(float))   # 과제코드 -> 연구원 -> 실적 mw
 person_plan_ym = defaultdict(lambda: defaultdict(float))    # 연구원 -> ym(>기준월) -> 계획 mw
+proj_ym = defaultdict(lambda: defaultdict(float))           # 과제코드 -> ym -> 실적 mw (과제 카드 월별)
 mw_org_ym = defaultdict(lambda: defaultdict(float))        # org -> ym -> mw
 person = {}                                                # name -> dict
 person_projects = defaultdict(set)
@@ -136,6 +137,7 @@ for r in a2:
         mw_monthly_act[ym][act] += v
         mw_org_ym[org][ym] += v
         person_ym[name][ym] += v
+        proj_ym[r["과제코드"]][ym] += v
         total += v
     if total <= 0:
         continue
@@ -551,32 +553,45 @@ def short(s, n):
     s = (s or "").strip()
     return s if len(s) <= n else s[:n - 1] + "…"
 
-# 4.1 전략 프로젝트 상세 (a3, W/N/L 제외)
+# 4.1 전략 프로젝트 상세 (a3, W/N/L 제외) — 진행중 전체를 내려보내고 KPI·차트·필터는 클라이언트에서 계산
 strat_run = [r for r in a3 if classify(r["과제코드"]) == 1 and "진행중" in r.get("진행상태", "")]
-tech_budget = defaultdict(float)
-type_dist = Counter()
-dept_cnt = Counter()
+MEGA_EOK = 500          # 초대형 과제 기준 (연구비 억원) — KPI·차트 제외 토글
+CARD_MONTHS = yms[-12:]  # 과제 카드 월별 실적 MW 창
+def _int(v):
+    try:
+        return int(float(str(v).replace(",", "") or 0))
+    except ValueError:
+        return 0
+def _elapsed(r):
+    s0, e0 = d(r.get("착수일")), d(r.get("완료일"))
+    if not s0 or not e0 or e0 <= s0:
+        return None
+    return max(0, min(100, round(100 * (TODAY - s0).days / (e0 - s0).days)))
+strat_projects = []
 for r in strat_run:
-    t = r.get("기술분류", "").strip()
-    if t and t != "-":
-        tech_budget[t] += money(r["연구비"])
-    type_dist[r.get("과제유형", "기타")] += 1
-    dept_cnt[dept_short(r.get("연구부서"))] += 1
-strat_budget = sum(money(r["연구비"]) for r in strat_run)
-strat_exec = sum(money(r["집행예산"]) for r in strat_run)
+    code = r["과제코드"]
+    parts = sorted(proj_person_mw[code].items(), key=lambda x: -x[1])
+    strat_projects.append({
+        "code": code, "name": short(r["과제명"], 44), "full": r["과제명"],
+        "dept": dept_short(r.get("연구부서")), "deptFull": r.get("연구부서", ""), "lab": top_org(r.get("연구부서")),
+        "leader": r.get("연구책임자", ""), "type": r.get("과제유형", "기타") or "기타",
+        "nature": r.get("연구성격", "") or "기타", "effect": r.get("성과유형", "-") or "-",
+        "tech": (r.get("기술분류", "") or "-").strip() or "-",
+        "useDept": dept_short(r.get("활용부서")),
+        "budget": eok(money(r["연구비"])), "exec": eok(money(r["집행예산"])),
+        "expected": eok(money(r["기대이익"])),
+        "mw": round(proj_mw_total.get(code, 0.0), 1), "people": len(proj_people.get(code, ())),
+        "start": r.get("착수일", ""), "end": r.get("완료일", ""), "elapsed": _elapsed(r),
+        "stages": [_int(r.get("총단계")), _int(r.get("현단계"))],
+        "stage": r.get("연구단계", "")[:1],
+        "parts": [[n, round(m, 1)] for n, m in parts[:8]],
+        "monthly": [round(proj_ym[code].get(ym, 0), 1) for ym in CARD_MONTHS],
+    })
+strat_projects.sort(key=lambda x: -x["budget"])
 strategy_detail = {
-    "kpi": {"running": len(strat_run), "budget": eok(strat_budget),
-            "execRate": round(100 * strat_exec / max(1, strat_budget)),
-            "mw": round(act_mw_total.get(1, 0))},
-    "techTreemap": sorted([{"name": short(k, 22), "value": eok(v)}
-                           for k, v in tech_budget.items() if v > 0],
-                          key=lambda x: -x["value"])[:14],
-    "typeDist": type_dist.most_common(7),
-    "deptBar": dept_cnt.most_common(10),
-    "projects": [{"code": r["과제코드"], "name": short(r["과제명"], 38),
-                  "dept": dept_short(r.get("연구부서")), "leader": r.get("연구책임자", ""),
-                  "budget": eok(money(r["연구비"])), "end": r.get("완료일", "")}
-                 for r in sorted(strat_run, key=lambda x: -money(x["연구비"]))[:60]],
+    "asOf": str(TODAY), "megaEok": MEGA_EOK, "cardMonths": CARD_MONTHS,
+    "mwTotal": round(act_mw_total.get(1, 0)), "mwFrom": yms[0],
+    "projects": strat_projects,
 }
 
 # 4.4 탐색·혁신 상세 (a3, N·L 코드)
