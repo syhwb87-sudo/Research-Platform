@@ -1149,7 +1149,7 @@ for r, (p, eff) in zip(regs, picked):
     recompute_ok = abs(diff) <= max(gross * 0.005, 1)
     checks = [
         ["ERP 스냅샷 동결", "ok" if has_snapshot else "warn", f"{snap_id} · {frozen}" if has_snapshot else "등록 단계 — 스냅샷 미생성"],
-        ["Rule 버전 잠금", "ok" if rule["status"] == "승인" else "warn", f"{rule['id']} {rule['ver']} 잠금" if rule["status"] == "승인" else f"{rule['id']} {rule['ver']} 개정 검토중 — 잠금 전"],
+        ["산식 버전 잠금", "ok" if rule["status"] == "승인" else "warn", f"{rule['id']} {rule['ver']} 잠금" if rule["status"] == "승인" else f"{rule['id']} {rule['ver']} 개정 검토중 — 잠금 전"],
         ["재계산 일치", "ok" if recompute_ok else "warn", f"재계산 {eok(recomputed)}억 vs 등록 {r['grossEok']}억 (차이 {eok(diff):+.1f}억)"],
         ["원천 변경 감지", "ok" if drift == 0 else "info", "스냅샷 이후 원천 변경 없음" if drift == 0 else f"현재 ERP 재조회 {r['match']+drift:,}건 (스냅샷 {r['match']:,}건, +{drift}) — 산출은 스냅샷 기준 유지"],
         ["승인 기록", "ok" if r["status"] in ("승인", "확정") else "info" if r["status"] in ("검토", "보완") else "warn",
@@ -1180,6 +1180,20 @@ for r, (p, eff) in zip(regs, picked):
         "registeredAt": reg_day.isoformat(),
     }
 
+# ── ① 워크벤치 신규 등록 후보: 완료과제 중 미등록 건 (연간기대이익 1~80억, 상위 40건). a1 참고값 포함
+_reg_codes = {r["code"] for r in regs}
+candidates = []
+for p in sorted(completed, key=lambda x: -x["annual"]):
+    if p["code"] in _reg_codes or not (1e8 <= p["annual"] <= 8e9):
+        continue
+    r1 = a1_by_code.get(p["code"]) or {}
+    eff = re.split(r"[,\s]", (r1.get("정량효과유형") or "기타").strip())[0] or "기타"
+    candidates.append({"code": p["code"], "name": short(p["name"], 40), "dept": p["useDept"], "effect": eff,
+                       "annualEok": eok(p["annual"]), "persist": max(1, round(p["persist"])) if p["persist"] else 3,
+                       "a1Contrib": round(money(r1.get("연구기여도", "")) or 70)})
+    if len(candidates) >= 40:
+        break
+
 appr_counts = Counter(r["status"] for r in regs)
 type_amounts = defaultdict(float)
 for r in regs:
@@ -1191,6 +1205,7 @@ perf = {
     "rules": RULES,
     "keyDict": KEY_DICT,
     "contribTable": CONTRIB_TABLE,
+    "candidates": candidates,
     "regs": regs,
     "approval": {
         "wait": appr_counts.get("검토", 0) + appr_counts.get("보완", 0) + appr_counts.get("등록", 0),

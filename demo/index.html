@@ -532,6 +532,64 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #pp-gross .gr-act:hover{background:#f0f5fc}
 #pp-gross .gr-regs button{border:1px solid var(--border);background:var(--surface);font:inherit;font-size:12px;border-radius:8px;padding:6px 10px;cursor:pointer;text-align:left;width:100%;display:flex;gap:8px;align-items:center}
 #pp-gross .gr-regs button:hover{background:#f0f5fc} #pp-gross .gr-regs .m{margin-left:auto;color:var(--text-3);font-size:11px;white-space:nowrap}
+/* ═════════ 성과 플랫폼 ① 자동산출 워크벤치 — #pp-wb 스코프 ═════════ */
+#pp-wb .wb-todo{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+#pp-wb .wb-todo button{border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:9px 12px;text-align:left;font:inherit;cursor:pointer;display:flex;gap:10px;align-items:flex-start;border-left:4px solid var(--warn)}
+#pp-wb .wb-todo button.b{border-left-color:var(--brand)} #pp-wb .wb-todo button.r{border-left-color:var(--bad)} #pp-wb .wb-todo button.g{border-left-color:var(--good)}
+#pp-wb .wb-todo button:hover{background:#f7f9fc} #pp-wb .wb-todo button:focus-visible,#pp-wb button:focus-visible,#pp-wb input:focus-visible,#pp-wb select:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+#pp-wb .wb-todo b{display:block;font-size:12.5px} #pp-wb .wb-todo small{color:var(--text-3);font-size:11px}
+#pp-wb .wb-todo .ic{font-size:14px;flex:none;line-height:1.2}
+#pp-wb .wb-head{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+#pp-wb .wb-actions{margin-left:auto;display:flex;gap:8px}
+#pp-wb .wb-btn{border:1px solid var(--border);background:var(--surface);color:var(--text-1);font:inherit;font-size:12.5px;font-weight:600;border-radius:8px;padding:7px 14px;cursor:pointer}
+#pp-wb .wb-btn.primary{background:var(--brand);border-color:transparent;color:#fff} #pp-wb .wb-btn.primary:hover{background:#083d80}
+#pp-wb .wb-btn.ghost{color:var(--brand);border-color:var(--brand)} #pp-wb .wb-btn.danger{color:var(--bad);border-color:#f3c5c5}
+#pp-wb .wb-btn[disabled]{opacity:.45;cursor:not-allowed}
+#pp-wb .wb-stepper{display:flex;gap:0;align-items:stretch;overflow-x:auto}
+#pp-wb .wb-step{flex:1 1 0;min-width:150px;border:1px solid var(--border);background:var(--surface);font:inherit;text-align:left;padding:9px 12px;cursor:pointer;display:flex;gap:9px;align-items:center;position:relative}
+#pp-wb .wb-step:first-child{border-radius:10px 0 0 10px} #pp-wb .wb-step:last-child{border-radius:0 10px 10px 0} #pp-wb .wb-step+.wb-step{border-left:0}
+#pp-wb .wb-step .n{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:800;flex:none;background:#eef1f5;color:var(--text-3)}
+#pp-wb .wb-step .t{font-size:12.5px;font-weight:600;color:var(--text-2)} #pp-wb .wb-step .s{display:block;font-size:10.5px;color:var(--text-3);font-weight:500}
+#pp-wb .wb-step.done .n{background:var(--good);color:#fff} #pp-wb .wb-step.cur{background:#f0f5fc;border-color:var(--brand);box-shadow:inset 0 -3px 0 var(--brand)} #pp-wb .wb-step.cur .n{background:var(--brand);color:#fff} #pp-wb .wb-step.cur .t{color:var(--brand)}
+#pp-wb .wb-step[disabled]{cursor:not-allowed;opacity:.55}
+#pp-wb .wb-form{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:8px}
+#pp-wb .wb-form .f{display:flex;flex-direction:column;gap:3px;min-width:0} #pp-wb .wb-form .f.w{grid-column:1 / -1}
+#pp-wb .wb-form label{font-size:11px;color:var(--text-3)} #pp-wb .wb-form label b{color:var(--bad)}
+#pp-wb .wb-form input,#pp-wb .wb-form select{font:inherit;font-size:12.5px;border:1px solid var(--border);border-radius:6px;padding:6px 9px;background:var(--surface);width:100%;min-width:0}
+#pp-wb .wb-form input[readonly]{background:#f7f9fc;color:var(--text-2)}
+#pp-wb .wb-form .h{font-size:11px;color:var(--text-3)}
+#pp-wb .wb-ref{background:#f7f9fc;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text-2);margin-top:8px}
+#pp-wb .wb-types{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+#pp-wb .wb-type{border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:9px 11px;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:3px;border-top:3px solid var(--border)}
+#pp-wb .wb-type:hover{box-shadow:var(--shadow)} #pp-wb .wb-type.on{border-color:var(--brand);border-top-color:var(--brand);background:#f0f5fc}
+#pp-wb .wb-type .t{display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:700} #pp-wb .wb-type .f{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;color:var(--text-2);line-height:1.4}
+#pp-wb .wb-type .m{font-size:10.5px;color:var(--text-3)}
+#pp-wb .wb-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+#pp-wb .wb-chip{border:1px solid var(--border);background:var(--surface);font:inherit;font-size:12px;font-weight:600;color:var(--text-2);border-radius:20px;padding:5px 12px;cursor:pointer}
+#pp-wb .wb-chip[aria-pressed="true"]{background:var(--brand);border-color:transparent;color:#fff}
+#pp-wb .wb-nav{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;padding-top:10px;border-top:1px dashed var(--border)}
+#pp-wb .wb-warn{font-size:12px;color:#7a4d00;background:#fdf1d7;border:1px solid #f0d9a0;border-radius:6px;padding:6px 10px;margin-top:8px}
+#pp-wb .wb-ok{font-size:12px;color:#1a6b3a;background:#e6f4ec;border:1px solid #bfe3cc;border-radius:6px;padding:6px 10px;margin-top:8px}
+#pp-wb .wb-kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12.5px;align-items:baseline;margin:0}
+#pp-wb .wb-kv dt{color:var(--text-3);font-size:11.5px;white-space:nowrap} #pp-wb .wb-kv dd{margin:0}
+#pp-wb .wb-formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;background:#f7f9fc;border:1px solid var(--border);border-radius:8px;padding:10px 12px;line-height:1.7;white-space:pre-wrap}
+#pp-wb .wb-samples{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--text-2)}
+#pp-wb .wb-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+#pp-wb .wb-card{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:12.5px;border-left:4px solid var(--border)}
+#pp-wb .wb-card.e{border-left-color:var(--warn)} #pp-wb .wb-card.c{border-left-color:var(--good)}
+#pp-wb .wb-card h4{margin:0 0 6px;font-size:12.5px;display:flex;align-items:center;gap:8px}
+#pp-wb .wb-card .big{font-size:18px;font-weight:800}
+#pp-wb .wb-gaps{list-style:none;margin:0;padding:0} #pp-wb .wb-gaps li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12.5px}
+#pp-wb .wb-gaps li:last-child{border-bottom:0} #pp-wb .wb-gaps .ic{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;background:var(--warn)}
+#pp-wb .wb-gaps .ic.ok{background:var(--good)} #pp-wb .wb-gaps button{border:0;background:none;font:inherit;color:var(--brand);font-weight:600;cursor:pointer;padding:0;margin-left:auto;white-space:nowrap}
+#pp-wb .wb-fil{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px}
+#pp-wb table#ppRegs tr.r{cursor:pointer} #pp-wb table#ppRegs tr.r:hover td{background:#f7f9fc} #pp-wb table#ppRegs tr.cur td{background:#f0f5fc}
+#pp-wb .wb-gap{display:inline-block;font-size:10.5px;border-radius:4px;padding:0 5px;background:#fdf1d7;color:#7a4d00;margin:1px 2px 1px 0;white-space:nowrap}
+#pp-wb .wb-tl{list-style:none;margin:6px 0 0;padding:0 0 0 18px;position:relative}
+#pp-wb .wb-tl::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;border-left:2px solid var(--border)}
+#pp-wb .wb-tl li{position:relative;padding:4px 0 10px;font-size:12.5px}
+#pp-wb .wb-tl li::before{content:'';position:absolute;left:-17px;top:9px;width:8px;height:8px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 0 0 1px var(--brand)}
+#pp-wb .wb-tl .m{font-size:11px;color:var(--text-3)}
 </style>
 </head>
 <body>
@@ -967,27 +1025,32 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
   </div>
 
   <!-- ① 자동산출 워크벤치 -->
+  <!-- ① 자동산출 워크벤치 — 신규 등록 시뮬레이션(Step1~5) + 등록 건 진행 조회. 렌더: 스크립트 하단 WB 모듈 -->
   <div class="ppanel" id="pp-wb">
     <div class="card" style="margin-bottom:14px">
-      <div id="ppStepper" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"></div>
+      <h3>할 일 <span class="legend-note" style="font-weight:500">— 지금 막혀 있는 등록 건 (누르면 해당 단계로 이동)</span></h3>
+      <div class="wb-todo" id="wbTodo"></div>
     </div>
-    <div class="row" style="grid-template-columns:5fr 7fr">
-      <div class="card">
-        <h3>성과 등록 (Step 1)</h3>
-        <div class="sub">연구책임자는 산식을 쓰지 않는다 — 유형 선택·기여율·지속년수·직접비만 입력</div>
-        <div id="ppReg"></div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="wb-head">
+        <div><h3 style="font-size:16px;margin:0">자동산출 워크벤치</h3><div class="sub" id="wbTitle" style="margin:3px 0 0"></div></div>
+        <div class="wb-actions"><button type="button" class="wb-btn primary" data-act="new">＋ 신규 성과 등록</button></div>
       </div>
-      <div class="card">
-        <h3>ERP 매칭 미리보기 (Step 2) → 자동 산출 (Step 3~4)</h3>
-        <div class="sub">성과 발생 대상 지정 시 회사 공식 데이터 자동 매칭 · 매칭 0건이면 저장 불가</div>
-        <div id="ppMatch" style="margin-bottom:6px"></div>
-        <div class="chart short" id="ppWaterfall"></div>
+      <div class="wb-stepper" id="wbStepper" role="tablist" aria-label="등록 단계"></div>
+    </div>
+    <div class="row" style="grid-template-columns:7fr 5fr">
+      <div class="card" id="wbStep" role="tabpanel" aria-live="polite"></div>
+      <div>
+        <div class="card" style="margin-bottom:14px"><h3>진행 요약</h3><div class="sub">성과총액 → −역효과 → ×기여율 → −직접비 → 순재무성과</div><dl class="wb-kv" id="wbSummary"></dl><div class="chart short" id="ppWaterfall" style="margin-top:8px"></div></div>
+        <div class="card"><h3>미완 항목</h3><div class="sub">검토 요청 또는 승인 전에 채워야 할 것</div><ul class="wb-gaps" id="wbGaps"></ul></div>
       </div>
     </div>
-    <div class="card"><h3>성과 등록 현황 (12건 · 행 클릭 시 위 패널 갱신)</h3>
-      <div class="scroll" style="max-height:280px"><table id="ppRegs">
-        <thead><tr><th>성과ID</th><th>과제</th><th>유형</th><th class="num">성과총액</th>
-        <th class="num">순재무성과</th><th>상태</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card">
+      <h3>성과 등록 현황 <span class="legend-note" id="wbCount"></span></h3>
+      <div class="wb-fil" id="wbFil" role="group" aria-label="등록 현황 필터"></div>
+      <div class="scroll" style="max-height:320px"><table id="ppRegs">
+        <thead><tr><th>성과ID</th><th>과제</th><th>유형</th><th>단계</th><th class="num">성과총액</th><th class="num">순재무성과</th><th>상태</th><th>미완</th></tr></thead><tbody></tbody></table></div>
+    </div>
   </div>
 
   <!-- ③ 성과 총액 — 유형별 산식 18종(PF.rules, etl.py RULES)·대상 식별 Key(PF.keyDict). 렌더: 스크립트 하단 GR 모듈 -->
@@ -2282,6 +2345,15 @@ renderMe(myDefault);
 
 /* ══════════ 성과 플랫폼 탭 (P-1 목업) ══════════ */
 const PF = D.perf;
+/* ── ① 워크벤치 저장소: 사용자가 만든 성과 등록(시연)과 작성 중 초안. 실운영: PRIDE 성과등록 API로 교체.
+   저장된 등록 건은 로드 시 PF.regs에 합쳐 ②~⑥이 시드 목업과 동일하게 취급한다. */
+const WbRepo = (() => {
+  const K_REGS = 'pride.regs.v1', K_DRAFT = 'pride.regdraft.v1';
+  const rd = k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } };
+  const wr = (k, v) => { try { if(v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+  return { loadRegs: () => rd(K_REGS) || [], saveRegs: l => wr(K_REGS, l), loadDraft: () => rd(K_DRAFT), saveDraft: d => wr(K_DRAFT, d) };
+})();
+WbRepo.loadRegs().forEach(r => { if(!PF.regs.some(x => x.id === r.id)) PF.regs.push(r); });
 const GC = {A:'#2a78d6', B:'#1baf7a', C:'#eda100'};
 const gcOf = t => GC[t[0]] || INK3;
 const typeName = t => (PF.types.find(x=>x[0]===t)||[,, t])[2];
@@ -2308,9 +2380,7 @@ function goPp(k){
 ppNav.addEventListener('click', e=>{const b=e.target.closest('.achip'); if(b) goPp(b.dataset.k)});
 goPp('wb');
 
-/* ① 워크벤치 */
-const STEP_OF = {'등록':2,'검토':4,'보완':4,'승인':5,'확정':5};
-let ppWf = null;
+/* ① 워크벤치 — 워터폴 공통 차트 */
 function drawWaterfall(elId, r, chartRef){
   const adj = Math.round((r.grossEok - r.erosionEok) * (100 - r.contrib) / 100 * 10) / 10;
   const steps = [
@@ -2342,51 +2412,257 @@ function drawWaterfall(elId, r, chartRef){
   if(!chartRef.c) chartRef.c = mk(elId, opt); else chartRef.c.setOption(opt);
 }
 const wfRef = {c:null};
-function renderWb(reg){
-  const stepAt = STEP_OF[reg.status];
-  document.getElementById('ppStepper').innerHTML =
-    ['Step1 성과 등록','Step2 ERP 매칭','Step3 자동 산출','Step4 보정·검증','Step5 누적관리']
-    .map((s,i)=>{
-      const done = i+1 < stepAt, cur = i+1 === stepAt;
-      return `<span style="padding:7px 14px;border-radius:20px;font-weight:600;font-size:12px;
-        background:${done?'#e6f4ec':cur?'var(--brand)':'#f0f2f5'};
-        color:${done?'var(--good)':cur?'#fff':'var(--text-3)'}">${done?'✓ ':''}${s}</span>`
-        + (i<4?'<span style="color:var(--text-3)">─▶</span>':'');
-    }).join('');
-  const recs = PF.effectMap[reg.effect] || [];
-  document.getElementById('ppReg').innerHTML = `
-    <table style="margin-top:4px">
-      <tr><td style="width:110px;color:var(--text-2)">대상 성과</td><td><b>${reg.id}</b> · ${reg.name}</td></tr>
-      <tr><td style="color:var(--text-2)">연구효과(14종)</td><td>${reg.effect}</td></tr>
-      <tr><td style="color:var(--text-2)">자동 추천</td><td>${recs.map(t=>
-        `<span class="pill" style="background:${t===reg.type?gcOf(t):'#f0f2f5'};
-         color:${t===reg.type?'#fff':'var(--text-2)'};margin-right:4px">${t} ${typeName(t)}${t===reg.type?' ✓':''}</span>`).join('')||'—'}</td></tr>
-      <tr><td style="color:var(--text-2)">연구기여율</td><td><b>${reg.contrib}%</b> <span class="legend-note">표준 ${reg.contribution.standard}% · ${({STANDARD:'표준 적용',DOWN:'하향 적용(활용부서장 판단)',UP:'상향 적용(재무실 '+(reg.contribution.approval&&reg.contribution.approval.status||'미요청')+')'})[reg.contribution.mode]}</span> <a href="#" onclick="CT.select('${reg.id}');goPp('contrib');return false" style="font-size:11px">⑤ 기여율 →</a></td></tr>
-      <tr><td style="color:var(--text-2)">기술지속년수</td><td>${reg.persist}년 — 매년 자동 재산출</td></tr>
-      <tr><td style="color:var(--text-2)">직접발생비</td><td>${nf(reg.directEok)}억원</td></tr>
-      <tr><td style="color:var(--text-2)">역효과</td><td>${reg.erosionName} ${reg.erosionEok?`(−${nf(reg.erosionEok)}억, 자동 첨부)`:''}</td></tr>
-    </table>`;
-  document.getElementById('ppMatch').innerHTML = `
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <span class="pill g">✓ 매칭 ${nf(reg.match)}건</span>
-      <span class="pill g">기간 ${reg.period}</span>
-      <span class="pill" style="background:#f0f5fc;color:var(--brand)">산식 ${reg.rule} (${reg.ruleVer})</span>
-      <span class="legend-note" style="align-self:center">Key: ${reg.key}</span>
-    </div>`;
-  drawWaterfall('ppWaterfall', reg, wfRef);
-}
-function renderRegsTable(){   // ⑥ 기여율 변경 시에도 재호출
-  document.querySelector('#ppRegs tbody').innerHTML = PF.regs.map((r,i)=>
-  `<tr data-i="${i}" style="cursor:pointer"><td>${r.id}</td><td>${r.name}</td>
-   <td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${r.type}</span></td>
-   <td class="num">${nf(r.grossEok)}억</td><td class="num"><b>${nf(r.netEok)}억</b></td>
-   <td>${stPill(r.status)}</td></tr>`).join('');
-}
-renderRegsTable();
-document.querySelector('#ppRegs tbody').addEventListener('click', e=>{
-  const tr = e.target.closest('tr'); if(tr) renderWb(PF.regs[+tr.dataset.i]);
-});
-renderWb(PF.regs[0]);
+/* ① 자동산출 워크벤치 — 5단계 등록 흐름. 신규 등록(초안)과 등록 건 조회를 같은 단계 화면으로 렌더한다.
+   Step1 성과 등록 → Step2 ERP 매칭(목업)·스냅샷 → Step3 자동 산출(RuleEval) → Step4 보정(직접비·역효과 조정·기여율) → Step5 검토 요청·누적
+   ERP 매칭은 백엔드가 없어 입력 Key로 시드를 만든 결정적 목업이다(연동 지점: mockMatch). */
+const WB = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const today = () => new Date().toISOString().slice(0,10);
+  const eok = won => Math.round(won / 1e7) / 10;
+  const ruleOf = t => PF.rules.find(r => r.type === t);
+  const stdOf = t => (PF.contribTable.find(c => c.type === t) || {}).std ?? 0;
+  const STEP_OF = {'등록':2,'검토':4,'보완':4,'승인':5,'확정':5};
+  const STEPS = [['성과 등록','과제·유형·지속년수·직접비'],['ERP 매칭','대상 Key 지정·스냅샷 동결'],['자동 산출','산식 대입 → 성과 총액'],['보정·검증','역효과·기여율·직접비'],['검토 요청·누적','재무실 검토 → 연차 재산출']];
+  const PAT = {DIFF:'차이형', RATIO:'비율형', TOTAL:'총액형', ADD:'가산형', ADJ:'보정형'};
+
+  /* 결정적 난수: Key 입력값 → 시드 (같은 입력이면 같은 매칭 결과) */
+  const hash = s => { let h = 2166136261; for(const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const rnd = (x, dec) => { const m = Math.pow(10, dec||0); return Math.round(x * m) / m; };
+  /* ERP 매칭 목업 — 실운영: ERP 조회 API(입력 Key·기간 → 집계값·레코드 식별자) */
+  function mockMatch(rule, keys, base, ver){
+    const missing = rule.keys.filter(k => !(keys[k] || '').trim());
+    if(missing.length || !base || !ver) return {records:0, missing, vars:[], samples:[], grossWon:0};
+    const rng = mulberry(hash(rule.id + JSON.stringify(rule.keys.map(k => keys[k])) + base + ver));
+    const val = {};
+    rule.varsDef.forEach(v => { val[v.n] = rnd(v.r[0] + (v.r[1]-v.r[0]) * rng(), v.dec); });
+    rule.expr.forEach(terms => terms.forEach(t => { if('d' in t && val[t.d[0]] <= val[t.d[1]]){ const a = val[t.d[0]]; val[t.d[0]] = val[t.d[1]]; val[t.d[1]] = a; if(val[t.d[0]] === val[t.d[1]]) val[t.d[0]] = rnd(val[t.d[0]] * 1.03, rule.varsDef.find(v=>v.n===t.d[0]).dec); } }));
+    const ev = RuleEval.evaluate(rule, val);
+    const pre = {A:'SD', B:'PD', C:'FI'}[rule.type[0]]; const records = 150 + Math.floor(rng() * 2200);
+    const samples = Array.from({length:10}, () => `${pre}-2026${String(1+Math.floor(rng()*8)).padStart(2,'0')}-${100000+Math.floor(rng()*899999)}`);
+    return {records, missing:[], vars: rule.varsDef.map(v => [v.n, val[v.n], v.u, v.s]), samples, grossWon: Math.round(ev.total)};
+  }
+
+  /* ── 상태 */
+  let draft = WbRepo.loadDraft(), curReg = null, step = 1, fil = {s:'ALL', g:'ALL'};
+  const newDraft = () => ({step:1, projectCode:'', type:'', persist:3, directEok:0, erosionEok:0, keys:{}, base:'2025-09 ~ 2026-02', ver:'2026-03 ~ 2026-08', matched:null, frozen:null, updatedAt:today()});
+  const saveDraft = () => { if(draft){ draft.updatedAt = today(); WbRepo.saveDraft(draft); } else WbRepo.saveDraft(null); };
+  const candidates = () => PF.candidates.filter(c => !PF.regs.some(r => r.code === c.code));
+  const project = () => PF.candidates.find(c => c.code === (draft||{}).projectCode) || null;
+
+  /* 초안 → 화면 모델 (등록 건과 같은 필드) */
+  function draftModel(){
+    const d = draft, p = project(), rule = d.type ? ruleOf(d.type) : null, m = d.matched;
+    const gross = m && d.frozen ? eok(m.grossWon) : (m ? eok(m.grossWon) : 0), std = d.type ? stdOf(d.type) : 0;
+    const net = Math.round(((gross - (d.erosionEok||0)) * std / 100 - (d.directEok||0)) * 10) / 10;
+    const gaps = [];
+    if(!p) gaps.push(['Step1', '대상 과제를 선택하세요', 1]); if(!d.type) gaps.push(['Step1', '재무성과 유형을 선택하세요', 1]);
+    if(rule && rule.keys.some(k => !(d.keys[k]||'').trim())) gaps.push(['Step2', `대상 식별 Key ${rule.keys.filter(k=>!(d.keys[k]||'').trim()).length}개 미입력`, 2]);
+    if(rule && !m) gaps.push(['Step2', 'ERP 매칭 미리보기를 실행하세요', 2]); else if(m && m.records === 0) gaps.push(['Step2', '매칭 0건 — Key를 확인하세요', 2]);
+    if(m && m.records > 0 && !d.frozen) gaps.push(['Step2', '스냅샷을 동결하세요', 2]);
+    if(d.frozen && (d.directEok == null || isNaN(d.directEok))) gaps.push(['Step4', '직접발생비를 입력하세요', 4]);
+    return {isDraft:true, id:'(초안)', code:p?p.code:'', name:p?p.name:'', dept:p?p.dept:'', effect:p?p.effect:'', a1Contrib:p?p.a1Contrib:null, type:d.type, rule, persist:d.persist, directEok:d.directEok||0, erosionEok:d.erosionEok||0,
+      contrib:std, contribution:{mode:'STANDARD', standard:std, effective:std, applied:std}, grossEok:gross, netEok:net, status:'작성중', step:d.step, keys:d.keys, base:d.base, ver:d.ver, matched:m, frozen:d.frozen, gaps, userCreated:true};
+  }
+  function regModel(r){
+    const gaps = [], L = r.lineage;
+    if(r.status === '보완') gaps.push(['Step4', '재무실 보완 요청 — 역효과 산정 근거 보완 후 재제출', 4]);
+    if(typeof ErosionService !== 'undefined' && ['등록','검토','보완'].includes(r.status)){ const s = ErosionService.assessmentSummary(r.id); if(!s || s.status !== 'COMPLETED') gaps.push(['④ 역효과', s ? `점검 ${ER_ENUM.status[s.status]} (${s.commonDone+s.typeDone}/${s.commonTotal+s.typeTotal})` : '역효과 체크리스트 미작성', 4]); }
+    const c = r.contribution || {}; if(c.mode === 'UP' && c.approval && c.approval.status === '승인대기') gaps.push(['⑤ 기여율', `상향 ${c.applied}% 재무실 승인 대기 (표준 ${c.standard}% 유효)`, 4]);
+    (L.checks || []).filter(x => x[1] === 'warn').forEach(x => gaps.push(['② 추적', `${x[0]}: ${x[2]}`, 2]));
+    return Object.assign({isDraft:false, reg:r, step:STEP_OF[r.status] || 1, gaps, keys:null, matched:{records:r.match, vars:L.calc.vars, samples:L.snapshot.samples||[], grossWon:r.grossEok*1e8}, frozen:L.snapshot.id ? {id:L.snapshot.id, at:L.snapshot.frozenAt} : null, a1Contrib:(c.a1Ref ?? null), userCreated:!!r.userCreated}, r, {rule: ruleOf(r.type)});
+  }
+  const model = () => curReg ? regModel(curReg) : (draft ? draftModel() : null);
+  const doneStep = (m, n) => { if(!m.isDraft) return n < m.step; if(n===1) return !!(m.code && m.type); if(n===2) return !!(m.frozen && m.matched && m.matched.records>0); if(n===3) return doneStep(m,2); if(n===4) return doneStep(m,3) && m.directEok != null; return false; };
+  const canOpen = (m, n) => !m.isDraft || n === 1 || doneStep(m, n-1) || doneStep(m, n);
+
+  /* ── 렌더 */
+  function render(){
+    const m = model();
+    renderTodo(); renderTable();
+    if(!m){ $('wbTitle').textContent = '등록 건을 선택하거나 신규 성과 등록을 시작하세요'; $('wbStepper').innerHTML = ''; $('wbStep').innerHTML = `<div class="legend-note" style="padding:20px 4px">아직 선택된 등록 건이 없습니다. 상단 「신규 성과 등록」을 누르거나 아래 현황 표에서 건을 고르세요.</div>`; $('wbSummary').innerHTML = ''; $('wbGaps').innerHTML = ''; return; }
+    if(!canOpen(m, step)) step = m.isDraft ? Math.min(step, Math.max(1, ...[1,2,3,4,5].filter(n => canOpen(m,n)))) : m.step;
+    if(m.isDraft && draft.step !== step){ draft.step = step; saveDraft(); }
+    $('wbTitle').innerHTML = m.isDraft ? `<b>신규 등록 (초안)</b> · ${m.name ? esc(m.code)+' · '+esc(m.name) : '과제 미선택'} · 자동 저장됨 ${esc(draft.updatedAt)}` : `<b>${esc(m.id)}</b> · ${esc(m.code)} · ${esc(m.name)} · ${esc(m.dept)} · ${stPill(m.status)}${m.userCreated?' <span class="badge">시연 등록</span>':''}`;
+    $('wbStepper').innerHTML = STEPS.map(([t,s],i) => { const n = i+1, done = doneStep(m,n), cur = n===step, open = canOpen(m,n);
+      return `<button type="button" class="wb-step${done?' done':''}${cur?' cur':''}" role="tab" aria-selected="${cur}" data-step="${n}"${open?'':' disabled'}><span class="n">${done?'✓':n}</span><span><span class="t">Step${n} ${t}</span><span class="s">${s}</span></span></button>`; }).join('');
+    $('wbStep').innerHTML = [renderS1, renderS2, renderS3, renderS4, renderS5][step-1](m);
+    renderSummary(m); renderGaps(m);
+  }
+  function renderTodo(){
+    const items = [];
+    if(draft){ const m = draftModel(); items.push(['b','✎', `작성 중인 신규 등록 (Step${m.step})`, m.name ? m.code+' · '+m.name.slice(0,22) : '과제 미선택 — 이어서 작성', 'draft', m.step]); }
+    PF.regs.forEach((r,i) => { const m = regModel(r); m.gaps.forEach(g => items.push([g[0]==='Step4'&&r.status==='보완'?'r':g[0].startsWith('⑤')?'b':'y', g[0]==='② 추적'?'!':g[0].startsWith('④')?'⚠':g[0].startsWith('⑤')?'%':'↺', `${r.id} · ${g[1]}`, `${r.name.slice(0,22)} · ${r.status}`, String(i), g[2]])); });
+    $('wbTodo').innerHTML = items.length ? items.slice(0,8).map(([cls,ic,t,s,open,st]) => `<button type="button" class="${cls}" data-open="${esc(open)}" data-step="${st}"><span class="ic">${ic}</span><span><b>${esc(t)}</b><small>${esc(s)}</small></span></button>`).join('') + (items.length>8?`<div class="legend-note" style="align-self:center">외 ${items.length-8}건 — 아래 현황 표의 미완 열 참고</div>`:'')
+      : `<div class="wb-ok">✓ 막힌 등록 건이 없습니다.</div>`;
+  }
+  /* Step1 성과 등록 */
+  function renderS1(m){
+    const ed = m.isDraft, cands = candidates(), grp = m._grp || (m.type ? m.type[0] : 'A');
+    const projSel = ed ? `<select id="wbProj" data-f="projectCode"><option value="">완료과제 선택 (미등록 ${cands.length}건)</option>${cands.map(c=>`<option value="${esc(c.code)}"${c.code===m.code?' selected':''}>${esc(c.code)} · ${esc(c.name)} — ${esc(c.dept)} · 연간 ${nf(c.annualEok)}억</option>`).join('')}</select>` : `<input readonly value="${esc(m.code)} · ${esc(m.name)}">`;
+    const ref = m.code ? `<div class="wb-ref">참고 — 완료평가 정량효과 유형(14종): <b>${esc(m.effect||'—')}</b> · a1 연구기여도 ${m.a1Contrib ?? '—'}% · 활용부서 ${esc(m.dept)}${ed?` · 연간기대이익 ${nf((project()||{}).annualEok||0)}억`:''}<br><span class="legend-note">14종 유형은 참고값이며 재무성과 유형은 아래 18종에서 직접 선택합니다.</span></div>` : '';
+    const types = PF.types.filter(t => t[1] === grp);
+    return `<h3>Step1 성과 등록 <span class="legend-note">— 연구책임자</span></h3><div class="sub">연구원은 산식을 쓰지 않습니다. 과제·유형·지속년수·직접비만 입력하면 산식·데이터·계산은 시스템이 맡습니다.</div>
+      <div class="wb-form"><div class="f w"><label for="wbProj">대상 과제 <b>*</b></label>${projSel}</div></div>${ref}
+      <h4 style="margin:14px 0 4px;font-size:12.5px">재무성과 유형 <b style="color:var(--bad)">*</b> <span class="legend-note">— 그룹을 고른 뒤 산식 카드를 선택 (표준 기여율 표시)</span></h4>
+      ${ed ? `<div class="wb-chips">${[['A','A 판매·매출'],['B','B 원가·생산'],['C','C 판관비·클레임']].map(([g,t])=>`<button type="button" class="wb-chip" data-grp="${g}" aria-pressed="${grp===g}">${t}</button>`).join('')}</div>` : ''}
+      <div class="wb-types">${(ed ? types : PF.types.filter(t=>t[0]===m.type)).map(t => { const r = ruleOf(t[0]); return `<button type="button" class="wb-type${t[0]===m.type?' on':''}" data-type="${esc(t[0])}"${ed?'':' disabled'} style="border-top-color:${t[0]===m.type?'var(--brand)':gcOf(t[0])}"><span class="t"><span class="pill" style="background:${gcOf(t[0])};color:#fff">${esc(t[0])}</span>${esc(t[2])}</span><span class="f">${esc(r?r.formula:'')}</span><span class="m">${r?PAT[r.pattern]:''} · 표준 기여율 ${stdOf(t[0])}% · ${r?esc(r.id)+' '+esc(r.ver):''}${r&&r.status!=='승인'?' · <span style="color:var(--warn)">'+esc(r.status)+'</span>':''}</span></button>`; }).join('')}</div>
+      <div class="wb-form" style="margin-top:12px">
+        <div class="f"><label for="wbPersist">기술지속년수 (년)</label><input id="wbPersist" type="number" min="1" max="5" step="1" data-f="persist" value="${m.persist}"${ed?'':' readonly'}><span class="h">완료평가 지속년수 기본값 · 매년 자동 재산출</span></div>
+        <div class="f"><label for="wbDirect">직접발생비 (억원)</label><input id="wbDirect" type="number" min="0" step="0.1" data-f="directEok" value="${m.directEok}"${ed?'':' readonly'}><span class="h">성과 실현을 위해 직접 투입한 비용 (설비 개조·시운전 등)</span></div>
+      </div>
+      ${ed ? `<div class="wb-nav"><button type="button" class="wb-btn danger" data-act="discard">초안 삭제</button><button type="button" class="wb-btn primary" data-go="2"${doneStep(m,1)?'':' disabled'}>다음: ERP 매칭 →</button></div>` : ''}`;
+  }
+  /* Step2 ERP 매칭 */
+  function renderS2(m){
+    const ed = m.isDraft, r = m.rule, K = PF.keyDict, mt = m.matched;
+    const keyRows = ed ? r.keys.map(k => `<div class="f"><label for="wbk-${esc(k)}">${esc(k)} <b>*</b> <span class="h">· ${esc((K[k]||[])[0]||'')}</span></label><input id="wbk-${esc(k)}" type="text" data-key="${esc(k)}" value="${esc(m.keys[k]||'')}" placeholder="${esc((K[k]||[])[1]||'')}"></div>`).join('')
+      : m.reg.lineage.keyValues.map(kv => `<div class="f"><label>${esc(kv[0])} <span class="h">· ${esc(kv[2]||'')}</span></label><input readonly value="${esc(kv[1])}"></div>`).join('');
+    const period = ed ? `<div class="f"><label for="wbBase">기준기간 (${esc(r.periodKey)}) <b>*</b></label><input id="wbBase" type="text" data-f="base" value="${esc(m.base)}" placeholder="YYYY-MM ~ YYYY-MM"></div><div class="f"><label for="wbVer">검증기간 <b>*</b></label><input id="wbVer" type="text" data-f="ver" value="${esc(m.ver)}" placeholder="YYYY-MM ~ YYYY-MM"><span class="h">기준기간과 같은 길이로 지정</span></div>`
+      : `<div class="f"><label>조회 기간</label><input readonly value="${esc(m.period)}"></div>`;
+    const result = mt ? (mt.records > 0 ? `<div class="wb-ok">✓ 매칭 <b>${nf(mt.records)}건</b> · 집계값 ${mt.vars.length}개 산출${m.frozen?` · 스냅샷 <b>${esc(m.frozen.id)}</b> 동결 ${esc(m.frozen.at)}`:' · <b>스냅샷 동결 전</b>'}</div>
+        <h4 style="margin:12px 0 6px;font-size:12.5px">집계값 (산식 변수로 전달)</h4><div style="overflow-x:auto"><table><thead><tr><th>변수</th><th class="num">값</th><th>출처</th></tr></thead><tbody>${mt.vars.map(v=>`<tr><td>${esc(v[0])}</td><td class="num"><b>${typeof v[1]==='number'?v[1].toLocaleString('ko-KR',{maximumFractionDigits:3}):esc(v[1])}</b> ${esc(v[2])}</td><td class="legend-note">${esc(v[3])}</td></tr>`).join('')}</tbody></table></div>
+        <h4 style="margin:12px 0 6px;font-size:12.5px">레코드 식별자 샘플 10건 <span class="legend-note">/ ${nf(mt.records)}건</span></h4><div class="wb-samples">${mt.samples.map(s=>`<span>${esc(s)}</span>`).join('')}</div>`
+      : `<div class="wb-warn">⚠ 매칭 0건 — ${mt.missing && mt.missing.length ? `Key 미입력: ${mt.missing.map(esc).join(', ')}` : '기간 또는 Key를 확인하세요'}. 매칭 0건이면 저장할 수 없습니다.</div>`)
+      : `<div class="legend-note" style="margin-top:8px">Key와 기간을 입력한 뒤 「ERP 매칭 미리보기」를 누르세요.</div>`;
+    return `<h3>Step2 ERP 매칭 <span class="legend-note">— 대상 식별 Key 지정 → 회사 공식 데이터 자동 매칭</span> <span class="badge">ERP 목업</span></h3>
+      <div class="sub">${esc(r.type)} ${esc(typeName(r.type))} · 산식 ${esc(r.id)} ${esc(r.ver)} · 원천 ${esc(r.source)} — Key 명칭은 ③ 성과 총액의 Key 사전을 따릅니다</div>
+      <div class="wb-form">${keyRows}${period}</div>
+      ${ed ? `<div class="wb-nav" style="justify-content:flex-start;border-top:0;padding-top:0"><button type="button" class="wb-btn ghost" data-act="match">ERP 매칭 미리보기</button><button type="button" class="wb-btn primary" data-act="freeze"${mt&&mt.records>0&&!m.frozen?'':' disabled'}>${m.frozen?'✓ 스냅샷 동결됨':'스냅샷 동결'}</button><span class="legend-note" style="align-self:center">ERP 원본은 변할 수 있으므로 집계값·식별자 목록을 동결해 보관합니다 (② 추적의 스냅샷 노드)</span></div>` : ''}
+      ${result}
+      ${ed ? `<div class="wb-nav"><button type="button" class="wb-btn" data-go="1">← Step1</button><button type="button" class="wb-btn primary" data-go="3"${doneStep(m,2)?'':' disabled'}>다음: 자동 산출 →</button></div>` : ''}`;
+  }
+  /* Step3 자동 산출 */
+  function renderS3(m){
+    const r = m.rule, vm = {}; (m.matched ? m.matched.vars : []).forEach(v => { vm[v[0]] = v[1]; });
+    const ev = RuleEval.evaluate(r, vm), gross = m.isDraft ? ev.total : m.grossEok * 1e8;
+    return `<h3>Step3 자동 산출 <span class="legend-note">— 산식에 스냅샷 변수 대입</span></h3><div class="sub">③ 성과 총액의 산식 정의(${esc(r.id)} ${esc(r.ver)})를 그대로 평가합니다. 연구원이 계산하지 않습니다.</div>
+      <div class="wb-formula">성과총액 = ${esc(r.formula)}</div>
+      <div style="overflow-x:auto"><table><thead><tr><th>곱셈항</th><th>대입</th><th class="num">값</th></tr></thead><tbody>${ev.prods.map(p=>`<tr><td>${p.parts.map(x=>esc(x.label)).join(' × ')}</td><td class="legend-note" style="font-family:ui-monospace,Menlo,Consolas,monospace">${p.parts.map(x=>(isNaN(x.raw)?'?':x.raw.toLocaleString('ko-KR',{maximumFractionDigits:3}))+(x.pct?'%':'')).join(' × ')}</td><td class="num"><b>${isNaN(p.value)?'—':nf(Math.round(p.value))} 원</b></td></tr>`).join('')}${ev.prods.length>1?`<tr><td>합계</td><td></td><td class="num"><b>${nf(Math.round(ev.total))} 원</b></td></tr>`:''}</tbody></table></div>
+      <div class="stat" style="margin-top:10px;color:${gcOf(r.type)}">${nf(eok(gross))}<small>억원 · 성과 총액 (역효과·기여율 반영 전)</small></div>
+      ${!m.isDraft ? `<div class="legend-note">등록 성과총액 ${nf(m.grossEok)}억 · 재계산 ${nf(m.reg.lineage.calc.recomputedEok)}억 (${m.reg.lineage.calc.ok?'일치':'차이 '+m.reg.lineage.calc.diffEok+'억'})</div>` : ''}
+      <div class="wb-nav"><button type="button" class="wb-btn ghost" data-act="gross">③ 성과 총액에서 산식 보기 →</button>${m.isDraft?`<button type="button" class="wb-btn" data-go="2">← Step2</button><button type="button" class="wb-btn primary" data-go="4">다음: 보정·검증 →</button>`:''}</div>`;
+  }
+  /* Step4 보정·검증 */
+  function renderS4(m){
+    const ed = m.isDraft, c = m.contribution || {}, es = (!ed && typeof ErosionService !== 'undefined') ? ErosionService.assessmentSummary(m.id) : null;
+    const eroCard = `<div class="wb-card e"><h4>역효과 (Erosion) <span class="ct-who" style="display:inline-block;font-size:10.5px;font-weight:700;border-radius:4px;padding:1px 6px;background:#fdf1d7;color:#7a4d00;border:1px solid #f0d9a0">④ 체크리스트</span></h4>
+      <div class="big" style="color:var(--warn)">−${nf(m.erosionEok)}억</div>
+      ${ed ? `<div class="legend-note">차감액은 재무실 조정값입니다. 체크리스트 점검은 검토 요청 후 ④에서 진행하며, '해당' 금액은 자동 차감되지 않습니다.</div>` :
+        `<div style="font-size:12px;margin-top:4px">${es ? `점검 <b>${ER_ENUM.status[es.status]}</b> · 해당 ${es.applicable}건 · 판단불가 ${es.undetermined}건 · 조정 검토 ${es.adjust}건` : '<b>체크리스트 미작성</b>'} · 자동 첨부: ${esc(m.erosionName)}</div><div style="margin-top:6px"><button type="button" class="wb-btn ghost" data-act="erosion" style="padding:4px 10px;font-size:12px">④ 역효과 점검 열기 →</button></div>`}</div>`;
+    const ctCard = `<div class="wb-card c"><h4>연구기여율 <span style="display:inline-block;font-size:10.5px;font-weight:700;border-radius:4px;padding:1px 6px;background:#e6f4ec;color:#1a6b3a;border:1px solid #bfe3cc">⑤ 표준 기여율</span></h4>
+      <div class="big" style="color:var(--good)">× ${m.contrib}%</div>
+      <div style="font-size:12px;margin-top:4px">표준 ${c.standard}% · ${({STANDARD:'표준 적용',DOWN:'하향 적용 (활용부서장 판단)',UP:'상향 적용 요청 '+c.applied+'% — 재무실 '+((c.approval||{}).status||'미요청')})[c.mode]||'표준 적용'}</div>
+      ${ed ? `<div class="legend-note">하향·상향은 검토 요청 후 ⑤에서 결정합니다. 승인 전에는 표준값이 유효합니다.</div>` : `<div style="margin-top:6px"><button type="button" class="wb-btn ghost" data-act="contrib" style="padding:4px 10px;font-size:12px">⑤ 기여율 산정 열기 →</button></div>`}</div>`;
+    const checks = ed ? [['ERP 스냅샷 동결', m.frozen?'ok':'warn', m.frozen?`${m.frozen.id} · ${m.frozen.at}`:'미동결'],['산식 버전 잠금', m.rule.status==='승인'?'ok':'warn', `${m.rule.id} ${m.rule.ver} ${m.rule.status}`],['재계산 일치','ok','산식 정의 직접 평가'],['역효과 점검','info','검토 요청 후 ④ 점검'],['승인 기록','info','검토 요청 전']] : m.reg.lineage.checks;
+    return `<h3>Step4 보정·검증 <span class="legend-note">— 순재무성과 = (총액 − 역효과) × 기여율 − 직접비</span></h3><div class="sub">역효과와 기여율은 각각 ④·⑤에서 근거를 남기며 결정되고, 이 화면은 그 결과를 합쳐 보여 줍니다.</div>
+      <div class="wb-cards">${eroCard}${ctCard}</div>
+      <div class="wb-form" style="margin-top:12px">
+        <div class="f"><label for="wbDirect2">직접발생비 (억원)</label><input id="wbDirect2" type="number" min="0" step="0.1" data-f="directEok" value="${m.directEok}"${ed?'':' readonly'}><span class="h">ERP CO 과제 원가 집계 · 재무실 인정분</span></div>
+        <div class="f"><label for="wbEro">역효과 차감액 (억원) <span class="h">— 재무실 조정</span></label><input id="wbEro" type="number" min="0" step="0.1" data-f="erosionEok" value="${m.erosionEok}"${ed?'':' readonly'}><span class="h">④ '해당' 금액은 검토용이며 자동 차감되지 않음</span></div>
+      </div>
+      <div class="wb-formula" style="margin-top:10px">순재무성과 = (${nf(m.grossEok)} − ${nf(m.erosionEok)}) × ${m.contrib}% − ${nf(m.directEok)} = <b>${nf(m.netEok)}억</b></div>
+      <h4 style="margin:12px 0 6px;font-size:12.5px">체인 건전성</h4><ul class="wb-gaps">${checks.map(x=>`<li><span class="ic ${x[1]==='ok'?'ok':''}" style="${x[1]==='info'?'background:var(--brand)':''}">${({ok:'✓',warn:'!',info:'i'})[x[1]]}</span><span><b>${esc(x[0])}</b> <span class="legend-note">${esc(x[2])}</span></span></li>`).join('')}</ul>
+      <div class="wb-nav"><button type="button" class="wb-btn ghost" data-act="trace">② 산출 근거 추적 →</button>${ed?`<button type="button" class="wb-btn" data-go="3">← Step3</button><button type="button" class="wb-btn primary" data-go="5"${doneStep(m,4)?'':' disabled'}>다음: 검토 요청 →</button>`:''}</div>`;
+  }
+  /* Step5 검토 요청·누적 */
+  function renderS5(m){
+    if(m.isDraft){
+      const ready = m.gaps.length === 0;
+      return `<h3>Step5 검토 요청 <span class="legend-note">— 재무실 검토 큐로 이동</span></h3><div class="sub">요청하면 상태가 등록 → 검토로 바뀌고 ⑥ 승인 큐와 ②·④·⑤ 화면에서 이 성과를 다룰 수 있습니다.</div>
+        <dl class="wb-kv" style="margin-top:8px"><dt>과제</dt><dd>${esc(m.code)} · ${esc(m.name)} (${esc(m.dept)})</dd><dt>유형</dt><dd><span class="pill" style="background:${gcOf(m.type)};color:#fff">${esc(m.type)}</span> ${esc(typeName(m.type))} · ${esc(m.rule.id)} ${esc(m.rule.ver)}</dd><dt>대상 Key</dt><dd>${m.rule.keys.map(k=>`<span class="gr-key" style="display:inline-block;font-size:10.5px;border:1px solid var(--border);border-radius:4px;padding:0 5px;margin:1px 2px 1px 0">${esc(k)}: ${esc(m.keys[k]||'')}</span>`).join('')} · ${esc(m.base)} / ${esc(m.ver)}</dd><dt>스냅샷</dt><dd>${m.frozen?esc(m.frozen.id)+' · '+nf(m.matched.records)+'건':'미동결'}</dd><dt>성과총액</dt><dd><b>${nf(m.grossEok)}억</b></dd><dt>순재무성과</dt><dd><b>${nf(m.netEok)}억</b> (역효과 ${nf(m.erosionEok)}억 · 기여율 ${m.contrib}% · 직접비 ${nf(m.directEok)}억)</dd><dt>지속년수</dt><dd>${m.persist}년 — 연차별 활용평가로 재산출</dd></dl>
+        ${ready ? `<div class="wb-ok" style="margin-top:10px">✓ 검토 요청 준비 완료</div>` : `<div class="wb-warn">⚠ 미완 항목 ${m.gaps.length}건: ${m.gaps.map(g=>esc(g[1])).join(' · ')}</div>`}
+        <div class="wb-nav"><button type="button" class="wb-btn" data-go="4">← Step4</button><button type="button" class="wb-btn primary" data-act="submit"${ready?'':' disabled'}>재무실 검토 요청</button></div>`;
+    }
+    const L = m.reg.lineage;
+    return `<h3>Step5 검토·승인·누적관리</h3><div class="sub">현재 ${stPill(m.status)} · SLA 잔여 ${m.slaDay}일 · 승인 후 연차별 활용평가로 재산출</div>
+      <h4 style="margin:10px 0 4px;font-size:12.5px">승인 이력</h4><ul class="wb-tl">${L.approval.map(a=>`<li><b>${esc(a[0])}</b> <span class="m">${esc(a[2])} · ${esc(a[1])}</span><div class="m">${esc(a[3])}</div></li>`).join('')}${m.status!=='확정'?`<li style="opacity:.55"><b>다음: ${esc(({'등록':'검토','검토':'승인','보완':'재검토','승인':'확정'})[m.status]||'')}</b><div class="m">대기중</div></li>`:''}</ul>
+      <h4 style="margin:10px 0 4px;font-size:12.5px">연차 누적</h4><div style="overflow-x:auto"><table><thead><tr><th>연차</th><th>활용상태</th><th class="num">순재무성과(억)</th><th>비고</th></tr></thead><tbody>${L.years.map(y=>`<tr><td>${y[0]}년차</td><td>${esc(y[1])}</td><td class="num">${y[2]!=null?`<b>${nf(y[2])}</b>`:'—'}</td><td class="legend-note">${esc(y[3])}</td></tr>`).join('')}</tbody></table></div>
+      <div class="wb-nav"><button type="button" class="wb-btn ghost" data-act="approval">⑥ 재무실 승인 큐 →</button>${m.userCreated?`<button type="button" class="wb-btn danger" data-act="delete">시연 등록 삭제</button>`:''}</div>`;
+  }
+  function renderSummary(m){
+    $('wbSummary').innerHTML = [['과제', m.code ? `${esc(m.code)} · ${esc(m.name.slice(0,24))}` : '—'],['유형', m.type ? `<span class="pill" style="background:${gcOf(m.type)};color:#fff">${esc(m.type)}</span> ${esc(typeName(m.type))}` : '—'],
+      ['대상 Key', m.rule ? `${m.rule.keys.length}개 · ${esc(m.rule.periodKey)}` : '—'],['ERP 매칭', m.matched ? `${nf(m.matched.records)}건${m.frozen?' · 동결':''}` : '—'],['성과총액', `<b>${nf(m.grossEok)}억</b>`],['역효과', `−${nf(m.erosionEok)}억`],['기여율', `× ${m.contrib}%`],['직접발생비', `−${nf(m.directEok)}억`],['순재무성과', `<b style="color:var(--brand)">${nf(m.netEok)}억</b>`],['상태', m.isDraft ? '작성중 (초안)' : stPill(m.status)]].map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('');
+    drawWaterfall('ppWaterfall', {grossEok:m.grossEok, erosionEok:m.erosionEok, contrib:m.contrib, directEok:m.directEok, netEok:m.netEok, type:m.type||'A-1'}, wfRef);
+  }
+  function renderGaps(m){
+    $('wbGaps').innerHTML = m.gaps.length ? m.gaps.map(g=>`<li><span class="ic">!</span><span><b>${esc(g[0])}</b> ${esc(g[1])}</span><button type="button" data-go="${g[2]}">이동 →</button></li>`).join('') : `<li><span class="ic ok">✓</span><span>${m.isDraft?'검토 요청 준비 완료':'미완 항목 없음'}</span></li>`;
+  }
+  function renderTable(){
+    const rows = PF.regs.map((r,i)=>[r,i]).filter(([r]) => (fil.g==='ALL' || r.type[0]===fil.g) && (fil.s==='ALL' || (fil.s==='OPEN' ? ['등록','검토','보완'].includes(r.status) : ['승인','확정'].includes(r.status))));
+    $('wbFil').innerHTML = [['s','ALL','전체'],['s','OPEN','진행 중 (등록·검토·보완)'],['s','DONE','승인·확정']].map(([k,v,t])=>`<button type="button" class="wb-chip" data-fk="${k}" data-fv="${v}" aria-pressed="${fil[k]===v}">${t}</button>`).join('') + `<span style="width:1px;background:var(--border);margin:0 4px"></span>` + [['g','ALL','모든 그룹'],['g','A','A'],['g','B','B'],['g','C','C']].map(([k,v,t])=>`<button type="button" class="wb-chip" data-fk="${k}" data-fv="${v}" aria-pressed="${fil[k]===v}">${t}</button>`).join('');
+    $('wbCount').textContent = `— ${PF.regs.length}건 (시연 등록 ${PF.regs.filter(r=>r.userCreated).length}건) · 행 클릭 시 해당 단계로`;
+    document.querySelector('#ppRegs tbody').innerHTML = rows.map(([r,i]) => { const m = regModel(r);
+      return `<tr class="r${curReg===r?' cur':''}" data-i="${i}" tabindex="0"><td><b>${esc(r.id)}</b>${r.userCreated?' <span class="badge">시연</span>':''}</td><td>${esc(r.name)}</td><td><span class="pill" style="background:${gcOf(r.type)};color:#fff">${esc(r.type)}</span></td><td>Step${m.step} ${STEPS[m.step-1][0]}</td><td class="num">${nf(r.grossEok)}억</td><td class="num"><b>${nf(r.netEok)}억</b></td><td>${stPill(r.status)}</td><td>${m.gaps.length?m.gaps.map(g=>`<span class="wb-gap">${esc(g[0])}</span>`).join(''):'<span class="legend-note">—</span>'}</td></tr>`; }).join('') || `<tr><td colspan="8" class="legend-note" style="padding:12px">조건에 맞는 등록 건이 없습니다.</td></tr>`;
+  }
+
+  /* ── 초안 → 등록 건 생성 (검토 요청) */
+  function materialize(){
+    const m = draftModel(), r = m.rule, p = project(), n = 1 + Math.max(0, ...PF.regs.map(x => +(x.id.split('-').pop()) || 0));
+    const id = `PF-2026-${String(n).padStart(3,'0')}`, t = today(), snapId = `SNAP-${t.replace(/-/g,'')}-${String(n).padStart(3,'0')}`;
+    const std = stdOf(r.type), gross = m.grossEok, ero = m.erosionEok, direct = m.directEok, net = m.netEok;
+    return {id, code:p.code, name:p.name, effect:p.effect, type:r.type, status:'검토', contrib:std, persist:m.persist, grossEok:gross, erosionEok:ero, directEok:direct, netEok:net,
+      rule:r.id, ruleVer:r.ver, match:m.matched.records, period:`${m.base} / ${m.ver}`, key:r.keys.join('·'), erosionName: ero ? '재무실 조정 차감' : '해당 역효과 없음 (④ 점검 전)', dept:p.dept, slaDay:10, utilY1:'예정', userCreated:true,
+      contribution:{mode:'STANDARD', applied:std, standard:std, effective:std, reason:'', evidence:'', a1Ref:p.a1Contrib},
+      lineage:{snapshot:{id:snapId, frozenAt:`${t} ${new Date().toTimeString().slice(0,5)}`, source:r.source, records:m.matched.records, currentRecords:m.matched.records, period:`${m.base} / ${m.ver}`, samples:m.matched.samples},
+        keyValues: r.keys.map(k => [k, m.keys[k], (PF.keyDict[k]||[])[0]||'']).concat([[r.periodKey, `${m.base} / ${m.ver}`, (PF.keyDict[r.periodKey]||[])[0]||'']]),
+        calc:{vars:m.matched.vars, recomputedEok:gross, diffEok:0, ok:true},
+        approval:[['등록','연구책임자 (과제 부서)',t,'성과 등록·입력 Key 지정, ERP 스냅샷 동결'],['검토','재무실 검토자',t,'검토 접수 — 산식 변수·역효과 첨부 검토 예정']],
+        years: Array.from({length:m.persist}, (_,i)=>[i+1,'예정',null,i===0?'승인 전 — 산출값 미확정':`${2026+i}년 활용평가 예정`]),
+        checks:[['ERP 스냅샷 동결','ok',`${snapId} · ${t}`],['산식 버전 잠금', r.status==='승인'?'ok':'warn', `${r.id} ${r.ver} ${r.status==='승인'?'잠금':'개정 검토중 — 잠금 전'}`],['재계산 일치','ok',`재계산 ${nf(gross)}억 vs 등록 ${nf(gross)}억 (차이 +0.0억)`],['원천 변경 감지','ok','스냅샷 이후 원천 변경 없음'],['승인 기록','info',`검토 · ${t}`]],
+        registeredAt:t}};
+  }
+  function refreshOthers(){
+    if(typeof renderRegsTable === 'function') renderTable();
+    ['LN','CT','GR','ErosionView'].forEach(k => { const mod = ({LN:typeof LN!=='undefined'&&LN, CT:typeof CT!=='undefined'&&CT, GR:typeof GR!=='undefined'&&GR, ErosionView:typeof ErosionView!=='undefined'&&ErosionView})[k]; if(mod && mod.refreshRegs) mod.refreshRegs(); });
+  }
+
+  /* ── 이벤트 */
+  function init(){
+    const root = $('pp-wb');
+    root.addEventListener('click', e => {
+      const b = e.target.closest('button'); if(!b) return;
+      if(b.dataset.open){ if(b.dataset.open === 'draft'){ curReg = null; } else { curReg = PF.regs[+b.dataset.open]; } step = +b.dataset.step || 1; render(); root.scrollIntoView({block:'start'}); return; }
+      if(b.dataset.step && b.classList.contains('wb-step')){ step = +b.dataset.step; render(); return; }
+      if(b.dataset.go){ step = +b.dataset.go; render(); return; }
+      if(b.dataset.grp){ const m = model(); if(m) m._grp = b.dataset.grp; grpSel = b.dataset.grp; $('wbStep').innerHTML = renderS1(Object.assign(model(), {_grp:grpSel})); return; }
+      if(b.dataset.type && draft && !curReg){ draft.type = b.dataset.type; draft.keys = {}; draft.matched = null; draft.frozen = null; saveDraft(); render(); return; }
+      if(b.dataset.fk){ fil[b.dataset.fk] = b.dataset.fv; renderTable(); return; }
+      const act = b.dataset.act;
+      if(act === 'new'){ if(!draft){ draft = newDraft(); saveDraft(); } curReg = null; step = draft.step || 1; render(); return; }
+      if(act === 'discard'){ if(confirm('작성 중인 초안을 삭제할까요?')){ draft = null; saveDraft(); step = 1; render(); } return; }
+      if(act === 'match'){ const r = ruleOf(draft.type); draft.matched = mockMatch(r, draft.keys, draft.base, draft.ver); draft.frozen = null; saveDraft(); render(); return; }
+      if(act === 'freeze'){ if(draft.matched && draft.matched.records > 0){ draft.frozen = {id:'(동결 예정)', at:today()}; saveDraft(); render(); } return; }
+      if(act === 'submit'){ const reg = materialize(); PF.regs.push(reg); WbRepo.saveRegs(PF.regs.filter(x => x.userCreated)); draft = null; saveDraft(); curReg = reg; step = 4; refreshOthers(); render(); return; }
+      if(act === 'delete'){ if(curReg && curReg.userCreated && confirm(`${curReg.id} 시연 등록을 삭제할까요?`)){ const i = PF.regs.indexOf(curReg); PF.regs.splice(i,1); WbRepo.saveRegs(PF.regs.filter(x => x.userCreated)); curReg = null; refreshOthers(); render(); } return; }
+      const m = model(); if(!m) return;
+      if(act === 'gross'){ GR.select(m.type); goPp('gross'); }
+      if(act === 'trace' && curReg){ LN.render(PF.regs.indexOf(curReg), 4); goPp('trace'); }
+      if(act === 'erosion' && curReg){ ErosionView.select(curReg.id); goPp('erosion'); }
+      if(act === 'contrib' && curReg){ CT.select(curReg.id); goPp('contrib'); }
+      if(act === 'approval'){ goPp('approval'); }
+    });
+    root.addEventListener('keydown', e => { const tr = e.target.closest('tr.r'); if(tr && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openIdx(+tr.dataset.i); } });
+    root.addEventListener('click', e => { const tr = e.target.closest('#ppRegs tr.r'); if(tr) openIdx(+tr.dataset.i); });
+    root.addEventListener('change', e => { const el = e.target; if(!draft || curReg) return;
+      if(el.dataset.f === 'projectCode'){ draft.projectCode = el.value; const p = project(); if(p) draft.persist = p.persist; saveDraft(); render(); return; }
+      if(el.dataset.f === 'persist'){ draft.persist = Math.max(1, Math.min(5, +el.value || 1)); saveDraft(); renderSummary(model()); return; }
+    });
+    root.addEventListener('input', e => { const el = e.target; if(!draft || curReg) return;
+      if(el.dataset.key != null){ draft.keys[el.dataset.key] = el.value; draft.matched = null; draft.frozen = null; saveDraft(); const bt = root.querySelector('[data-act="freeze"]'); if(bt) bt.disabled = true; return; }
+      if(el.dataset.f === 'base' || el.dataset.f === 'ver'){ draft[el.dataset.f] = el.value; draft.matched = null; draft.frozen = null; saveDraft(); return; }
+      if(el.dataset.f === 'directEok' || el.dataset.f === 'erosionEok'){ const v = Number(el.value); draft[el.dataset.f] = el.value === '' || isNaN(v) || v < 0 ? 0 : v; saveDraft(); const m = model(); renderSummary(m); renderGaps(m); const f = root.querySelector('.wb-formula'); if(f && step===4) f.innerHTML = `순재무성과 = (${nf(m.grossEok)} − ${nf(m.erosionEok)}) × ${m.contrib}% − ${nf(m.directEok)} = <b>${nf(m.netEok)}억</b>`; return; }
+    });
+    curReg = draft ? null : PF.regs[0]; step = draft ? (draft.step || 1) : STEP_OF[PF.regs[0].status];
+    render();
+  }
+  let grpSel = null;
+  function openIdx(i){ curReg = PF.regs[i]; step = STEP_OF[curReg.status] || 1; render(); }
+  return {init, openReg(r){ const i = PF.regs.indexOf(r); if(i >= 0) openIdx(i); }, renderTable, refresh: render, get ready(){ return true; }};
+})();
+function renderWb(reg){ if(typeof WB !== 'undefined') WB.openReg(reg); }        // 구 호환 (CT 등에서 호출)
+function renderRegsTable(){ if(typeof WB !== 'undefined') WB.renderTable(); }
 
 /* ── 산식 평가기: PF.rules[i].expr(Σ Π term)를 변수값으로 계산. ③ 성과 총액 미리계산기와 ② 근거 추적 재계산이 공유 */
 const RuleEval = (() => {
@@ -2501,7 +2777,8 @@ const GR = (() => {
       if(el.id === 'grQ'){ fil.q = el.value; renderTable(); return; }
       if(el.dataset.var){ const v = Number(el.value); calcVal[el.dataset.var] = el.value === '' ? NaN : v; renderRes(); } });
   }
-  return {init, select: type => { const i = rules.findIndex(r => r.type === type); if(i >= 0) select(i); }, refresh(){ renderKpis(); renderTable(); renderDetail(); renderChart(); }};
+  const refresh = () => { renderKpis(); renderTable(); renderDetail(); renderChart(); };
+  return {init, select: type => { const i = rules.findIndex(r => r.type === type); if(i >= 0) select(i); }, refresh, refreshRegs: refresh};
 })();
 
 /* ③ 산출 근거 추적 */
@@ -2650,7 +2927,8 @@ const LN = (() => {
     });
     kpis(); render(0, 9);
   }
-  return {init, render, refresh: () => { kpis(); render(cur, sel); }};
+  function refreshRegs(){ $('ppLinSel').innerHTML = PF.regs.map((r,i)=>`<option value="${i}">${r.id} · ${r.name}</option>`).join(''); if(cur >= PF.regs.length) cur = 0; kpis(); render(cur, sel); }
+  return {init, render, refreshRegs, refresh: () => { kpis(); render(cur, sel); }};
 })();
 function renderLineage(idx){ LN.render(idx); }   // ④ 승인 큐 → 추적 바로가기 호환
 
@@ -3339,7 +3617,8 @@ const ErosionView = (() => {
 
   function init(){ load(0); renderCatFilters(); renderCatalog(); }
   function select(performanceResultId){ const i = ER.ctxs.findIndex(c => c.performanceResultId === performanceResultId); if(i >= 0) load(i); }
-  return {init, select, state:ER};
+  function refreshRegs(){ const keep = ER.ctx && ER.ctx.performanceResultId; ER.ctxs = ErosionContext.list(); const i = ER.ctxs.findIndex(c => c.performanceResultId === keep); load(i >= 0 ? i : 0); }
+  return {init, select, refreshRegs, state:ER};
 })();
 ErosionView.init();
 LN.init();   // ③ 산출 근거 추적 — ⑤ 점검 상태를 참조하므로 역효과 모듈 이후 초기화
@@ -3471,8 +3750,7 @@ const CT = (() => {
   function commit(r){
     const d = decision(r); apply(r, d); CtRepo.save(r.id, d);
     render();
-    if(typeof renderRegsTable === 'function') renderRegsTable();
-    const wb = document.getElementById('ppReg'); if(wb && wb.textContent.includes(r.id)) renderWb(r);
+    if(typeof WB !== 'undefined') WB.refresh();
     if(typeof LN !== 'undefined') LN.refresh();
   }
   const root = $('pp-contrib');
@@ -3516,11 +3794,13 @@ const CT = (() => {
     if(changed){ if(typeof renderRegsTable === 'function') renderRegsTable(); renderWb(PF.regs[0]); if(typeof LN !== 'undefined') LN.refresh(); }
     render();
   }
-  return {init, select(id){ const i = PF.regs.findIndex(r => r.id === id); if(i >= 0){ cur = i; render(); } }, refresh: render};
+  function refreshRegs(){ $('ctReg').innerHTML = PF.regs.map((r,i)=>`<option value="${i}">${esc(r.id)} · ${esc(r.name)}</option>`).join(''); PF.regs.forEach(r => { if(r.contribution && r.contribution.effective == null) apply(r, r.contribution); }); if(cur >= PF.regs.length) cur = 0; render(); }
+  return {init, refreshRegs, select(id){ const i = PF.regs.findIndex(r => r.id === id); if(i >= 0){ cur = i; render(); } }, refresh: render};
 })();
 
 CT.init();   // ⑤ 기여율 — 저장된 결정을 PF.regs에 반영한 뒤 ①·② 재렌더
 GR.init();   // ③ 성과 총액 — 산식 카탈로그·미리계산기
+WB.init();   // ① 워크벤치 — 모든 모듈 초기화 후 (초안·시연 등록 반영)
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */
 applyingRoute = false;
