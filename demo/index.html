@@ -657,6 +657,36 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 #p-mw table.mw-proj a.code:hover{text-decoration:underline}
 #p-mw .yoy.up{color:var(--good);font-weight:700} #p-mw .yoy.down{color:var(--bad);font-weight:700}
 #p-mw .pill.n{background:#eef1f5;color:var(--text-2)}
+/* ── 시뮬레이터 재구성: 입력 패널·시나리오 비교·개인 배정 ── */
+#p-sim .sim-form{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;margin-top:8px}
+#p-sim .sim-form label{font-size:12px;color:var(--text-2);display:flex;flex-direction:column;gap:4px}
+#p-sim .sim-form select,#p-sim .sim-form input{font:inherit;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);min-width:110px}
+#p-sim .sim-form input[type=number]{width:110px}
+#p-sim .sim-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+#p-sim .sim-actions input{width:150px}
+#p-sim .sim-kpi{cursor:pointer} #p-sim .sim-kpi:hover{border-color:var(--brand)}
+#p-sim .stat.ok{color:var(--good)} #p-sim .stat.bad{color:var(--bad)}
+#p-sim table.sim-tb,#p-sim table.sim-cmp{width:100%;border-collapse:collapse;font-size:12.5px}
+#p-sim table.sim-tb th,#p-sim table.sim-cmp th{font-size:11.5px;font-weight:700;color:var(--text-3);text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--surface)}
+#p-sim table.sim-tb td,#p-sim table.sim-cmp td{padding:7px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+#p-sim table .num{text-align:right;font-variant-numeric:tabular-nums}
+#p-sim table.sim-tb td.name{color:var(--brand);font-weight:700;cursor:pointer}
+#p-sim table.sim-tb tr.fit td.name::after{content:' ✓';color:var(--good);font-size:11px}
+#p-sim table.sim-tb tr.assigned{background:#f6f9fe}
+#p-sim table.sim-tb input.asg{width:76px;font:inherit;padding:4px 8px;border:1px solid var(--border);border-radius:6px;text-align:right}
+#p-sim .lbar{display:flex;align-items:center;gap:8px;min-width:150px}
+#p-sim .lbar .track{flex:1;height:8px;border-radius:99px;background:#eef2f7;overflow:hidden;position:relative}
+#p-sim .lbar .track i{display:block;height:100%;border-radius:99px;background:var(--brand)}
+#p-sim .lbar .track i.warn{background:#e0791e} #p-sim .lbar .track i.bad{background:var(--bad)}
+#p-sim .lbar .track b{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--text-2);opacity:.5}
+#p-sim .lbar .v{font-size:12px;font-weight:700;min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
+#p-sim .sim-sum{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:0 0 10px;font-size:12.5px}
+#p-sim .sim-sum .prog{flex:1;min-width:200px;height:10px;border-radius:99px;background:#eef2f7;overflow:hidden}
+#p-sim .sim-sum .prog i{display:block;height:100%;background:var(--good)} #p-sim .sim-sum .prog i.short{background:#e0791e}
+#p-sim .sim-cmp td.cur{font-weight:700;color:var(--brand)}
+#p-sim .sim-cmp button{font:inherit;font-size:11.5px;padding:2px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;margin-right:4px}
+#p-sim .sim-cmp button:hover{border-color:var(--brand);color:var(--brand)}
+#p-sim .sim-empty{font-size:12.5px;color:var(--text-3);padding:24px 8px;text-align:center;line-height:1.7}
 </style>
 </head>
 <body>
@@ -995,35 +1025,49 @@ footer{max-width:1480px;margin:0 auto;padding:0 20px 30px;font-size:11px;color:v
 
 <!-- ─────────────── 시뮬레이터 ─────────────── -->
 <section class="page" id="p-sim">
+  <!-- ① 입력 패널 -->
   <div class="card" style="margin-bottom:14px">
     <h3>신규 과제 투입 시뮬레이터</h3>
     <div class="sub" id="simSub"></div>
-    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end;margin-top:8px">
-      <label style="font-size:12px;color:var(--text-2)">대상 조직<br>
-        <select id="simOrg" style="font:inherit;padding:6px 10px;border:1px solid var(--border);border-radius:6px;margin-top:4px"></select></label>
-      <label style="font-size:12px;color:var(--text-2)">신규 과제 필요 MW/월<br>
-        <input id="simMw" type="number" value="20" min="1" max="500"
-          style="font:inherit;padding:6px 10px;border:1px solid var(--border);border-radius:6px;width:120px;margin-top:4px"></label>
-      <label style="font-size:12px;color:var(--text-2)">수행 기간(개월)<br>
-        <input id="simDur" type="number" value="12" min="1" max="36"
-          style="font:inherit;padding:6px 10px;border:1px solid var(--border);border-radius:6px;width:100px;margin-top:4px"></label>
+    <div class="sim-form" id="simForm">
+      <label>대상 조직<select id="simOrg"></select></label>
+      <label>과제 유형<select id="simType"><option value="1">전략 프로젝트</option><option value="3">현업·고객 문제해결</option><option value="4">탐색·혁신</option></select></label>
+      <label>필요 MW/월<input id="simMw" type="number" value="20" min="1" max="500" step="1"></label>
+      <label>시작월<select id="simStart"></select></label>
+      <label>수행 기간(개월)<input id="simDur" type="number" value="12" min="1" max="18" step="1"></label>
+      <span class="sim-actions">
+        <input id="simName" placeholder="시나리오 이름" maxlength="20">
+        <button type="button" class="er-fbtn" id="simSave">시나리오 저장</button>
+      </span>
     </div>
   </div>
-  <div class="row" style="grid-template-columns:repeat(4,1fr)" id="simKpis"></div>
-  <div class="row" style="grid-template-columns:6fr 6fr">
+
+  <!-- ② KPI -->
+  <div class="row" style="grid-template-columns:repeat(5,1fr)" id="simKpis"></div>
+
+  <!-- ③ 월별 부하 곡선 / 시나리오 비교 -->
+  <div class="row" style="grid-template-columns:7fr 5fr">
     <div class="card">
-      <h3>조직 부하율: 현재 → 신규 반영 후</h3>
-      <div class="sub">가용 = 인원 × <span class="simCap"></span> MW/월 · 적정 상한 90%</div>
-      <div class="chart" id="simLoad"></div>
+      <h3>월별 조직 부하율 <span class="legend-note" id="simLoadScope"></span></h3>
+      <div class="sub">실적 6개월 + 계획 18개월(a2 등록 과제 기준 · 계획 없는 월은 마지막 계획값 유지) + 신규 과제 · 상한 <span class="simLimit"></span>%</div>
+      <div class="chart tall" id="simLoad"></div>
       <div class="brief" id="simVerdict" style="margin-top:8px"></div>
     </div>
     <div class="card">
-      <h3>배정 후보 연구원 (여력 큰 순 15명)</h3>
-      <div class="sub">여력 = <span class="simCap"></span> − 최근 6개월 월평균 투입 MW</div>
-      <div class="scroll" style="max-height:340px"><table id="simTable">
-        <thead><tr><th>연구원</th><th>조직</th><th class="num">월평균 투입</th>
-        <th class="num">여력 MW/월</th><th>상태</th></tr></thead><tbody></tbody></table></div>
+      <h3>시나리오 비교 <span class="legend-note">— 최대 3개 저장 · 브라우저 보관</span></h3>
+      <div class="sub">저장한 시나리오의 부하·배정 결과를 나란히 비교 · 불러오기로 입력·배정 복원</div>
+      <div id="simCompare"></div>
     </div>
+  </div>
+
+  <!-- ④ 개인 배정 -->
+  <div class="card">
+    <h3>배정 시뮬레이션 <span class="legend-note" id="simAssignScope">— 활동 인원만 (최근 12개월 기록) · 유형 일치 · 여력 순</span></h3>
+    <div class="sub">여력 = 인당 상한 <span class="simCapM"></span> MW/월 − 과제 기간 중 계획 투입 평균 · 배정 MW를 입력하면 개인 부하율(기간 평균)과 합계를 즉시 계산 · 이름 클릭 → My Dashboard</div>
+    <div id="simAssignSum" class="sim-sum"></div>
+    <div class="scroll" style="max-height:420px"><table id="simTable" class="sim-tb">
+      <thead><tr><th>연구원</th><th>주력 활동군</th><th class="num">6개월 평균</th><th class="num">3개월 추세</th><th class="num">진행 과제</th><th class="num">기간 계획 평균</th><th class="num">여력</th><th class="num">배정 MW/월</th><th>배정 후 부하</th></tr></thead>
+      <tbody></tbody></table></div>
   </div>
 </section>
 
@@ -2246,63 +2290,161 @@ document.querySelector('#prTable tbody').innerHTML = PRD.list.map(r=>
    <td>${r.status==='완료'?'<span class="pill g">완료</span>':'<span class="pill y">'+r.status+'</span>'}</td></tr>`).join('');
 
 /* ══════════ 시뮬레이터 탭 ══════════ */
+/* ── 투입 시뮬레이터 — 활동 인원 기준 가용, a2 계획 월 값 = 확정 투입, 월별 부하 곡선, 개인 배정, 시나리오 비교 ── */
 const SIM = D.sim;
-document.querySelectorAll('#p-sim .simCap').forEach(el => el.textContent = SIM.capPerPerson);
-document.getElementById('simSub').textContent =
-  `최근 6개월(${SIM.window[0]} ~ ${SIM.window[1]}) 실적 기반 · 가용 기준 ${SIM.capPerPerson} MW/월·인 · 설계서 5.1 ④`;
-const simOrgSel = document.getElementById('simOrg');
-simOrgSel.innerHTML = SIM.orgs.map(o=>`<option>${o.org}</option>`).join('');
-let simLoadChart = null;
-function runSim(){
-  const orgName = simOrgSel.value;
-  const o = SIM.orgs.find(x=>x.org===orgName);
-  const need = Math.max(1, +document.getElementById('simMw').value || 0);
-  const dur = Math.max(1, +document.getElementById('simDur').value || 0);
-  const loadNow = 100*o.avgMonthly/o.cap;
-  const loadAfter = 100*(o.avgMonthly+need)/o.cap;
-  const slack = o.cap - o.avgMonthly;
-  document.getElementById('simKpis').innerHTML =
-    kpiCard('조직 인원', o.people+' <small>명</small>', orgName)+
-    kpiCard('가용 MW/월', nf(o.cap)+' <small>MW</small>','인원 × '+SIM.capPerPerson)+
-    kpiCard('현재 투입 MW/월', nf(o.avgMonthly)+' <small>MW</small>','최근 6개월 평균')+
-    kpiCard('잔여 여력', nf(Math.round(slack*10)/10)+' <small>MW/월</small>',
-      slack>=need?'✓ 신규 수용 가능':'⚠ 여력 부족');
-  const opt = {
-    tooltip:tip({trigger:'axis',axisPointer:{type:'shadow'},
-      formatter:ps=>ps[0].name+'<br>'+ps.map(p=>`${p.marker}${p.seriesName} <b>${nf(Math.round(p.value*10)/10)}</b>%`).join('<br>')}),
-    legend:{top:0,right:0,itemWidth:12,itemHeight:8,textStyle:{fontSize:11,color:INK2}},
-    grid:{left:44,right:20,top:28,bottom:24},
-    xAxis:axisX({type:'category',data:['현재','신규 반영 후']}),
-    yAxis:axisY({type:'value',max:Math.max(120,Math.ceil(loadAfter/10)*10),axisLabel:{formatter:'{value}%'}}),
-    series:[
-      {name:'부하율',type:'bar',barMaxWidth:70,
-        itemStyle:{borderRadius:[4,4,0,0]},
-        label:{show:true,position:'top',fontWeight:700,color:INK1,
-          formatter:p=>Math.round(p.value)+'%'},
-        data:[{value:loadNow,itemStyle:{color:C[1]}},
-              {value:loadAfter,itemStyle:{color:loadAfter>90?'#c53030':C[1]}}]},
-      {name:'적정 상한 90%',type:'line',symbol:'none',
-        lineStyle:{color:'#b7791f',width:1.5,type:'dashed'},
-        markLine:{silent:true,symbol:'none',label:{show:false},
-          lineStyle:{color:'#b7791f',type:'dashed'},data:[{yAxis:90}]},
-        data:[90,90]},
-    ]};
-  if(!simLoadChart) simLoadChart = mk('simLoad', opt); else simLoadChart.setOption(opt);
-  const totalNeed = need*dur;
-  document.getElementById('simVerdict').innerHTML = slack>=need
-    ? `<b>수용 가능</b> — ${orgName}의 잔여 여력은 월 ${nf(Math.round(slack))} MW로, 신규 과제(월 ${need} MW × ${dur}개월 = 총 ${nf(totalNeed)} MW)를 반영해도 부하율 ${Math.round(loadAfter)}%로 ${loadAfter>90?'적정 상한(90%)을 초과하니 일부 인력 재배치를 권장합니다':'적정 범위입니다'}.`
-    : `<b>여력 부족</b> — 월 ${need} MW가 필요하나 잔여 여력은 ${nf(Math.round(slack))} MW입니다. 부하율이 ${Math.round(loadAfter)}%가 되므로 타 조직 협업 또는 기존 과제 조정이 필요합니다.`;
-  const cands = SIM.people.filter(p=>p.o===orgName)
-    .map(p=>({...p, slack: Math.max(0, SIM.capPerPerson - p.a)}))
-    .sort((a,b)=>b.slack-a.slack).slice(0,15);
-  document.querySelector('#simTable tbody').innerHTML = cands.map(p=>
-    `<tr><td>${p.n}</td><td>${p.o}</td><td class="num">${p.a.toFixed(1)}</td>
-     <td class="num"><b>${p.slack.toFixed(1)}</b></td>
-     <td>${p.a<1?'<span class="pill g">여유</span>':p.a<3.5?'<span class="pill g">배정 가능</span>':'<span class="pill y">포화 근접</span>'}</td></tr>`).join('');
-}
-['simOrg','simMw','simDur'].forEach(id=>
-  document.getElementById(id).addEventListener('input', runSim));
-runSim();
+const SIMV = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const CAPM = SIM.capPerPerson, LIMIT = SIM.loadLimit, K_SCEN = 'pride.sim.v1', H_EXTRA = 6;
+  const ymAdd = (ym, k) => { let y = +ym.slice(0,4), m = +ym.slice(5,7) + k; while(m > 12){ m -= 12; y++; } while(m <= 0){ m += 12; y--; } return `${y}-${String(m).padStart(2,'0')}`; };
+  const HORIZON = SIM.planYms.concat(Array.from({length:H_EXTRA}, (_, i) => ymAdd(SIM.planYms[SIM.planYms.length-1], i+1)));
+  const planAt = (arr, i) => arr[Math.min(i, arr.length - 1)] || 0;   // 계획 없는 월은 마지막 계획값 유지
+  let st = { org: SIM.orgs[0].org, type: 1, need: 20, start: 0, dur: 12, assign: {} };
+  let chart = null;
+  const orgOf = () => SIM.orgs.find(o => o.org === st.org) || SIM.orgs[0];
+  const r1 = v => Math.round(v * 10) / 10;
+
+  /* ── 모델: 월별 부하율(조직) ── */
+  function orgSeries(o){
+    const plan = HORIZON.map((_, i) => planAt(o.plan, i));
+    const add = HORIZON.map((_, i) => (i >= st.start && i < st.start + st.dur) ? st.need : 0);
+    const load = plan.map((v, i) => o.cap ? 100 * (v + add[i]) / o.cap : 0);
+    const win = load.slice(st.start, st.start + st.dur);
+    const peak = Math.max(...win), peakI = st.start + win.indexOf(peak);
+    let earliest = null;
+    for(let s = 0; s + st.dur <= HORIZON.length; s++){
+      const mx = Math.max(...plan.slice(s, s + st.dur).map(v => o.cap ? 100 * (v + st.need) / o.cap : 999));
+      if(mx <= LIMIT){ earliest = s; break; }
+    }
+    return { plan, add, load, peak, peakI, feasible: peak <= LIMIT, earliest };
+  }
+  function candidates(o){
+    const wPlan = p => { let s = 0; for(let i = st.start; i < st.start + st.dur; i++) s += planAt(p.plan, i); return s / st.dur; };
+    return SIM.people.filter(p => p.o === o.org).map(p => { const wp = wPlan(p); return { ...p, wp, slack: Math.max(0, CAPM - wp), fit: p.act === st.type }; })
+      .sort((a, b) => (b.fit - a.fit) || (b.slack - a.slack) || (b.a - a.a));   // 유형 일치 → 여력 → 최근 실적(가동 중인 인원 우선)
+  }
+  const assignedSum = () => Object.values(st.assign).reduce((s, v) => s + (+v || 0), 0);
+
+  /* ── 렌더 ── */
+  function renderKpis(o, m){
+    const cards = [
+      ['활동 인원', `${o.active} <small>명</small>`, `전체 ${o.people}명 중 최근 12개월 기록 · 클릭 → MW 분석`, () => { go('mw'); if(typeof MWV !== 'undefined' && MWV.org !== o.org) MWV.setOrg(o.org); }, ''],
+      ['가용 MW/월', `${nf(o.cap)} <small>MW</small>`, `활동 인원 × ${CAPM} MW`, null, ''],
+      ['현재 투입', `${nf(o.avgMonthly)} <small>MW/월</small>`, `최근 6개월 평균 · 부하율 ${Math.round(100 * o.avgMonthly / Math.max(1, o.cap))}%`, null, ''],
+      ['기간 중 최대 부하', `${Math.round(m.peak)}<small>%</small>`, `${HORIZON[m.peakI]} · 계획 + 신규 ${st.need} MW`, null, m.feasible ? 'ok' : 'bad'],
+      [m.feasible ? '판정: 수용 가능' : '판정: 상한 초과', m.feasible ? `${HORIZON[st.start]} <small>시작</small>` : (m.earliest != null ? `${HORIZON[m.earliest]} <small>부터 가능</small>` : '18개월 내 불가'), m.feasible ? `상한 ${LIMIT}% 이내로 ${st.dur}개월 수행` : (m.earliest != null ? `${HORIZON[st.start]} 시작 시 최대 ${Math.round(m.peak)}%` : '필요 MW 축소 또는 타 조직 협업 필요'), null, m.feasible ? 'ok' : 'bad'],
+    ];
+    $('simKpis').innerHTML = cards.map(([t, v, s, fn, cls], i) => `<div class="card${fn ? ' sim-kpi' : ''}" ${fn ? `data-i="${i}" role="button" tabindex="0"` : ''}><div class="sub" style="margin:0 0 2px">${t}</div><div class="stat ${cls}">${v}</div><div class="legend-note">${s}</div></div>`).join('');
+    $('simKpis').onclick = e => { const c = e.target.closest('.sim-kpi'); if(c) cards[+c.dataset.i][3](); };
+  }
+
+  function renderChart(o, m){
+    const x = SIM.recentYms.concat(HORIZON), nR = SIM.recentYms.length;
+    const actual = o.recent.concat(HORIZON.map(() => null));
+    const plan = SIM.recentYms.map(() => null).concat(m.plan);
+    const add = SIM.recentYms.map(() => null).concat(m.add.map(v => v || null));
+    const load = o.recent.map(v => o.cap ? 100 * v / o.cap : 0).concat(m.load);
+    $('simLoadScope').textContent = `— ${o.org} · ${ACT[st.type]} ${st.need} MW/월 × ${st.dur}개월 (${HORIZON[st.start]} ~ ${HORIZON[Math.min(HORIZON.length-1, st.start + st.dur - 1)]})`;
+    const opt = {
+      tooltip: tip({trigger:'axis', axisPointer:{type:'shadow'}, formatter: ps => `${ps[0].axisValue}${ps[0].dataIndex < nR ? ' (실적)' : ' (계획)'}<br>` + ps.filter(p => p.value != null).map(p => `${p.marker}${p.seriesName} <b>${nf(Math.round(p.value * 10) / 10)}</b>${p.seriesName === '부하율' ? '%' : ' MW'}`).join('<br>')}),
+      legend:{top:0, left:'center', itemWidth:12, itemHeight:8, textStyle:{fontSize:11, color:INK2}},
+      grid:{left:52, right:52, top:32, bottom:28},
+      xAxis: axisX({type:'category', data:x, axisLabel:{fontSize:10, color:INK3, interval:1, formatter:v => v.slice(2).replace('-', '.')}}),
+      yAxis: [axisY({type:'value', name:'MW', nameTextStyle:{color:INK3}}), axisY({type:'value', name:'부하율', max: Math.max(120, Math.ceil(Math.max(...load) / 10) * 10), axisLabel:{formatter:'{value}%'}, splitLine:{show:false}, nameTextStyle:{color:INK3}})],
+      series: [
+        {name:'실적', type:'bar', stack:'m', barMaxWidth:16, data:actual, itemStyle:{color:'#9aa6b8'}},
+        {name:'확정 계획', type:'bar', stack:'m', barMaxWidth:16, data:plan, itemStyle:{color:C[1], opacity:.75}},
+        {name:'신규 과제', type:'bar', stack:'m', barMaxWidth:16, data:add, itemStyle:{color:C[3], borderRadius:[3,3,0,0]}},
+        {name:'부하율', type:'line', yAxisIndex:1, data:load.map(v => Math.round(v * 10) / 10), smooth:.2, symbol:'circle', symbolSize:4, lineStyle:{width:2, color:INK1}, itemStyle:{color:INK1}, z:5,
+          markLine:{silent:true, symbol:'none', data:[{yAxis:LIMIT, lineStyle:{color:'#b7791f', type:'dashed'}, label:{formatter:`상한 ${LIMIT}%`, fontSize:10, color:'#b7791f', position:'insideEndTop'}}]},
+          markPoint:{data:[{coord:[nR + m.peakI, Math.round(m.peak)], value:Math.round(m.peak) + '%', itemStyle:{color: m.feasible ? C[1] : '#c53030'}, label:{fontSize:10, color:'#fff'}}], symbolSize:38}},
+      ],
+    };
+    chart = chart ? (chart.setOption(opt, {replaceMerge:['series', 'yAxis']}), chart) : mk('simLoad', opt);
+    const total = st.need * st.dur, over = m.load.map((v, i) => [v, i]).filter(([v, i]) => i >= st.start && i < st.start + st.dur && v > LIMIT);
+    $('simVerdict').innerHTML = m.feasible
+      ? `<b>수용 가능</b> — ${esc(o.org)}는 ${HORIZON[st.start]}부터 ${st.dur}개월간 월 ${st.need} MW(총 ${nf(total)} MW)를 더해도 최대 부하율 ${Math.round(m.peak)}%(${HORIZON[m.peakI]})로 상한 ${LIMIT}% 이내입니다. 계획은 등록된 과제 기준이므로 추가 수주 시 재계산하세요.`
+      : `<b>상한 초과</b> — ${HORIZON[st.start]} 시작 시 ${over.length}개월이 상한을 넘고 최대 ${Math.round(m.peak)}%(${HORIZON[m.peakI]})입니다. ` + (m.earliest != null ? `<b>${HORIZON[m.earliest]}</b> 시작이면 기간 내내 ${LIMIT}% 이내입니다.` : `18개월 내 가능한 시작월이 없습니다 — 필요 MW를 ${Math.max(1, Math.floor(o.cap * LIMIT / 100 - Math.max(...m.plan.slice(st.start, st.start + st.dur))))} MW 이하로 줄이거나 타 조직 협업이 필요합니다.`);
+  }
+
+  function renderAssign(o){
+    const rows = candidates(o).slice(0, 25), sum = assignedSum();
+    const over = rows.filter(p => (+st.assign[p.n] || 0) > 0 && 100 * (p.wp + (+st.assign[p.n] || 0)) / CAPM > 100).length;
+    const fit = rows.filter(p => p.fit).length;
+    $('simAssignScope').textContent = `— ${o.org} 활동 인원 ${o.active}명 중 ${ACT[st.type]} 주력 ${fit}명 우선 · 여력 순 상위 ${rows.length}명`;
+    $('simAssignSum').innerHTML = `<span>배정 합계 <b>${nf(r1(sum))}</b> / 필요 ${st.need} MW/월</span><div class="prog"><i class="${sum < st.need ? 'short' : ''}" style="width:${Math.min(100, 100 * sum / Math.max(1, st.need)).toFixed(1)}%"></i></div>` +
+      `<span>${sum >= st.need ? '<span class="pill g">배정 완료</span>' : `<span class="pill y">부족 ${nf(r1(st.need - sum))} MW</span>`}</span><span>${over ? `<span class="pill r">과부하 ${over}명</span>` : '<span class="pill g">과부하 0명</span>'}</span><span style="color:var(--text-3)">배정 인원 ${Object.values(st.assign).filter(v => +v > 0).length}명</span>`;
+    document.querySelector('#simTable tbody').innerHTML = rows.map(p => {
+      const a = +st.assign[p.n] || 0, after = 100 * (p.wp + a) / CAPM, tr = p.a3 - p.a;
+      const cls = after > 100 ? 'bad' : after > LIMIT ? 'warn' : '';
+      return `<tr data-n="${esc(p.n)}" class="${p.fit ? 'fit' : ''}${a > 0 ? ' assigned' : ''}">
+        <td class="name" title="My Dashboard로 이동">${esc(p.n)}</td><td><span class="pill" style="background:${C[p.act]}1a;color:${C[p.act]}">${ACT[p.act]}</span></td>
+        <td class="num">${p.a.toFixed(1)}</td><td class="num" style="color:${tr > 0.3 ? 'var(--bad)' : tr < -0.3 ? 'var(--good)' : 'var(--text-2)'}">${tr >= 0 ? '▲' : '▼'} ${Math.abs(tr).toFixed(1)}</td>
+        <td class="num">${p.run}</td><td class="num">${p.wp.toFixed(1)}</td><td class="num"><b>${p.slack.toFixed(1)}</b></td>
+        <td class="num"><input class="asg" type="number" min="0" max="${CAPM * 1.5}" step="0.5" value="${a || ''}" placeholder="0" data-n="${esc(p.n)}"></td>
+        <td><div class="lbar"><div class="track"><i class="${cls}" style="width:${Math.min(100, after / 1.2).toFixed(1)}%"></i><b style="left:${(LIMIT / 1.2).toFixed(1)}%"></b></div><span class="v">${Math.round(after)}%</span></div>${a > 0 ? (after > 100 ? ' <span class="pill r">과부하</span>' : after > LIMIT ? ' <span class="pill y">상한 초과</span>' : ' <span class="pill g">적정</span>') : ''}</td></tr>`;
+    }).join('') || '<tr><td colspan="9" class="sim-empty">활동 인원이 없습니다</td></tr>';
+  }
+
+  /* ── 시나리오 ── */
+  const loadScen = () => { try { return JSON.parse(localStorage.getItem(K_SCEN) || '[]'); } catch(e){ return []; } };
+  const saveScen = l => { try { localStorage.setItem(K_SCEN, JSON.stringify(l)); } catch(e){} };
+  function evalScen(s){
+    const saved = st; st = { ...s, assign: s.assign || {} };
+    const o = orgOf(), m = orgSeries(o), sum = assignedSum();
+    const over = candidates(o).filter(p => (+st.assign[p.n] || 0) > 0 && 100 * (p.wp + (+st.assign[p.n] || 0)) / CAPM > 100).length;
+    st = saved;
+    return { peak: Math.round(m.peak), feasible: m.feasible, earliest: m.earliest != null ? HORIZON[m.earliest] : '−', sum: r1(sum), over };
+  }
+  function renderCompare(){
+    const list = loadScen();
+    if(!list.length){ $('simCompare').innerHTML = '<div class="sim-empty">저장된 시나리오가 없습니다.<br>입력·배정을 마친 뒤 이름을 붙여 저장하면 여기서 나란히 비교합니다.</div>'; return; }
+    const cur = { name:'현재 입력', ...st };
+    const rows = [cur].concat(list).map((s, i) => { const r = evalScen(s); return `<tr class="${i === 0 ? 'cur' : ''}"><td class="${i === 0 ? 'cur' : ''}">${esc(s.name)}</td><td>${esc(s.org)}</td><td>${ACT[s.type]}</td><td class="num">${s.need}</td><td>${HORIZON[s.start]} · ${s.dur}개월</td><td class="num" style="color:${r.feasible ? 'var(--good)' : 'var(--bad)'};font-weight:700">${r.peak}%</td><td>${r.feasible ? '<span class="pill g">가능</span>' : `<span class="pill r">초과</span> <small style="color:var(--text-3)">${r.earliest}~</small>`}</td><td class="num">${r.sum}/${s.need}</td><td class="num">${r.over ? `<span class="pill r">${r.over}</span>` : '0'}</td><td>${i === 0 ? '' : `<button data-act="load" data-i="${i - 1}">불러오기</button><button data-act="del" data-i="${i - 1}">삭제</button>`}</td></tr>`; });
+    $('simCompare').innerHTML = `<div class="scroll" style="max-height:330px"><table class="sim-cmp"><thead><tr><th>시나리오</th><th>조직</th><th>유형</th><th class="num">MW/월</th><th>시작 · 기간</th><th class="num">최대 부하</th><th>판정</th><th class="num">배정/필요</th><th class="num">과부하</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+  }
+
+  /* ── 진입·이벤트 ── */
+  function syncForm(){
+    $('simOrg').value = st.org; $('simType').value = String(st.type); $('simMw').value = st.need; $('simStart').value = String(st.start); $('simDur').value = st.dur;
+  }
+  function run(){
+    const o = orgOf(), m = orgSeries(o);
+    renderKpis(o, m); renderChart(o, m); renderAssign(o); renderCompare();
+  }
+  function readForm(){
+    const org = $('simOrg').value; if(org !== st.org){ st.assign = {}; }
+    st.org = org; st.type = +$('simType').value || 1;
+    st.need = Math.max(1, +$('simMw').value || 1); st.start = +$('simStart').value || 0;
+    st.dur = Math.min(HORIZON.length, Math.max(1, +$('simDur').value || 1)); if($('simDur').value != st.dur) $('simDur').value = st.dur;
+    if(st.start + st.dur > HORIZON.length){ st.start = HORIZON.length - st.dur; $('simStart').value = String(st.start); }
+    run();
+  }
+  function init(){
+    document.querySelectorAll('#p-sim .simCapM').forEach(el => el.textContent = CAPM);
+    document.querySelectorAll('#p-sim .simLimit').forEach(el => el.textContent = LIMIT);
+    $('simSub').textContent = `실적 창 ${SIM.window[0]} ~ ${SIM.window[1]} · 계획 ${SIM.planYms[0]} ~ ${HORIZON[HORIZON.length-1]} (a2 등록 과제) · 가용 = 활동 인원 × ${CAPM} MW/월 (연 ${SIM.capYear} MW) · 적정 상한 ${LIMIT}% · 설계서 5.1 ④`;
+    $('simOrg').innerHTML = SIM.orgs.map(o => `<option value="${esc(o.org)}">${esc(o.org)} (활동 ${o.active}명)</option>`).join('');
+    $('simStart').innerHTML = HORIZON.map((ym, i) => `<option value="${i}">${ym}</option>`).join('');
+    syncForm();
+    ['simOrg', 'simType', 'simMw', 'simStart', 'simDur'].forEach(id => $(id).addEventListener('input', readForm));
+    document.querySelector('#simTable tbody').addEventListener('input', e => { const inp = e.target.closest('input.asg'); if(!inp) return; const v = Math.max(0, +inp.value || 0); if(v > 0) st.assign[inp.dataset.n] = v; else delete st.assign[inp.dataset.n]; const o = orgOf(); renderAssign(o); renderCompare(); inp.closest('tr').querySelector('input.asg').focus(); });
+    document.querySelector('#simTable tbody').addEventListener('click', e => { const td = e.target.closest('td.name'); if(td && typeof MY !== 'undefined'){ MY.select(td.closest('tr').dataset.n); go('my'); } });
+    $('simSave').addEventListener('click', () => {
+      const list = loadScen(); const name = ($('simName').value || '').trim() || `시나리오 ${list.length + 1}`;
+      const rec = { name, org: st.org, type: st.type, need: st.need, start: st.start, dur: st.dur, assign: { ...st.assign }, savedAt: new Date().toISOString().slice(0, 10) };
+      const i = list.findIndex(s => s.name === name); if(i >= 0) list[i] = rec; else { if(list.length >= 3){ alert('시나리오는 3개까지 저장됩니다. 하나를 삭제한 뒤 저장해 주세요.'); return; } list.push(rec); }
+      saveScen(list); $('simName').value = ''; renderCompare();
+    });
+    $('simCompare').addEventListener('click', e => {
+      const b = e.target.closest('button[data-act]'); if(!b) return; const list = loadScen(), s = list[+b.dataset.i]; if(!s) return;
+      if(b.dataset.act === 'del'){ list.splice(+b.dataset.i, 1); saveScen(list); renderCompare(); return; }
+      st = { org: s.org, type: s.type, need: s.need, start: s.start, dur: s.dur, assign: { ...(s.assign || {}) } }; syncForm(); run();
+    });
+    run();
+  }
+  return { init, get state(){ return st; } };
+})();
 
 /* ══════════════════ My Dashboard — Researcher's Guild ══════════════════
    설계 원칙
@@ -4468,6 +4610,7 @@ CTO.init();   // Executive(연구원장) — 구조 관점
 INST.init();  // Executive(연구소장) — 조직 실행 관점
 MY.init();    // My Dashboard — 성과 플랫폼 원장(등록·후보) 연결 후 렌더
 MWV.init();   // MW 분석 — 계획 분리·조직 필터·연구원 표 (행 클릭 → MY.select)
+SIMV.init();  // 투입 시뮬레이터 — 활동 인원·계획값·개인 배정 (MY.select, MWV.setOrg 연동)
 HM.init();    // 홈 종합현황 — 모든 모듈 초기화 후 (등록 원장·역효과·승인 상태 참조)
 
 /* ══════════ 초기 라우트 적용 (딥링크 복원) ══════════ */

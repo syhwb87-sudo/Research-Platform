@@ -96,6 +96,7 @@ mw_org_ym_plan = defaultdict(lambda: defaultdict(float))   # org -> ym(>기준�
 proj_people = defaultdict(set)                             # 과제코드 -> 연구원 집합 (실적)
 proj_org = defaultdict(lambda: defaultdict(float))         # 과제코드 -> org -> 실적 mw
 proj_person_mw = defaultdict(lambda: defaultdict(float))   # 과제코드 -> 연구원 -> 실적 mw
+person_plan_ym = defaultdict(lambda: defaultdict(float))    # 연구원 -> ym(>기준월) -> 계획 mw
 mw_org_ym = defaultdict(lambda: defaultdict(float))        # org -> ym -> mw
 person = {}                                                # name -> dict
 person_projects = defaultdict(set)
@@ -130,6 +131,7 @@ for r in a2:
         if ym > ASOF_YM:                      # 계획 월: 실적 집계에서 분리
             mw_monthly_plan[ym][act] += v
             mw_org_ym_plan[org][ym] += v
+            person_plan_ym[name][ym] += v
             continue
         mw_monthly_act[ym][act] += v
         mw_org_ym[org][ym] += v
@@ -636,21 +638,38 @@ promo_detail = {
               "status": r.get("진행상태", "")} for r in a6],
 }
 
-# 투입 시뮬레이터: 최근 6개월(기준일 이전) 월평균 부하
+# 투입 시뮬레이터: 활동 인원(최근 12개월 기록) 기준 가용, a2 계획 월 값 = 확정 투입, 개인 배정
 SIM_WINDOW = yms[-6:]
+SIM_PLAN_YMS = sorted(mw_monthly_plan)[:12]
+a3_running = {r["과제코드"] for r in a3 if "진행" in r.get("진행상태", "")}
+active_names = {pt["name"] for pt in people_table if pt["active"]}
 sim_orgs = []
 for o in orgs_sorted:
-    avg_m = sum(mw_org_ym[o].get(ym, 0) for ym in SIM_WINDOW) / len(SIM_WINDOW)
     ppl = {p["name"] for p in person.values() if p["org"] == o}
     if not ppl:
         continue
-    sim_orgs.append({"org": o, "people": len(ppl), "avgMonthly": round(avg_m, 1),
-                     "cap": round(len(ppl) * CAP_MW_MONTH, 1)})
+    act_ppl = ppl & active_names
+    avg_m = sum(mw_org_ym[o].get(ym, 0) for ym in SIM_WINDOW) / len(SIM_WINDOW)
+    sim_orgs.append({"org": o, "people": len(ppl), "active": len(act_ppl),
+                     "avgMonthly": round(avg_m, 1),
+                     "cap": round(len(act_ppl) * CAP_MW_MONTH, 1),
+                     "recent": [round(mw_org_ym[o].get(ym, 0), 1) for ym in SIM_WINDOW],
+                     "plan": [round(mw_org_ym_plan[o].get(ym, 0), 1) for ym in SIM_PLAN_YMS]})
 sim_people = []
 for name, p in person.items():
+    if name not in active_names:
+        continue
     avg6 = sum(person_ym[name].get(ym, 0) for ym in SIM_WINDOW) / len(SIM_WINDOW)
-    sim_people.append({"n": name, "o": p["org"], "a": round(avg6, 2)})
-sim = {"window": [SIM_WINDOW[0], SIM_WINDOW[-1]], "capPerPerson": CAP_MW_MONTH, "capYear": CAP_MW_YEAR,
+    avg3 = sum(person_ym[name].get(ym, 0) for ym in SIM_WINDOW[-3:]) / 3
+    main_act = max(p["acts"].items(), key=lambda x: x[1])[0] if p["acts"] else 1
+    sim_people.append({"n": name, "o": p["org"], "a": round(avg6, 2), "a3": round(avg3, 2),
+                       "act": main_act,
+                       "run": sum(1 for c in person_projects[name] if c in a3_running),
+                       "last": max(person_ym[name]),
+                       "plan": [round(person_plan_ym[name].get(ym, 0), 2) for ym in SIM_PLAN_YMS]})
+sim = {"window": [SIM_WINDOW[0], SIM_WINDOW[-1]], "asOfYm": ASOF_YM,
+       "capPerPerson": CAP_MW_MONTH, "capYear": CAP_MW_YEAR, "loadLimit": 90,
+       "recentYms": SIM_WINDOW, "planYms": SIM_PLAN_YMS,
        "orgs": sim_orgs, "people": sim_people}
 
 detail = {"strategy": strategy_detail, "explore": explore_detail,
